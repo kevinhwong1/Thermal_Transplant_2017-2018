@@ -31,98 +31,9 @@ library('plyr')
 library('dplyr')
 library(stringr)
 
-##PI CURVE FITTING
-
-#PI.curve.data<-read.csv('~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Data/Transp.PI.Curve.csv', header=T, sep = ",")
-install.packages('phytotools')
-library('phytotools')
-
-PAR <- c(0,
-         33.6,
-         59.2,
-         106,
-         152.2,
-         287.4,
-         473.6,
-         602,
-         803.6) #umol photons m-2 s-1
-P.11.A <- c(-12.94590436,
-        -9.045692,
-        -7.924455866,
-        -3.728947449,
-        -0.962667146,
-        1.035645869,
-        3.503857592,
-        4.019513747,
-        2.576833866) #e.g., µmol O2 cm-2 sec-1
-
-P.15.A <- c(-6.955172896,
-            -3.762284871,
-            -1.353798824,
-            1.001380557,
-            3.031387527,
-            4.771539855,
-            6.626304225,
-            6.674334259,
-            4.662077298) #e.g., µmol O2 cm-2 sec-1
-
-R.4.A <- c(-7.053264844,
-            -3.945091701,
-            -1.18259728,
-            1.941012164,
-            4.303536245,
-            7.137453234,
-            9.688390597,
-            9.276687659,
-            10.89734604) #e.g., µmol O2 cm-2 sec-1
-R.7.B <- c(-1.838393379,
-           -2.703094952,
-           -2.333213889,
-           1.748332539,
-           4.312864619,
-           6.72017876,
-           9.153658177,
-           9.015297733) #e.g., µmol O2 cm-2 sec-1
-
-#Model J.M. Heberling (2013) https://sites.google.com/site/fridleylab/home/protocols/sampleCode_lrc.R?attredirects=0
-#https://academic.oup.com/aobpla/article/9/2/plx011/3074888#supplementary-data
-curve.P.11.A = nls(P.11.A ~ (1/(2*theta))*(AQY*PAR+Am-sqrt((AQY*PAR+Am)^2-4*AQY*theta*Am*PAR))-Rd,start=list(Am=(max(P.11.A)-min(P.11.A)),AQY=0.05,Rd=-min(P.11.A),theta=1)) 
-
-my.fit <- summary(curve.P.11.A) #summary of model fit
-curve.fitting <- curve((1/(2*summary(curve.P.11.A)$coef[4,1]))*(summary(curve.P.11.A)$coef[2,1]*x+summary(curve.P.11.A)$coef[1,1]-sqrt((summary(curve.P.11.A)$coef[2,1]*x+summary(curve.P.11.A)$coef[1,1])^2-4*summary(curve.P.11.A)$coef[2,1]*summary(curve.P.11.A)$coef[4,1]*summary(curve.P.11.A)$coef[1,1]*x))-summary(curve.P.11.A)$coef[3,1],lwd=2,col="blue",add=T)
-
-#Amax (max gross photosytnthetic rate) 
-Pmax.gross <- my.fit$parameters[1]
-
-#AQY (apparent quantum yield) alpha  
-AQY <- my.fit$parameters[2]
-
-#Rd (dark respiration)
-Rd <- my.fit$parameters[3]
-
-Ik <- Pmax.gross/AQY
-
-Ic <- Rd/AQY
-
-Pmax.net <- Pmax.gross - Rd
-
-PI.Output <- rbind(Pmax.gross, Pmax.net, -Rd, AQY,Ik,Ic)
-row.names(PI.Output) <- c("Pg.max","Pn.max","Rdark","alpha", "Ik", "Ic")
-PI.Output
-
-#Plot input data and model fit
-par(mar=c(3,3,0,0),oma=c(1.5,1.5,1,1))
-plot(PAR,P.11.A,xlab="", ylab="", ylim=c(-15,max(P.11.A)+2),cex.lab=0.8,cex.axis=0.8,cex=1)
-mtext(expression("Irradiance ("*mu*"mol photons "*m^-2*s^-1*")"),side=1,line=3.3,cex=1)
-mtext(expression(Rate*" ("*mu*"mol "*O[2]*" "*cm^-2*s^-1*")"),side=2,line=2,cex=1)
-lines(curve.fitting ,lwd=2,col="blue")
-
-
-
-
 ##### PHOTOSYNTHESIS POST-TRANSPLANT (2018) #####
 
-path.p<-"~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Data/OR_RESP/" #the location of all your respirometry files 
+path.p<-"data/2018/Colony_Respirometry/OR_RESP/" #the location of all your respirometry files 
 
 # bring in the respiration files
 file.names<-basename(list.files(path = path.p, pattern = "csv$", recursive = TRUE)) #list all csv file names in the folder and subfolders
@@ -161,7 +72,7 @@ for(i in 1:length(file.names)) { # for every file in list start at the first and
     
     #Save plot prior to and after data thinning to make sure thinning is not too extreme
     rename <- sub("_.*", "", file.names[i])
-    pdf(paste0("~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Output/Photo_Resp_Output/",rename,"_",j,"thinning.pdf"))
+    pdf(paste0("output/Photo_Resp_Output/",rename,"_",j,"thinning.pdf"))
     par(omi=rep(0.3, 4)) #set size of the outer margins in inches
     par(mfrow=c(1,2)) #set number of rows and columns in multi plot graphic
     plot(Value ~ sec, data=Photo.Data , xlab='Time (seconds)', ylab=substitute(' O'[2]~' (µmol/L)'), type='n', axes=FALSE) #plot data as a function of time
@@ -190,7 +101,7 @@ for(i in 1:length(file.names)) { # for every file in list start at the first and
     ##Olito et al. 2017: It is running a bootstrapping technique and calculating the rate based on density
     Regs  <-  rankLocReg(xall=Photo.Data $sec, yall=Photo.Data $Value, alpha=0.2, 
                          method="pc", verbose=TRUE) 
-    pdf(paste0("~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Output/Photo_Resp_Output/",rename,"_",j,"regression.pdf"))
+    pdf(paste0("output/Photo_Resp_Output/",rename,"_",j,"regression.pdf"))
     plot(Regs)
     dev.off()
     
@@ -203,9 +114,9 @@ for(i in 1:length(file.names)) { # for every file in list start at the first and
   }
 }
 
-write.csv(Photo.R, 'Photo.R.csv')
+write.csv(Photo.R, 'data/2018/Colony_Respirometry/Photo.R.csv')
 
-Photo.R <- read.csv(file="~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Data/Photo.R.csv", header=T) #read in volume and sample.info data
+Photo.R <- read.csv(file="data/2018/Colony_Respirometry/Photo.R.csv", header=T) #read in volume and sample.info data
 
 #Split up the photostynthesis and respiration data into two dataframes
 PHO <- Photo.R[Photo.R$V5=='Photo', ]
@@ -216,11 +127,11 @@ PHO$Fragment.ID <- PHO$Fragment.ID %>% str_replace("_1","")
 RES$Fragment.ID <- RES$Fragment.ID %>% str_replace("_2","")
 
 #Load Sample Info
-Sample.Info <- read.csv(file="~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Data/Sample_Info_Transp.csv", header=T) #read in volume and sample.info data
+Sample.Info <- read.csv(file="data/2018/Colony_Respirometry/Sample_Info_Transp.csv", header=T) #read in volume and sample.info data
 Sample.Info$Vol.L <- Sample.Info$Height*15.625*8.000*0.0163871 #calculate volume from height of water and dimensions of tank, multiplied by the conversion of cubic inch to liters
 colnames(Sample.Info)[colnames(Sample.Info)=="coral.id"] <- "Fragment.ID" #changing column name to match resp data
 
-coral.sa.calc <- read.csv('~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Data/coral.trans.calcsa.csv', header=T, stringsAsFactors=FALSE)
+coral.sa.calc <- read.csv('data/2018/Surface.Area/colony.2018.calcsa.resp.csv', header=T, stringsAsFactors=FALSE)
 colnames(coral.sa.calc)[colnames(coral.sa.calc)=="coral.id"] <- "Fragment.ID" #changing column name to match resp data
 coral.sa.calc$Surface_Area <- as.numeric(coral.sa.calc$Surface_Area)
 Sample.Info <- merge(Sample.Info, coral.sa.calc, by ="Fragment.ID")
@@ -234,13 +145,13 @@ Resp$umol.sec <- Resp$umol.L.sec*Sample.Info$Vol.L
 Photo$umol.sec <- Photo$umol.L.sec*Sample.Info$Vol.L
 
 ## BLANKS HAVE TO BE SPECIFIC TO RESPONSE VARIABLE (I.E., PHOTO OR RESP) AND TEMP (ALL AT ONE TEMP)
-photo.blnk <- aggregate(umol.sec ~ Group, data=Photo, mean)
-photo.Blanks <- subset(photo.blnk, Group == "Blank")
+photo.blnk <- aggregate(umol.sec ~ Type, data=Photo, mean)
+photo.Blanks <- subset(photo.blnk, Type == "Blank")
 Photo$Blank <- photo.Blanks[1,2]
 
 #Calculate resp blank rate
-resp.blnk <- aggregate(umol.sec ~ Group, data=Resp, mean)
-resp.Blanks <- subset(resp.blnk, Group == "Blank")
+resp.blnk <- aggregate(umol.sec ~ Type, data=Resp, mean)
+resp.Blanks <- subset(resp.blnk, Type == "Blank")
 Resp$Blank <- resp.Blanks[1,2]
 
 #Account for blank rate Subtract Blank by the temperature blank
@@ -248,8 +159,8 @@ Resp$umol.sec.corr <- Resp$umol.sec-Resp$Blank
 Photo$umol.sec.corr <- Photo$umol.sec-Photo$Blank
 
 #remove blanks from dataset
-Photo <- subset(Photo, Group!= "Blank")
-Resp <- subset(Resp, Group!= "Blank")
+Photo <- subset(Photo, Type!= "Blank")
+Resp <- subset(Resp, Type!= "Blank")
 
 #normalize to surface area and h-1
 Photo$umol.cm2.hr<-(Photo$umol.sec.corr*3600) / Photo$Surface_Area
@@ -257,154 +168,151 @@ Resp$umol.cm2.hr<-(Resp$umol.sec.corr*3600) / Resp$Surface_Area
 
 ## Results
 
-write.csv(Photo, file="~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Output/Photo_Resp_Output/Photosynthesis.rates.csv")
-write.csv(Resp, file="~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Output/Photo_Resp_Output/Respiration.rates.csv")
+write.csv(Photo, file="output/Photo_Resp_Output/Photosynthesis.rates.2019.csv")
+write.csv(Resp, file="output/Photo_Resp_Output/Respiration.rates2019.csv")
+
+Photo <- read_csv("output/Photo_Resp_Output/Photosynthesis.rates.2019.csv")
+Resp <- read_csv("output/Photo_Resp_Output/Respiration.rates2019.csv")
 
 #calculate gross photosynthesis Pnet -- Rdark
-resp.data <- merge(Photo[,c(1,11,12,13,14,26)],Resp[,c(1,26)], by="Fragment.ID")
+resp.data <- merge(Photo[,c(1,10,11,12,13,25)],Resp[,c(1,25)], by="Fragment.ID")
 
 #rename the columns
-#names(resp.data)[names(resp.data) == "umol.cm2.hr.x"]<- "Pnet_umol.cm2.hr" 
-#names(resp.data)[names(resp.data) == "umol.cm2.hr.y"] <- "Rdark_umol.cm2.hr"
 colnames(resp.data)[6] <- "Pnet_umol.cm2.hr" #not necessary
 colnames(resp.data) [7] <- "Rdark_umol.cm2.hr"
 
 #Pnet plus resp (if positive) is pGross
 resp.data$Pgross_umol.cm2.hr <- resp.data$Pnet_umol.cm2.hr - resp.data$Rdark_umol.cm2.hr
 
-#adding treatment column
-#resp.data <- merge(resp.data[,],Photo[,c(1,11)], by="Fragment.ID")
-
 resp.data$Origin.Treatment <- paste(resp.data$Origin, resp.data$Treatment)
 
-#Calculate means
-AllMeans <- ddply(resp.data, c('Transplant.Site','Origin.Treatment', 'Origin', "Treatment"), summarize, #take out treatment?
-                  #pnet
-                  Pnet.mean= mean(Pnet_umol.cm2.hr, na.rm=T), #mean pnet
-                  N = sum(!is.na(Pnet_umol.cm2.hr)), # sample size
-                  Pnet.se = sd(Pnet_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
-                  #Rdark
-                  Rdark.mean= mean(Rdark_umol.cm2.hr, na.rm=T), #mean rdark
-                  Rdark.se = sd(Rdark_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
-                  #Pgross
-                  Pgross.mean  = mean(Pgross_umol.cm2.hr, na.rm=TRUE),
-                  Pgross.se = sd (Pgross_umol.cm2.hr, na.rm=TRUE)/sqrt(N))
-AllMeans
-#write Results
-write.csv(resp.data, file="../Data/AllRates.csv") # raw data
-write.csv(AllMeans, file="../Output/AllMeans.csv") # Mean data
+write.csv(resp.data, file ="data/2018/Colony_Respirometry/All.resp.data2018.csv")
 
-#Plot the pnet mean
-Fig.Pn <-  ggplot(AllMeans, aes(x=Transplant.Site, y=Pnet.mean,  group=Origin.Treatment)) + #set up plot information
-  geom_errorbar(aes(x=Transplant.Site, ymax=Pnet.mean+Pnet.se, ymin=Pnet.mean-Pnet.se), colour="black", width=.1, position = position_dodge(width = 0.2)) + #add standard error bars about the mean
-  geom_point(aes(shape=Origin, color = Treatment), position = position_dodge(width = 0.2), size=4) + #plot points
-  scale_shape_manual(values=c(16,17)) + #sets point shape manually
-  scale_color_manual(values=c("blue", "red")) +
-  geom_line(aes(), position = position_dodge(width = 0.2), size = 0.5) + #add lines
-  xlab("Transplant Site") + #label x axis
-  ylab("Net Photosynthesis umol cm-2 h-1") + #label y axis
-  ylim(0, 1)+
-  theme_bw() + #Set the background color
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #Set the text angle
-        axis.line = element_blank(), #Set the axes color
-        panel.border = element_rect(linetype = "solid", color = "black"), #Set the border
-        panel.grid.major = element_blank(), #Set the major gridlines
-        panel.grid.minor = element_blank(), #Set the minor gridlines
-        plot.background=element_blank(),  #Set the plot background
-        legend.key = element_blank(),  #remove legend background
-        legend.position='none') + #set legend location
-  ggtitle("Net Photosythesis") + #add a main title
-  theme(plot.title = element_text(face = 'bold', 
-                                  size = 12, 
-                                  hjust = 0)) #set title attributes
-Fig.Pn #view plot
+## Making residuals 
+resp.data.2018 <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
 
-#plot pgross mean
-Fig.Pg <-  ggplot(AllMeans, aes(x=Transplant.Site, y=Pgross.mean, group=Origin.Treatment)) + #set up plot information
-  geom_errorbar(aes(x=Transplant.Site, ymax=Pgross.mean+Pgross.se, ymin=Pgross.mean-Pgross.se), colour="black", width=.1, position = position_dodge(width = 0.2)) + #add standard error bars about the mean
-  geom_point(aes(shape=Origin, color = Treatment), position = position_dodge(width = 0.2), size=4) + #plot points
-  scale_shape_manual(values=c(16,17)) + #sets point shape manually
-  scale_color_manual(values=c("blue", "red")) +
-  geom_line(aes(), position = position_dodge(width = 0.2), size = 0.5) + #add lines
-  xlab("Transplant Site") + #label x axis
-  ylab("Gross Photosynthesis umol cm-2 h-1") + #label y axis
-  ylim(1,2.5)+
-  theme_bw() + #Set the background color
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #Set the text angle
-        axis.line = element_blank(), #Set the axes color
-        panel.border = element_rect(linetype = "solid", color = "black"), #Set the border
-        panel.grid.major = element_blank(), #Set the major gridlines
-        panel.grid.minor = element_blank(), #Set the minor gridlines
-        plot.background=element_blank(),  #Set the plot background
-        legend.key = element_blank(),  #remove legend background
-        legend.position='none') + #set legend location
-  ggtitle("Gross Photosythesis") + #add a main title
-  theme(plot.title = element_text(face = 'bold', 
-                                  size = 12, 
-                                  hjust = 0)) #set title attributes
-Fig.Pg #view plot
+resp.data.2018.TPatch <- resp.data.2018 %>%
+  filter(Transplant.Site == "Patch")
 
-#plot rdark mean
-Fig.Rd <-  ggplot(AllMeans, aes(x=Transplant.Site, y=Rdark.mean,  group=Origin.Treatment)) + #set up plot information
-  geom_errorbar(aes(x=Transplant.Site, ymax=Rdark.mean+Rdark.se, ymin=Rdark.mean-Rdark.se), colour="black", width=.1, position = position_dodge(width = 0.2)) + #add standard error bars about the mean
-  geom_point(aes(shape=Origin, color = Treatment), position = position_dodge(width = 0.2), size=4) + #plot points
-  scale_shape_manual(values=c(16,17)) + #sets point shape manually
-  scale_color_manual(values=c("blue", "red")) +
-  geom_line(aes(), position = position_dodge(width = 0.2), size = 0.5) + #add lines
-  xlab("Transplant Site") + #label x axis
-  ylab("Dark Respiration umol cm-2 h-1") + #label y axis
-  ylim(-1.25, 0)+
-  theme_bw() + #Set the background color
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #Set the text angle
-        axis.line = element_blank(), #Set the axes color
-        panel.border = element_rect(linetype = "solid", color = "black"), #Set the border
-        panel.grid.major = element_blank(), #Set the major gridlines
-        panel.grid.minor = element_blank(), #Set the minor gridlines
-        plot.background=element_blank(),  #Set the plot background
-        legend.key = element_blank(),  #remove legend background
-        legend.position=c(0.8, 0.75)) + #set legend location
-  ggtitle("Dark Respiration") + #add a main title
-  theme(plot.title = element_text(face = 'bold', 
-                                  size = 12, 
-                                  hjust = 0)) #set title attributes
-Fig.Rd #view plot
+resp.data.2018.TRim <- resp.data.2018 %>%
+  filter(Transplant.Site == "Rim")
 
-dev.off()
+resp.data.2018.TPatch$coral.id <- resp.data.2018.TPatch$Fragment.ID %>% str_replace("-A","")
+resp.data.2018.TRim$coral.id <- resp.data.2018.TRim$Fragment.ID %>% str_replace("-B","")
 
-Resp.Figs <- arrangeGrob( Fig.Pn, Fig.Pg,Fig.Rd, ncol=3)
-ggsave(file="~/Dropbox/BIOS_Summer_2018/20172018_Transplant/RAnalysis/Output/Photo_Resp_Output/Transp_Respirometry.pdf", Resp.Figs, width = 11, height = 6, units = c("in"))
+resp.2018.comp <- merge(resp.data.2018.TPatch, resp.data.2018.TRim, by = "coral.id")
 
-## Statsitics (time 2)
-# Pnet
-hist(resp.data2$Pnet_umol.cm2.hr)
-library(car)
-shapiro.test(resp.data2$Pnet_umol.cm2.hr) 
-bartlett.test(Pnet_umol.cm2.hr~Treatment, data=resp.data2)
-bartlett.test(Pnet_umol.cm2.hr~Origin, data=resp.data2)
+# residual calculation
+resp.2018.comp$resid.Pnet <- resid(lm(resp.2018.comp$Pnet_umol.cm2.hr.y - resp.2018.comp$Pnet_umol.cm2.hr.x ~0))
+resp.2018.comp$resid.Rdark <- resid(lm(resp.2018.comp$Rdark_umol.cm2.hr.y - resp.2018.comp$Rdark_umol.cm2.hr.x ~0))
+resp.2018.comp$resid.Pgross <- resid(lm(resp.2018.comp$Pgross_umol.cm2.hr.y - resp.2018.comp$Pgross_umol.cm2.hr.x ~0))
 
-Pnet.aov <- aov(Pnet_umol.cm2.hr ~ Treatment*Origin, data = resp.data2)
-summary(Pnet.aov)
-TukeyHSD(Pnet.aov)
+# Summarizing residuals
+Pnet.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pnet", groupvars=c("Treatment.x", "Origin.x"))
+Rdark.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Rdark", groupvars=c("Treatment.x", "Origin.x"))
+Pgross.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pgross", groupvars=c("Treatment.x", "Origin.x"))
 
-#Pgross
-hist(resp.data2$Pgross_umol.cm2.hr)
-library(car)
-shapiro.test(resp.data2$Pgross_umol.cm2.hr) 
-bartlett.test(Pgross_umol.cm2.hr~Treatment, data=resp.data2)
-bartlett.test(Pgross_umol.cm2.hr~Origin, data=resp.data2)
+# Plotting 
 
-Pgross.aov <- aov(Pgross_umol.cm2.hr ~ Treatment*Origin, data = resp.data2)
-summary(Pgross.aov)
-TukeyHSD(Pgross.aov)
+##Pnet residuals plot
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+resid.Pnet.2018<- ggplot(Pnet.resid.2018.mean, aes(x=Treatment.x, y=resid.Pnet, shape=Origin.x, group=Origin.x)) + 
+  geom_line(position=pd, color="black")+
+  geom_errorbar(aes(ymin=resid.Pnet-se, ymax=resid.Pnet+se), width=.1, position=pd, color="black") + #Error bars
+  geom_hline(yintercept = 0,linetype="dashed") +
+  #  ylim(0,16)+
+  xlab("Treatment") + ylab(expression("Net Photosynthesis " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
+  geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
+  scale_shape_manual(values=c(16,17),
+                     name = "Origin") + 
+  annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
+  annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank())+
+  theme(axis.text = element_text(size = 14, color = "black"),
+        axis.title = element_text(size = 16, color = "black")) +
+  theme(legend.position = c(0.9,0.8))
+
+ggsave(file = "output/Graphs/A2018.Pnet.resid.pdf", resid.Pnet.2018)
+
+##Rdark residuals plot
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+resid.Rdark.2018<- ggplot(Rdark.resid.2018.mean, aes(x=Treatment.x, y=resid.Rdark, shape=Origin.x, group=Origin.x)) + 
+  geom_line(position=pd, color="black")+
+  geom_errorbar(aes(ymin=resid.Rdark-se, ymax=resid.Rdark+se), width=.1, position=pd, color="black") + #Error bars
+  geom_hline(yintercept = 0,linetype="dashed") +
+  #  ylim(0,16)+
+  xlab("Treatment") + ylab(expression("Dark Respiration " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
+  geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
+  scale_shape_manual(values=c(16,17),
+                     name = "Origin") + 
+  annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
+  annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank())+
+  theme(axis.text = element_text(size = 14, color = "black"),
+        axis.title = element_text(size = 16, color = "black")) +
+  theme(legend.position = c(0.9,0.8))
+
+ggsave(file = "output/Graphs/A2018.Rdark.resid.pdf", resid.Rdark.2018)
+
+## Pgross residuals plot
+
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+resid.Pgross.2018<- ggplot(Pgross.resid.2018.mean, aes(x=Treatment.x, y=resid.Pgross, shape=Origin.x, group=Origin.x)) + 
+  geom_line(position=pd, color="black")+
+  geom_errorbar(aes(ymin=resid.Pgross-se, ymax=resid.Pgross+se), width=.1, position=pd, color="black") + #Error bars
+  geom_hline(yintercept = 0,linetype="dashed") +
+  #  ylim(0,16)+
+  xlab("Treatment") + ylab(expression("Gross Photosynthesis " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
+  geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
+  scale_shape_manual(values=c(16,17),
+                     name = "Origin") + 
+  annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
+  annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank())+
+  theme(axis.text = element_text(size = 14, color = "black"),
+        axis.title = element_text(size = 16, color = "black")) +
+  theme(legend.position = c(0.9,0.8))
+
+ggsave(file = "output/Graphs/A2018.Pgross.resid.pdf", resid.Pgross.2018)
+
+
+# Statsitics 
+
+##Pnet 
+Pnet.2018.anova <- lm(resid.Pnet~Origin.x*Treatment.x, data = resp.2018.comp)
+qqnorm(resid(Pnet.2018.anova))
+qqline(resid(Pnet.2018.anova))
+
+boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Origin.x)
+boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Treatment.x)
+
+anova(Pnet.2018.anova)
+
+capture.output(anova(Pnet.2018.anova), file = "output/Statistics/A2018.Pnet.csv")
 
 #Rdark
+Rdark.2018.anova <- lm(resid.Rdark~Origin.x*Treatment.x, data = resp.2018.comp)
+qqnorm(resid(Rdark.2018.anova))
+qqline(resid(Rdark.2018.anova))
 
-hist(resp.data2$Rdark_umol.cm2.hr)
-library(car)
-shapiro.test(resp.data2$Rdark_umol.cm2.hr) 
-bartlett.test(Rdark_umol.cm2.hr~Treatment, data=resp.data2)
-bartlett.test(Rdark_umol.cm2.hr~Origin, data=resp.data2)
+boxplot(resid(Rdark.2018.anova)~resp.2018.comp$Origin.x)
+boxplot(resid(Rdark.2018.anova)~resp.2018.comp$Treatment.x)
 
-Rdark.aov <- aov(Rdark_umol.cm2.hr ~ Treatment*Origin, data = resp.data2)
-summary(Rdark.aov)
-TukeyHSD(Rdark.aov)
+anova(Rdark.2018.anova)
+
+capture.output(anova(Rdark.2018.anova), file = "output/Statistics/A2018.Rdark.csv")
+
+##Pgross
+Pgross.2018.anova <- lm(resid.Pgross~Origin.x*Treatment.x, data = resp.2018.comp)
+qqnorm(resid(Pgross.2018.anova))
+qqline(resid(Pgross.2018.anova))
+
+boxplot(resid(Pgross.2018.anova)~resp.2018.comp$Origin.x)
+boxplot(resid(Pgross.2018.anova)~resp.2018.comp$Treatment.x)
+
+anova(Pgross.2018.anova)
+
+capture.output(anova(Pgross.2018.anova), file = "output/Statistics/A2018.Pgross.csv")

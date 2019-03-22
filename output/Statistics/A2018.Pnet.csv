@@ -1,0 +1,8 @@
+Analysis of Variance Table
+
+Response: resid.Pnet
+                     Df  Sum Sq  Mean Sq F value Pr(>F)
+Origin.x              1 0.06999 0.069994  0.3766 0.5480
+Treatment.x           1 0.00000 0.000000  0.0000 0.9996
+Origin.x:Treatment.x  1 0.30478 0.304781  1.6401 0.2186
+Residuals            16 2.97336 0.185835               

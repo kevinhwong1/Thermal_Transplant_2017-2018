@@ -1,0 +1,8 @@
+Analysis of Variance Table
+
+Response: resid.Rdark
+                     Df  Sum Sq  Mean Sq F value Pr(>F)
+Origin.x              1 0.00972 0.009715  0.1107 0.7436
+Treatment.x           1 0.12176 0.121758  1.3876 0.2560
+Origin.x:Treatment.x  1 0.08636 0.086363  0.9842 0.3359
+Residuals            16 1.40393 0.087746               

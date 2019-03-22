@@ -1,0 +1,12 @@
+
+	Welch Two Sample t-test
+
+data:  Conc.calcS by treatment
+t = 0.64053, df = 57.631, p-value = 0.5244
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -6.480657 12.578544
+sample estimates:
+mean in group Ambient     mean in group Hot 
+             40.02275              36.97380 
+

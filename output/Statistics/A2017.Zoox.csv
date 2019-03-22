@@ -1,0 +1,14 @@
+Analysis of Variance Table
+
+Response: Cells.cm2.x6
+                              Df Sum Sq Mean Sq F value    Pr(>F)    
+reef.zone                      1 0.0518  0.0518  0.4556  0.501861    
+treatment                      1 4.4379  4.4379 39.0613 2.699e-08 ***
+timepoint                      1 0.2992  0.2992  2.6337  0.109047    
+reef.zone:treatment            1 0.0015  0.0015  0.0133  0.908347    
+reef.zone:timepoint            1 0.8244  0.8244  7.2565  0.008809 ** 
+treatment:timepoint            1 3.5918  3.5918 31.6146 3.465e-07 ***
+reef.zone:treatment:timepoint  1 0.2932  0.2932  2.5804  0.112632    
+Residuals                     71 8.0665  0.1136                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
