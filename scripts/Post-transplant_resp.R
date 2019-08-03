@@ -188,131 +188,265 @@ resp.data$Origin.Treatment <- paste(resp.data$Origin, resp.data$Treatment)
 
 write.csv(resp.data, file ="data/2018/Colony_Respirometry/All.resp.data2018.csv")
 
-## Making residuals 
-resp.data.2018 <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
+#Graphing
 
-resp.data.2018.TPatch <- resp.data.2018 %>%
-  filter(Transplant.Site == "Patch")
+resp.data <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
 
-resp.data.2018.TRim <- resp.data.2018 %>%
-  filter(Transplant.Site == "Rim")
+#Calculate means
+AllMeans.2018 <- ddply(resp.data, c('Origin','Treatment','Transplant.Site'), summarize, #take out treatment?
+                   #pnet
+                   Pnet.mean= mean(Pnet_umol.cm2.hr, na.rm=T), #mean pnet
+                   N = sum(!is.na(Pnet_umol.cm2.hr)), # sample size
+                   Pnet.se = sd(Pnet_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
+                   #Rdark
+                   Rdark.mean= mean(Rdark_umol.cm2.hr, na.rm=T), #mean rdark
+                   Rdark.se = sd(Rdark_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
+                   #Pgross
+                   Pgross.mean  = mean(Pgross_umol.cm2.hr, na.rm=T),
+                   Pgross.se = sd(Pgross_umol.cm2.hr, na.rm=T)/sqrt(N))
 
-resp.data.2018.TPatch$coral.id <- resp.data.2018.TPatch$Fragment.ID %>% str_replace("-A","")
-resp.data.2018.TRim$coral.id <- resp.data.2018.TRim$Fragment.ID %>% str_replace("-B","")
-
-resp.2018.comp <- merge(resp.data.2018.TPatch, resp.data.2018.TRim, by = "coral.id")
-
-# residual calculation
-resp.2018.comp$resid.Pnet <- resid(lm(resp.2018.comp$Pnet_umol.cm2.hr.y - resp.2018.comp$Pnet_umol.cm2.hr.x ~0))
-resp.2018.comp$resid.Rdark <- resid(lm(resp.2018.comp$Rdark_umol.cm2.hr.y - resp.2018.comp$Rdark_umol.cm2.hr.x ~0))
-resp.2018.comp$resid.Pgross <- resid(lm(resp.2018.comp$Pgross_umol.cm2.hr.y - resp.2018.comp$Pgross_umol.cm2.hr.x ~0))
-
-# Summarizing residuals
-Pnet.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pnet", groupvars=c("Treatment.x", "Origin.x"))
-Rdark.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Rdark", groupvars=c("Treatment.x", "Origin.x"))
-Pgross.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pgross", groupvars=c("Treatment.x", "Origin.x"))
-
-# Plotting 
-
-##Pnet residuals plot
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-resid.Pnet.2018<- ggplot(Pnet.resid.2018.mean, aes(x=Treatment.x, y=resid.Pnet, shape=Origin.x, group=Origin.x)) + 
-  geom_line(position=pd, color="black")+
-  geom_errorbar(aes(ymin=resid.Pnet-se, ymax=resid.Pnet+se), width=.1, position=pd, color="black") + #Error bars
-  geom_hline(yintercept = 0,linetype="dashed") +
-  #  ylim(0,16)+
-  xlab("Treatment") + ylab(expression("Net Photosynthesis " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
-  geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
-  scale_shape_manual(values=c(16,17),
-                     name = "Origin") + 
-  annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
-  annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank())+
-  theme(axis.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 16, color = "black")) +
-  theme(legend.position = c(0.9,0.8))
-
-ggsave(file = "output/Graphs/A2018.Pnet.resid.pdf", resid.Pnet.2018)
-
-##Rdark residuals plot
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-resid.Rdark.2018<- ggplot(Rdark.resid.2018.mean, aes(x=Treatment.x, y=resid.Rdark, shape=Origin.x, group=Origin.x)) + 
-  geom_line(position=pd, color="black")+
-  geom_errorbar(aes(ymin=resid.Rdark-se, ymax=resid.Rdark+se), width=.1, position=pd, color="black") + #Error bars
-  geom_hline(yintercept = 0,linetype="dashed") +
-  #  ylim(0,16)+
-  xlab("Treatment") + ylab(expression("Dark Respiration " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
-  geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
-  scale_shape_manual(values=c(16,17),
-                     name = "Origin") + 
-  annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
-  annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank())+
-  theme(axis.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 16, color = "black")) +
-  theme(legend.position = c(0.9,0.8))
-
-ggsave(file = "output/Graphs/A2018.Rdark.resid.pdf", resid.Rdark.2018)
-
-## Pgross residuals plot
+AllMeans.2018$reef.treatment <- paste(AllMeans.2018$Origin, AllMeans.2018$Treatment)
 
 pd <- position_dodge(0.1) # moves object .05 to the left and right
-resid.Pgross.2018<- ggplot(Pgross.resid.2018.mean, aes(x=Treatment.x, y=resid.Pgross, shape=Origin.x, group=Origin.x)) + 
-  geom_line(position=pd, color="black")+
-  geom_errorbar(aes(ymin=resid.Pgross-se, ymax=resid.Pgross+se), width=.1, position=pd, color="black") + #Error bars
-  geom_hline(yintercept = 0,linetype="dashed") +
-  #  ylim(0,16)+
-  xlab("Treatment") + ylab(expression("Gross Photosynthesis " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
-  geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
-  scale_shape_manual(values=c(16,17),
-                     name = "Origin") + 
-  annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
-  annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank())+
-  theme(axis.text = element_text(size = 14, color = "black"),
-        axis.title = element_text(size = 16, color = "black")) +
-  theme(legend.position = c(0.9,0.8))
+legend.title <- "Reef Zone"
 
-ggsave(file = "output/Graphs/A2018.Pgross.resid.pdf", resid.Pgross.2018)
+#Plot the means
+Fig.Pn <-  ggplot(AllMeans.2018, aes(x=Transplant.Site, y=Pnet.mean,  color=Treatment, group=reef.treatment)) + #set up plot information
+  geom_errorbar(aes(x=Transplant.Site, ymax=Pnet.mean+Pnet.se, ymin=Pnet.mean-Pnet.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
+  geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
+  xlab("Treatment") + #label x axis
+  ylab(expression("Net Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
+#  ylim(-0.25, 0.75)+
+  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+Fig.Pn #view plot
 
+ggsave(file="output/Graphs/A2018.NetPhoto.pdf", Fig.Pn, width = 8, height = 11, units = c("in"))
 
-# Statsitics 
+Fig.Pg <-  ggplot(AllMeans.2018, aes(x=Transplant.Site, y=Pgross.mean,  color=Treatment, group=reef.treatment)) + #set up plot information
+  geom_errorbar(aes(x=Transplant.Site, ymax=Pgross.mean+Pgross.se, ymin=Pgross.mean-Pgross.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
+  geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
+  xlab("Treatment") + #label x axis
+  ylab(expression("Gross Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
+#  ylim(0, 1)+
+  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+Fig.Pg #view plot
+ggsave(file="output/Graphs/A2018.GrossPhoto.pdf", Fig.Pg, width = 8, height = 11, units = c("in"))
 
-##Pnet 
-Pnet.2018.anova <- lm(resid.Pnet~Origin.x*Treatment.x, data = resp.2018.comp)
-qqnorm(resid(Pnet.2018.anova))
-qqline(resid(Pnet.2018.anova))
+AllMeans.2018$Rdark.mean.abs <- abs(AllMeans.2018$Rdark.mean)
 
-boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Origin.x)
-boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Treatment.x)
+pd <- position_dodge(0.1)
+Fig.Rd <-  ggplot(AllMeans.2018, aes(x=Transplant.Site, y=Rdark.mean.abs,  color=Treatment, group=reef.treatment)) + #set up plot information
+  geom_errorbar(aes(x=Transplant.Site, ymax=Rdark.mean.abs+Rdark.se, ymin=Rdark.mean.abs-Rdark.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
+  geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
+  xlab("Treatment") + #label x axis
+  ylab(expression("Dark Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
+  ylim(0.6, 1.3)+
+  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  theme_bw() + theme(panel.border = element_rect(linetype = "solid", color = "black"), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1)) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+Fig.Rd #view plot
+ggsave(file="output/Graphs/A2018.Respiration.pdf", Fig.Rd, width = 8, height = 11, units = c("in"))
 
-anova(Pnet.2018.anova)
+## Statistics
 
-capture.output(anova(Pnet.2018.anova), file = "output/Statistics/A2018.Pnet.csv")
+#Pnet
+Pnet2018anova <- lm(Pnet_umol.cm2.hr~Origin*Treatment*Transplant.Site, data = resp.data)
+qqnorm(resid(Pnet2018anova))
+qqline(resid(Pnet2018anova)) 
+
+boxplot(resid(Pnet2018anova)~resp.data$Origin)
+boxplot(resid(Pnet2018anova)~resp.data$Treatment) 
+boxplot(resid(Pnet2018anova)~resp.data$Transplant.Site) 
+
+anova(Pnet2018anova)
+
+capture.output(anova(Pnet2018anova), file = "output/Statistics/A2018.Pnet.csv")
+
+#Pgross
+Pgross2018anova <- lm(Pgross_umol.cm2.hr~Origin*Treatment*Transplant.Site, data = resp.data)
+qqnorm(resid(Pgross2018anova))
+qqline(resid(Pgross2018anova)) 
+
+boxplot(resid(Pgross2018anova)~resp.data$Origin)
+boxplot(resid(Pgross2018anova)~resp.data$Treatment) 
+boxplot(resid(Pgross2018anova)~resp.data$Transplant.Site) 
+
+anova(Pgross2018anova)
+
+capture.output(anova(Pgross2018anova), file = "output/Statistics/A2018.Pgross.csv")
 
 #Rdark
-Rdark.2018.anova <- lm(resid.Rdark~Origin.x*Treatment.x, data = resp.2018.comp)
-qqnorm(resid(Rdark.2018.anova))
-qqline(resid(Rdark.2018.anova))
+Rdark2018anova <- lm(Rdark_umol.cm2.hr~Origin*Treatment*Transplant.Site, data = resp.data)
+qqnorm(resid(Rdark2018anova))
+qqline(resid(Rdark2018anova)) 
 
-boxplot(resid(Rdark.2018.anova)~resp.2018.comp$Origin.x)
-boxplot(resid(Rdark.2018.anova)~resp.2018.comp$Treatment.x)
+boxplot(resid(Rdark2018anova)~resp.data$Origin)
+boxplot(resid(Rdark2018anova)~resp.data$Treatment) 
+boxplot(resid(Rdark2018anova)~resp.data$Transplant.Site) 
 
-anova(Rdark.2018.anova)
+anova(Rdark2018anova)
 
-capture.output(anova(Rdark.2018.anova), file = "output/Statistics/A2018.Rdark.csv")
+capture.output(anova(Rdark2018anova), file = "output/Statistics/A2018.Rdark.csv")
 
-##Pgross
-Pgross.2018.anova <- lm(resid.Pgross~Origin.x*Treatment.x, data = resp.2018.comp)
-qqnorm(resid(Pgross.2018.anova))
-qqline(resid(Pgross.2018.anova))
 
-boxplot(resid(Pgross.2018.anova)~resp.2018.comp$Origin.x)
-boxplot(resid(Pgross.2018.anova)~resp.2018.comp$Treatment.x)
-
-anova(Pgross.2018.anova)
-
-capture.output(anova(Pgross.2018.anova), file = "output/Statistics/A2018.Pgross.csv")
+# ## Making residuals 
+# resp.data.2018 <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
+# 
+# resp.data.2018.TPatch <- resp.data.2018 %>%
+#   filter(Transplant.Site == "Patch")
+# 
+# resp.data.2018.TRim <- resp.data.2018 %>%
+#   filter(Transplant.Site == "Rim")
+# 
+# resp.data.2018.TPatch$coral.id <- resp.data.2018.TPatch$Fragment.ID %>% str_replace("-A","")
+# resp.data.2018.TRim$coral.id <- resp.data.2018.TRim$Fragment.ID %>% str_replace("-B","")
+# 
+# resp.2018.comp <- merge(resp.data.2018.TPatch, resp.data.2018.TRim, by = "coral.id")
+# 
+# # residual calculation
+# resp.2018.comp$resid.Pnet <- resid(lm(resp.2018.comp$Pnet_umol.cm2.hr.y - resp.2018.comp$Pnet_umol.cm2.hr.x ~0))
+# resp.2018.comp$resid.Rdark <- resid(lm(resp.2018.comp$Rdark_umol.cm2.hr.y - resp.2018.comp$Rdark_umol.cm2.hr.x ~0))
+# resp.2018.comp$resid.Pgross <- resid(lm(resp.2018.comp$Pgross_umol.cm2.hr.y - resp.2018.comp$Pgross_umol.cm2.hr.x ~0))
+# 
+# # Summarizing residuals
+# Pnet.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pnet", groupvars=c("Treatment.x", "Origin.x"))
+# Rdark.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Rdark", groupvars=c("Treatment.x", "Origin.x"))
+# Pgross.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pgross", groupvars=c("Treatment.x", "Origin.x"))
+# 
+# # Plotting 
+# 
+# ##Pnet residuals plot
+# pd <- position_dodge(0.1) # moves object .05 to the left and right
+# resid.Pnet.2018<- ggplot(Pnet.resid.2018.mean, aes(x=Treatment.x, y=resid.Pnet, shape=Origin.x, group=Origin.x)) + 
+#   geom_line(position=pd, color="black", linetype = "3313")+
+#   geom_errorbar(aes(ymin=resid.Pnet-se, ymax=resid.Pnet+se), width=.1, position=pd, color="black") + #Error bars
+#   geom_hline(yintercept = 0,linetype="dashed") +
+#   #  ylim(0,16)+
+#   xlab("Treatment") + ylab(expression("Net Photosynthesis " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
+#   geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
+#   scale_shape_manual(values=c(16,17),
+#                      name = "Origin") + 
+#   annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
+#   annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank())+
+#   theme(axis.text = element_text(size = 14, color = "black"),
+#         axis.title = element_text(size = 16, color = "black")) +
+#   theme(legend.position = c(0.9,0.8))
+# 
+# ggsave(file = "output/Graphs/A2018.Pnet.resid.pdf", resid.Pnet.2018)
+# 
+# ##Rdark residuals plot
+# pd <- position_dodge(0.1) # moves object .05 to the left and right
+# resid.Rdark.2018<- ggplot(Rdark.resid.2018.mean, aes(x=Treatment.x, y=resid.Rdark, shape=Origin.x, group=Origin.x)) + 
+#   geom_line(position=pd, color="black")+
+#   geom_errorbar(aes(ymin=resid.Rdark-se, ymax=resid.Rdark+se), width=.1, position=pd, color="black") + #Error bars
+#   geom_hline(yintercept = 0,linetype="dashed") +
+#   #  ylim(0,16)+
+#   xlab("Treatment") + ylab(expression("Dark Respiration " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
+#   geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
+#   scale_shape_manual(values=c(16,17),
+#                      name = "Origin") + 
+#   annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
+#   annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank())+
+#   theme(axis.text = element_text(size = 14, color = "black"),
+#         axis.title = element_text(size = 16, color = "black")) +
+#   theme(legend.position = c(0.9,0.8))
+# 
+# ggsave(file = "output/Graphs/A2018.Rdark.resid.pdf", resid.Rdark.2018)
+# 
+# ## Pgross residuals plot
+# 
+# pd <- position_dodge(0.1) # moves object .05 to the left and right
+# resid.Pgross.2018<- ggplot(Pgross.resid.2018.mean, aes(x=Treatment.x, y=resid.Pgross, shape=Origin.x, group=Origin.x)) + 
+#   geom_line(position=pd, color="black")+
+#   geom_errorbar(aes(ymin=resid.Pgross-se, ymax=resid.Pgross+se), width=.1, position=pd, color="black") + #Error bars
+#   geom_hline(yintercept = 0,linetype="dashed") +
+#   #  ylim(0,16)+
+#   xlab("Treatment") + ylab(expression("Gross Photosynthesis " (mu*mol~cm^{-2}~h^{-1}) (Rim - Patch))) + #Axis titles
+#   geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
+#   scale_shape_manual(values=c(16,17),
+#                      name = "Origin") + 
+#   annotate("text", x = 1, y = 0.75, label = "Rim > Patch") + 
+#   annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank())+
+#   theme(axis.text = element_text(size = 14, color = "black"),
+#         axis.title = element_text(size = 16, color = "black")) +
+#   theme(legend.position = c(0.9,0.8))
+# 
+# ggsave(file = "output/Graphs/A2018.Pgross.resid.pdf", resid.Pgross.2018)
+# 
+# 
+# # Statsitics 
+# 
+# ##Pnet 
+# Pnet.2018.anova <- lm(resid.Pnet~Origin.x*Treatment.x, data = resp.2018.comp)
+# qqnorm(resid(Pnet.2018.anova))
+# qqline(resid(Pnet.2018.anova))
+# 
+# boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Origin.x)
+# boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Treatment.x)
+# 
+# anova(Pnet.2018.anova)
+# 
+# capture.output(anova(Pnet.2018.anova), file = "output/Statistics/A2018.Pnet.csv")
+# 
+# #Rdark
+# Rdark.2018.anova <- lm(resid.Rdark~Origin.x*Treatment.x, data = resp.2018.comp)
+# qqnorm(resid(Rdark.2018.anova))
+# qqline(resid(Rdark.2018.anova))
+# 
+# boxplot(resid(Rdark.2018.anova)~resp.2018.comp$Origin.x)
+# boxplot(resid(Rdark.2018.anova)~resp.2018.comp$Treatment.x)
+# 
+# anova(Rdark.2018.anova)
+# 
+# capture.output(anova(Rdark.2018.anova), file = "output/Statistics/A2018.Rdark.csv")
+# 
+# ##Pgross
+# Pgross.2018.anova <- lm(resid.Pgross~Origin.x*Treatment.x, data = resp.2018.comp)
+# qqnorm(resid(Pgross.2018.anova))
+# qqline(resid(Pgross.2018.anova))
+# 
+# boxplot(resid(Pgross.2018.anova)~resp.2018.comp$Origin.x)
+# boxplot(resid(Pgross.2018.anova)~resp.2018.comp$Treatment.x)
+# 
+# anova(Pgross.2018.anova)
+# 
+# capture.output(anova(Pgross.2018.anova), file = "output/Statistics/A2018.Pgross.csv")

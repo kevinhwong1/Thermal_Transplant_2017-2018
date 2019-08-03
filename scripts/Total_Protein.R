@@ -7,6 +7,7 @@ library(dbplyr)
 library(tidyverse)
 library(readr)
 library(stringr)
+library(Rmisc)
 
 ### Adult 2017 Total Protein ###
 
@@ -244,7 +245,7 @@ TP2017Adult <- ggplot(mean.A2017.TP, aes(x=timepoint, y=Total.Protein.mgcm2, gro
   geom_line(position=pd, color="black")+
   geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, position=pd, color="black") + #Error bars
   ylim(1.3,2.6)+
-  xlab("Timepoint") + ylab(expression("Total Protein " (mu*g~cm^{-2})))+ #Axis titles
+  xlab("Timepoint") + ylab(expression("Total Protein " (mg~cm^{-2})))+ #Axis titles
   geom_point(aes(shape=reef.zone, color=treatment), size=4, position=pd)+
   scale_shape_manual(values=c(16,17),
                      name = "Reef Zone")+
@@ -270,6 +271,53 @@ boxplot(resid(A2017.TP.anova)~A2017.TP.final$timepoint)
 anova(A2017.TP.anova)
 
 capture.output(anova(A2017.TP.anova), file = "output/Statistics/A2017.TP.csv")
+
+### Only T2 Analysis
+
+A2017.TP.T2 <- A2017.TP.final %>%
+  filter(timepoint == "Post-Treatment")
+
+mean.A2017.TP.Col.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("coral.id","treatment", "reef.zone"))
+
+# Summarizing 
+mean.A2017.TP.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("treatment", "reef.zone"))
+
+# Plotting
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+TP2017Adult.T2 <- ggplot(mean.A2017.TP.T2, aes(x=treatment, y=Total.Protein.mgcm2, group=reef.zone)) + 
+  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
+  geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, position=pd, color="black") + #Error bars
+#  ylim(1.3,2.6)+
+  xlab("Timepoint") + ylab(expression("Total Protein " (mg~cm^{-2})))+ #Axis titles
+  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/A2017.TP.T2.pdf", TP2017Adult.T2, width = 11, height = 11, units = c("in"))
+
+##Statistics
+
+A2017.TP.anova.T2 <- lm(Total.Protein.mgcm2~reef.zone*treatment, data = mean.A2017.TP.Col.T2)
+qqnorm(resid(A2017.TP.anova.T2))
+qqline(resid(A2017.TP.anova.T2))
+
+boxplot(resid(A2017.TP.anova.T2)~mean.A2017.TP.Col.T2$reef.zone)
+boxplot(resid(A2017.TP.anova.T2)~mean.A2017.TP.Col.T2$treatment)
+
+anova(A2017.TP.anova.T2)
+
+capture.output(anova(A2017.TP.anova.T2), file = "output/Statistics/A2017.TP.T2.csv")
+
 
 
 ### 2017 Larval Total Protein ###
@@ -392,37 +440,364 @@ L2017.TP.Patch <- subset(L2017.TP.meta2, reef.zone=="Patch")
 
 ##### ug Protein per larva #####
 #Getting means
-L2017.TP.Patch.mean <- summarySE(L2017.TP.Patch, measurevar="Conc.calcS", groupvars="treatment")
+
+L2017.TP.Patch.Col.mean <- summarySE(L2017.TP.Patch, measurevar="Conc.calcS", groupvars=c("coral.id","treatment", "reef.zone"))
+L2017.TP.Patch.mean <- summarySE(L2017.TP.Patch, measurevar="Conc.calcS", groupvars=c("treatment", "reef.zone"))
 
 #Plotting reaction norm
 pd <- position_dodge(0.1) # moves object .05 to the left and right
 legend.title <- "Treatment"
-L2017.TP.Patch.plot<- ggplot(L2017.TP.Patch.mean, aes(x=treatment, y=Conc.calcS)) + 
-  geom_line(position=pd, color="black")+
+L2017.TP.Patch.plot<- ggplot(L2017.TP.Patch.mean, aes(x=treatment, y=Conc.calcS, group = reef.zone)) + 
+  geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
   geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se), width=.1, position=pd, color="black") + #Error bars
   ylim(30,45)+
   xlab("Treatment") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
-  geom_point(aes(fill=treatment), color ="black", pch=21, size=4)+
-  scale_fill_manual(legend.title, values=c("dodgerblue3", "tomato1"))+ #colour modification
+  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
   theme_bw() + theme(panel.grid.major = element_blank(), 
                      panel.grid.minor = element_blank(),
                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 16, color = "black"),
-        axis.title = element_text(size = 18, color = "black"),
-        axis.title.x = element_blank())
-
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
 
 L2017.TP.Patch.plot
-ggsave(file = "output/Graphs/L2017.TP.Patch.pdf", L2017.TP.Patch.plot)
-
+ggsave(file = "output/Graphs/L2017.TP.Patch.pdf", L2017.TP.Patch.plot, width = 11, height = 11, units = c("in"))
+# 
+# TP.L2017.bar <- ggplot(L2017.TP.Patch.mean, aes(x=treatment, y=Conc.calcS, fill=treatment)) + 
+#   geom_bar(position=position_dodge(), stat="identity", color = "black") +
+#   geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se),
+#                 width=.2,                    # Width of the error bars
+#                 position=position_dodge(.9)) +
+#   xlab("Treatment") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
+#   ylim(0,50) +
+#   scale_fill_manual(values=c("dodgerblue3", "tomato1"),
+#                     name = "Treatment") + #colour modification
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
+#   theme(axis.text = element_text(size = 16, color = "black"),
+#         axis.title = element_text(size = 18, color = "black"),
+#         axis.title.x = element_blank()) +
+#   theme(legend.position = "none")
 
 # Statistics
-L2017.TP.Patch.anova <- lm(Conc.calcS~treatment, data = L2017.TP.Patch)
+L2017.TP.Patch.anova <- lm(Conc.calcS~treatment, data = L2017.TP.Patch.Col.mean)
 qqnorm(resid(L2017.TP.Patch.anova))
 qqline(resid(L2017.TP.Patch.anova))
 
-boxplot(resid(L2017.TP.Patch.anova)~L2017.TP.Patch$treatment)
+boxplot(resid(L2017.TP.Patch.anova)~L2017.TP.Patch.Col.mean$treatment)
 
-t.test(Conc.calcS~treatment, data = L2017.TP.Patch)
+t.test(Conc.calcS~treatment, data = L2017.TP.Patch.Col.mean)
 
-capture.output(t.test(Conc.calcS~treatment, data = L2017.TP.Patch), file = "output/Statistics/L2017.TP.Patch.csv")
+capture.output(t.test(Conc.calcS~treatment, data = L2017.TP.Patch.Col.mean), file = "output/Statistics/L2017.TP.Patch.csv")
+
+
+### Total protein Adult 2018 ###
+
+# Import Data
+A2018.TP.Run1 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190426_Run1.csv")
+A2018.TP.Run2 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190426_Run2.csv")
+A2018.TP.Run3 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190514_Run3.csv")
+A2018.TP.Run4 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190514_Run4.csv")
+A2018.TP.Run5 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190514_Run5.csv")
+
+A2018.vial.meta <- read.csv("data/2018/Metadata/BIOS2018_Adult_Vial.csv") #Vial metadata
+A2018.frag.vol <- read.csv("data/2018/Metadata/BIOS2018_Frag_Vol.csv") #Fragment metadata
+A2018.frag.sa <- read.csv("data/2018/Surface.Area/Adult.Frag.2018.Calculated.csv") 
+A2018.meta <- read.csv("data/2018/Metadata/Sample_Info_Transp.csv") #Metadata
+A2018.TP.well <- read.csv("data/2018/Protein/Adult_Protein_2018_Well.csv")
+
+# Adding Run numbers into datasets
+A2018.TP.Run1$Run <- 1
+A2018.TP.Run2$Run <- 2
+A2018.TP.Run3$Run <- 3
+A2018.TP.Run4$Run <- 4
+A2018.TP.Run5$Run <- 5
+
+# Make a unique column for merging
+A2018.TP.Run1$run.well <- paste(A2018.TP.Run1$Run, A2018.TP.Run1$Well, sep = "-")
+A2018.TP.Run2$run.well <- paste(A2018.TP.Run2$Run, A2018.TP.Run2$Well, sep = "-")
+A2018.TP.Run3$run.well <- paste(A2018.TP.Run3$Run, A2018.TP.Run3$Well, sep = "-")
+A2018.TP.Run4$run.well <- paste(A2018.TP.Run4$Run, A2018.TP.Run4$Well, sep = "-")
+A2018.TP.Run5$run.well <- paste(A2018.TP.Run5$Run, A2018.TP.Run5$Well, sep = "-")
+
+A2018.TP.well$run.well <- paste(A2018.TP.well$Run, A2018.TP.well$Well, sep = "-")
+
+# Merge with metadata
+A2018.TP.Run1 <- merge(A2018.TP.Run1, A2018.TP.well, by = "run.well")
+A2018.TP.Run2 <- merge(A2018.TP.Run2, A2018.TP.well, by = "run.well")
+A2018.TP.Run3 <- merge(A2018.TP.Run3, A2018.TP.well, by = "run.well")
+A2018.TP.Run4 <- merge(A2018.TP.Run4, A2018.TP.well, by = "run.well")
+A2018.TP.Run5 <- merge(A2018.TP.Run5, A2018.TP.well, by = "run.well")
+
+# Subtract blanks means for each run (Runs 1, 3have standards and blanks)
+A2018.TP.standardblank1 <- A2018.TP.Run1 %>% 
+  filter(Sample.Type == "Blank") %>%
+  summarise(blk.avg = mean(X562))
+
+A2018.TP.standardblank3 <- A2018.TP.Run3 %>% 
+  filter(Sample.Type == "Blank") %>%
+  summarise(blk.avg = mean(X562))
+
+A2018.TP.Run1$abs.corr <- A2018.TP.Run1$X562 - A2018.TP.standardblank1$blk.avg
+A2018.TP.Run2$abs.corr <- A2018.TP.Run2$X562 - A2018.TP.standardblank1$blk.avg
+
+A2018.TP.Run3$abs.corr <- A2018.TP.Run3$X562 - A2018.TP.standardblank3$blk.avg
+A2018.TP.Run4$abs.corr <- A2018.TP.Run4$X562 - A2018.TP.standardblank3$blk.avg
+A2018.TP.Run5$abs.corr <- A2018.TP.Run5$X562 - A2018.TP.standardblank3$blk.avg
+
+# Run standards
+A2018.TP.standard1 <- A2018.TP.Run1 %>% 
+  filter(Sample.Type == "Standard") 
+A2018.TP.plot.S1<- ggplot(data = A2018.TP.standard1, aes(x=Concentration, y=abs.corr))+
+  ylab("Absorbance (nm)")+ xlab("Concentration") + 
+  geom_point()+
+  geom_smooth(method = "lm") +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+A2018.TP.lmstandard1 <- lm (Concentration ~ abs.corr, data = A2018.TP.standard1)
+A2018.TP.lmsummary1 <- summary(A2018.TP.lmstandard1)
+
+
+A2018.TP.standard3 <- A2018.TP.Run3 %>% 
+  filter(Sample.Type == "Standard") 
+A2018.TP.plot.S3<- ggplot(data = A2018.TP.standard3, aes(x=Concentration, y=abs.corr))+
+  ylab("Absorbance (nm)")+ xlab("Concentration") + 
+  geom_point()+
+  geom_smooth(method = "lm") +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+A2018.TP.lmstandard3 <- lm (Concentration ~ abs.corr, data = A2018.TP.standard3)
+A2018.TP.lmsummary3 <- summary(A2018.TP.lmstandard3)
+
+# Extrapolate concentration values
+
+A2018.TP.Sample1 <- A2018.TP.Run1 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+A2018.TP.Sample1$ConcentrationS <- predict(A2018.TP.lmstandard1, newdata = A2018.TP.Sample1) #using model to get concentration
+
+A2018.TP.Sample2 <- A2018.TP.Run2 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+A2018.TP.Sample2$ConcentrationS <- predict(A2018.TP.lmstandard1, newdata = A2018.TP.Sample2) #using model to get concentration
+
+A2018.TP.Sample3 <- A2018.TP.Run3 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+A2018.TP.Sample3$ConcentrationS <- predict(A2018.TP.lmstandard3, newdata = A2018.TP.Sample3) #using model to get concentration
+
+A2018.TP.Sample4 <- A2018.TP.Run4 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+A2018.TP.Sample4$ConcentrationS <- predict(A2018.TP.lmstandard3, newdata = A2018.TP.Sample4) #using model to get concentration
+
+A2018.TP.Sample5 <- A2018.TP.Run5 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+A2018.TP.Sample5$ConcentrationS <- predict(A2018.TP.lmstandard3, newdata = A2018.TP.Sample5) #using model to get concentration
+
+# Combining datasets
+
+A2018.TP.all <- rbind(A2018.TP.Sample1, 
+                      A2018.TP.Sample2, 
+                      A2018.TP.Sample3, 
+                      A2018.TP.Sample4, 
+                      A2018.TP.Sample5)
+
+A2018.TP.all <- A2018.TP.all %>%
+  select("Vial", "ConcentrationS")
+
+A2018.TP.coralid <- merge(A2018.TP.all, A2018.vial.meta, by = "Vial")
+A2018.TP.vol <- merge(A2018.TP.coralid, A2018.frag.vol, by = "coral.id")
+A2018.TP.sa <- merge(A2018.TP.vol, A2018.frag.sa, by = "coral.id")
+A2018.TP.meta <- merge(A2018.TP.sa, A2018.meta, by = "coral.id")
+A2018.TP.meta <- A2018.TP.meta %>% 
+  select(coral.id, ConcentrationS, Homo.Vol.mL, Surface.Area, Origin, Treatment, Transplant.Site)
+
+# Standardization 
+
+A2018.TP.meta$Total.Protein.ugcm2 <- (A2018.TP.meta$ConcentrationS * A2018.TP.meta$Homo.Vol.mL * 1.58)/A2018.TP.meta$Surface.Area #Calculating concentration. 1.58 = Dilution factor of acid+base in sample
+A2018.TP.meta$Total.Protein.mgcm2 <- A2018.TP.meta$Total.Protein.ugcm2/1000 
+
+# Summarizing 
+mean.TP.Col.A2018 <- summarySE(A2018.TP.meta, measurevar="Total.Protein.mgcm2", groupvars=c("coral.id", "Origin", "Treatment", "Transplant.Site"))
+mean.TP.Col.A2018$coral.id <- factor(mean.TP.Col.A2018$coral.id)
+mean.TP.Col.A2018$Origin <- factor(mean.TP.Col.A2018$Origin)
+mean.TP.Col.A2018$Treatment <- factor(mean.TP.Col.A2018$Treatment)
+mean.TP.Col.A2018$Transplant.Site <- factor(mean.TP.Col.A2018$Transplant.Site)
+
+mean.TP.A2018 <- summarySE(mean.TP.Col.A2018, measurevar="Total.Protein.mgcm2", groupvars=c("Origin", "Treatment", "Transplant.Site"))
+mean.TP.A2018$reef.treatment <- paste(mean.TP.A2018$Origin, mean.TP.A2018$Treatment)
+
+#Plotting 
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+TP2018Adult <- ggplot(mean.TP.A2018, aes(x=Transplant.Site, y=Total.Protein.mgcm2, group=reef.treatment)) + 
+  geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
+  geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, position=pd, color="black") + #Error bars
+  #  ylim(1,4)+
+  xlab("Transplant Site") + ylab(expression("Total Protein " (mg~cm^{-2}))) + #Axis titles
+  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                    name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/A2018.TP.pdf", TP2018Adult)
+
+TP2018Adult
+ggsave(file = "output/Graphs/A2018.TP.pdf", TP2018Adult,  width = 11, height = 11, units = c("in"))
+
+## Statistics
+TP2018Adult.2018.anova <- lm(Total.Protein.mgcm2~Origin*Treatment*Transplant.Site, data = mean.TP.Col.A2018)
+qqnorm(resid(TP2018Adult.2018.anova))
+qqline(resid(TP2018Adult.2018.anova)) 
+
+boxplot(resid(TP2018Adult.2018.anova)~mean.TP.Col.A2018$Origin)
+boxplot(resid(TP2018Adult.2018.anova)~mean.TP.Col.A2018$Treatment) 
+boxplot(resid(TP2018Adult.2018.anova)~mean.TP.Col.A2018$Transplant.Site)
+
+anova(TP2018Adult.2018.anova)
+
+capture.output(anova(TP2018Adult.2018.anova), file = "output/Statistics/A2018.TP.csv")
+
+### Larval Total Protein 2018 ### 
+
+# Import Data
+L2018.TP.Run1 <- read.csv("data/2018/Protein/TProtein_Larvae2018_20190515_Run1.csv")
+L2018.TP.Run2 <- read.csv("data/2018/Protein/TProtein_Larvae2018_20190515_Run2.csv")
+L2018.TP.Run3 <- read.csv("data/2018/Protein/TProtein_Larvae2018_20190515_Run3.csv")
+
+L2018.vial.meta <- read.csv("data/2018/Metadata/Larval_2018_vial_metadata.csv") #Vial metadata
+L2018.TP.well <- read.csv("data/2018/Protein/Larval_Protein_2018_Well.csv")
+A2018.meta <- read.csv("data/2018/Metadata/Sample_Info_Transp.csv")
+
+
+# Adding Run numbers into datasets
+L2018.TP.Run1$Run <- 1
+L2018.TP.Run2$Run <- 2
+L2018.TP.Run3$Run <- 3
+
+# Make a unique column for merging
+L2018.TP.Run1$run.well <- paste(L2018.TP.Run1$Run, L2018.TP.Run1$Well, sep = "-")
+L2018.TP.Run2$run.well <- paste(L2018.TP.Run2$Run, L2018.TP.Run2$Well, sep = "-")
+L2018.TP.Run3$run.well <- paste(L2018.TP.Run3$Run, L2018.TP.Run3$Well, sep = "-")
+
+L2018.TP.well$run.well <- paste(L2018.TP.well$Run, L2018.TP.well$Well, sep = "-")
+
+# Merge with metadata
+L2018.TP.Run1 <- merge(L2018.TP.Run1, L2018.TP.well, by = "run.well")
+L2018.TP.Run2 <- merge(L2018.TP.Run2, L2018.TP.well, by = "run.well")
+L2018.TP.Run3 <- merge(L2018.TP.Run3, L2018.TP.well, by = "run.well")
+
+# Subtract blanks means for each run (Runs 1, 3have standards and blanks)
+L2018.TP.standardblank1 <- L2018.TP.Run1 %>% 
+  filter(Sample.Type == "Blank") %>%
+  summarise(blk.avg = mean(X562))
+
+L2018.TP.Run1$abs.corr <- L2018.TP.Run1$X562 - L2018.TP.standardblank1$blk.avg
+L2018.TP.Run2$abs.corr <- L2018.TP.Run2$X562 - L2018.TP.standardblank1$blk.avg
+L2018.TP.Run3$abs.corr <- L2018.TP.Run3$X562 - L2018.TP.standardblank1$blk.avg
+
+# Run standards
+L2018.TP.standard1 <- L2018.TP.Run1 %>% 
+  filter(Sample.Type == "Standard") 
+L2018.TP.plot.S1<- ggplot(data = L2018.TP.standard1, aes(x=Concentration, y=abs.corr))+
+  ylab("Absorbance (nm)")+ xlab("Concentration") + 
+  geom_point()+
+  geom_smooth(method = "lm") +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+L2018.TP.lmstandard1 <- lm (Concentration ~ abs.corr, data = L2018.TP.standard1)
+L2018.TP.lmsummary1 <- summary(L2018.TP.lmstandard1)
+
+# Extrapolate concentration values
+
+L2018.TP.Sample1 <- L2018.TP.Run1 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+L2018.TP.Sample1$ConcentrationS <- predict(L2018.TP.lmstandard1, newdata = L2018.TP.Sample1) #using model to get concentration
+
+L2018.TP.Sample2 <- L2018.TP.Run2 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+L2018.TP.Sample2$ConcentrationS <- predict(L2018.TP.lmstandard1, newdata = L2018.TP.Sample2) #using model to get concentration
+
+L2018.TP.Sample3 <- L2018.TP.Run3 %>% #subsetting Samples
+  filter(Sample.Type == "Sample") 
+L2018.TP.Sample3$ConcentrationS <- predict(L2018.TP.lmstandard1, newdata = L2018.TP.Sample3) #using model to get concentration
+
+# Combining datasets
+
+L2018.TP.all <- rbind(L2018.TP.Sample1, 
+                      L2018.TP.Sample2, 
+                      L2018.TP.Sample3)
+
+L2018.TP.all <- L2018.TP.all %>%
+  select("Vial", "ConcentrationS")
+
+L2018.TP.coralid <- merge(L2018.TP.all, L2018.vial.meta, by = "Vial")
+L2018.TP.meta <- merge(L2018.TP.coralid, A2018.meta, by = "coral.id")
+L2018.TP.meta <- L2018.TP.meta %>% 
+  select(coral.id, ConcentrationS, Sample.Size, Origin, Treatment.y, Transplant.Site)
+
+# Standardization (DL = 4)
+L2018.TP.meta$Conc.calcS <- (L2018.TP.meta$ConcentrationS * 4 / L2018.TP.meta$Sample.Size) #Calculating concentration
+
+# Summarizing 
+mean.TP.col.L2018 <- summarySE(L2018.TP.meta, measurevar="Conc.calcS", groupvars=c("coral.id","Origin", "Treatment.y", "Transplant.Site"))
+
+mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
+mean.TP.L2018$reef.treatment <- paste(mean.TP.L2018$Origin, mean.TP.L2018$Treatment)
+
+#Plotting 
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+TP2018Larvae <- ggplot(mean.TP.L2018, aes(x=Transplant.Site, y=Conc.calcS, group=reef.treatment)) + 
+  geom_line(position=pd, aes(linetype=Origin, color = Treatment.y), size = 2)+
+  geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se), width=.1, position=pd, color="black") + #Error bars
+  #  ylim(1,4)+
+  xlab("Transplant Site") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
+  geom_point(aes(fill=Treatment.y, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+TP2018Larvae
+ggsave(file = "output/Graphs/L2018.TP.pdf", TP2018Larvae, width = 11, height = 11, units = c("in"))
+
+
+## Statistics
+TP2018Larvae.2018.anova <- lm(Conc.calcS~Origin*Treatment.y*Transplant.Site, data = mean.TP.col.L2018)
+qqnorm(resid(TP2018Larvae.2018.anova))
+qqline(resid(TP2018Larvae.2018.anova)) 
+
+boxplot(resid(TP2018Larvae.2018.anova)~mean.TP.col.L2018$Origin)
+boxplot(resid(TP2018Larvae.2018.anova)~mean.TP.col.L2018$Treatment.y) 
+boxplot(resid(TP2018Larvae.2018.anova)~mean.TP.col.L2018$Transplant.Site)
+
+anova(TP2018Larvae.2018.anova)
+
+capture.output(anova(TP2018Larvae.2018.anova), file = "output/Statistics/L2018.TP.csv")

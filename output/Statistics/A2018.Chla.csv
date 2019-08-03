@@ -1,0 +1,12 @@
+Analysis of Variance Table
+
+Response: ChlA.ugcm2
+                                 Df Sum Sq Mean Sq F value Pr(>F)
+Origin                            1  1.194 1.19401  1.0987 0.3024
+Treatment                         1  0.743 0.74270  0.6834 0.4145
+Transplant.Site                   1  0.801 0.80056  0.7367 0.3971
+Origin:Treatment                  1  0.277 0.27675  0.2547 0.6173
+Origin:Transplant.Site            1  0.131 0.13072  0.1203 0.7310
+Treatment:Transplant.Site         1  0.020 0.01991  0.0183 0.8932
+Origin:Treatment:Transplant.Site  1  0.424 0.42426  0.3904 0.5365
+Residuals                        32 34.775 1.08672               

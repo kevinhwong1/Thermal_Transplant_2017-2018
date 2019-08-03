@@ -1,8 +1,14 @@
 Analysis of Variance Table
 
-Response: resid.Pgross
-                     Df Sum Sq  Mean Sq F value Pr(>F)
-Origin.x              1 0.1319 0.131864  0.5050 0.4875
-Treatment.x           1 0.1216 0.121621  0.4658 0.5047
-Origin.x:Treatment.x  1 0.0667 0.066664  0.2553 0.6203
-Residuals            16 4.1779 0.261116               
+Response: Pgross_umol.cm2.hr
+                                 Df Sum Sq Mean Sq F value   Pr(>F)   
+Origin                            1 0.8989 0.89893  7.6996 0.009145 **
+Treatment                         1 0.8502 0.85020  7.2823 0.011025 * 
+Transplant.Site                   1 0.8835 0.88351  7.5675 0.009699 **
+Origin:Treatment                  1 0.0401 0.04014  0.3438 0.561734   
+Origin:Transplant.Site            1 0.0659 0.06593  0.5647 0.457853   
+Treatment:Transplant.Site         1 0.0608 0.06081  0.5209 0.475717   
+Origin:Treatment:Transplant.Site  1 0.0333 0.03333  0.2855 0.596813   
+Residuals                        32 3.7360 0.11675                    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

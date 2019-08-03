@@ -1,0 +1,10 @@
+Analysis of Variance Table
+
+Response: Total.Protein.mgcm2
+                    Df Sum Sq Mean Sq F value  Pr(>F)  
+reef.zone            1 0.0001 0.00005  0.0003 0.98665  
+treatment            1 0.7867 0.78667  4.1220 0.04998 *
+reef.zone:treatment  1 0.1668 0.16682  0.8741 0.35623  
+Residuals           35 6.6796 0.19084                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

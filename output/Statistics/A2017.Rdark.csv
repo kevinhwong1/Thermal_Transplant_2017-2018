@@ -1,0 +1,8 @@
+Analysis of Variance Table
+
+Response: Rdark_umol.cm2.hr
+                 Df  Sum Sq  Mean Sq F value Pr(>F)
+Origin            1 0.00273 0.002735  0.0767 0.7834
+Treatment         1 0.00644 0.006442  0.1807 0.6734
+Origin:Treatment  1 0.00204 0.002042  0.0573 0.8122
+Residuals        35 1.24756 0.035645               

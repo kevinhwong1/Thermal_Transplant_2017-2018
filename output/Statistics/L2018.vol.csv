@@ -1,8 +1,14 @@
 Analysis of Variance Table
 
-Response: resid.1
-                     Df    Sum Sq   Mean Sq F value Pr(>F)
-Origin.x              1 0.0020219 0.0020219  0.7104 0.4172
-Treatment.x           1 0.0023302 0.0023302  0.8188 0.3849
-Origin.x:Treatment.x  1 0.0002534 0.0002534  0.0890 0.7710
-Residuals            11 0.0313052 0.0028459               
+Response: Volume
+                                 Df   Sum Sq  Mean Sq F value    Pr(>F)    
+Origin                            1 0.053471 0.053471 19.3451 0.0001645 ***
+Treatment                         1 0.000855 0.000855  0.3093 0.5828599    
+Transplant.Site                   1 0.001164 0.001164  0.4209 0.5221589    
+Origin:Treatment                  1 0.002483 0.002483  0.8983 0.3519736    
+Origin:Transplant.Site            1 0.000938 0.000938  0.3395 0.5651635    
+Treatment:Transplant.Site         1 0.001902 0.001902  0.6880 0.4143858    
+Origin:Treatment:Transplant.Site  1 0.000240 0.000240  0.0868 0.7706278    
+Residuals                        26 0.071866 0.002764                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

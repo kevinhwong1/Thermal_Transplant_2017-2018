@@ -11,6 +11,7 @@ library(stringr)
 library(lme4)
 library(lmerTest)
 library(plyr)
+library(Rmisc)
 
 ### 2017 data ###
 
@@ -35,25 +36,45 @@ fec.tot.2017.mean <- summarySE(fec.tot.2017, measurevar="total.plan.sa2", groupv
 pd <- position_dodge(0.1) # moves object .05 to the left and right
 legend.title <- "Treatment"
 fec.2017<- ggplot(fec.tot.2017.mean, aes(x=treatment, y=total.plan.sa2, group=reef.zone)) + 
-  geom_line(position=pd, color="black")+
   geom_errorbar(aes(ymin=total.plan.sa2-se, ymax=total.plan.sa2+se), width=.1, position=pd, color="black") + #Error bars
+  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
   ylim(0,8)+
-  xlab("Treatment") + ylab(expression("Mean Larval Release per" ~ cm^{2}))+ #Axis titles
-  geom_point(aes(shape=reef.zone, color=treatment), size=4, position=pd)+
-  scale_shape_manual(values=c(16,17),
+  xlab("Treatment") + ylab(expression("Mean Larval Release " ~ cm^{-2}))+ #Axis titles
+  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
                      name = "Reef Zone")+
-  scale_color_manual(values=c("#0000FF", "tomato1"),
-                     name = "Treatment")+ #colour modification
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(legend.position = c(0.9,0.8))
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
 fec.2017
+
+ggsave(file = "output/Graphs/Fec.2017.point.pdf", fec.2017, width = 11, height = 11, units = c("in"))
 
 fec.2017.bar <- ggplot(fec.tot.2017.mean, aes(x=reef.zone, y=total.plan.sa2, fill=treatment)) + 
   geom_bar(position=position_dodge(), stat="identity", color = "black") +
   geom_errorbar(aes(ymin=total.plan.sa2-se, ymax=total.plan.sa2+se),
                 width=.2,                    # Width of the error bars
                 position=position_dodge(.9)) +
+  xlab("Reef Zone") + ylab(expression("Mean Larval Release per" ~ cm^{2}))+ #Axis titles
+  scale_fill_manual(values=c("dodgerblue3", "tomato1"),
+                    name = "Treatment") + #colour modification
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 16, color = "black"),
+        axis.title = element_text(size = 18, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = c(0.9,0.8))
+
+fec.2017.box <- ggplot(fec.tot.2017, aes(x=reef.zone, y=total.plan.sa2, fill=treatment)) + 
+  geom_boxplot()
+
+
   xlab("Reef Zone") + ylab(expression("Mean Larval Release per" ~ cm^{2}))+ #Axis titles
   scale_fill_manual(values=c("dodgerblue3", "tomato1"),
                      name = "Treatment") + #colour modification
@@ -67,22 +88,35 @@ fec.2017.bar <- ggplot(fec.tot.2017.mean, aes(x=reef.zone, y=total.plan.sa2, fil
 ggsave(file = "output/Graphs/Fec.2017.bar.pdf", fec.2017.bar)
 
 # Statistics
-fec.2017.anova <- lm(total.plan.sa2~reef.zone*treatment, data = fec.tot.2017)
-qqnorm(resid(fec.2017.anova))
+
+fec.tot.2017$total.plan.sa2.log <- log(fec.tot.2017$total.plan.sa2 + 1)
+
+fec.2017.anova <- lm(total.plan.sa2.log~reef.zone*treatment, data = fec.tot.2017)
+qqnorm(resid(fec.2017.anova)) #not normal
 qqline(resid(fec.2017.anova))
 
 boxplot(resid(fec.2017.anova)~fec.tot.2017$reef.zone)
 boxplot(resid(fec.2017.anova)~fec.tot.2017$treatment)
 
-#anova(fec.2017.anova)
-#capture.output(anova(A2017.Chla.anova), file = "output/Statistics/A2017.Chla.csv")
+anova(fec.2017.anova)
 
-hist(fec.tot.2017$total.plan.sa2)
 
-fec.2017.tb.set <- fec.tot.2017.mean %>%
-  select(treatment, reef.zone, total.plan.sa2)
+#Removing variables with zero
+fec.tot.2017.value <- fec.tot.2017 %>%
+  filter(total.plan.sa2 > 0)
 
-fec.2017.table <- dcast
+fec.tot.2017.value$total.plan.sa2.log <- log(fec.tot.2017.value$total.plan.sa2 + 1)
+
+fec.2017.anova <- lm(total.plan.sa2.log~reef.zone*treatment, data = fec.tot.2017.value)
+qqnorm(resid(fec.2017.anova)) #not normal
+qqline(resid(fec.2017.anova))
+
+boxplot(resid(fec.2017.anova)~fec.tot.2017.value$reef.zone)
+boxplot(resid(fec.2017.anova)~fec.tot.2017.value$treatment)
+
+anova(fec.2017.anova)
+
+capture.output(anova(fec.2017.anova), file = "output/Statistics/A2017.Fec.csv")
 
 
 ### 2018 data ###
@@ -103,6 +137,38 @@ pr.data.sa.2018 <- merge(pr.data.sa2018, info2018, by="coral.id")
 pr.data.2018 <- pr.data.sa.2018 %>%
   select(coral.id, Date.x, Lunar.Day, total.plan.sa2, reef.zone, treatment, Transplant.Site)
 
+fec.tot<- ddply(pr.data.2018, .(coral.id, treatment,reef.zone,Transplant.Site), #summing rows by variables
+                       summarize, 
+                       total.plan.sa2 = sum(total.plan.sa2))
+
+fec.tot.mean <- summarySE(fec.tot, measurevar="total.plan.sa2", groupvars=c("treatment","reef.zone","Transplant.Site")) #Summarizing by treatment and reef
+fec.tot.mean$reef.treatment <- paste(fec.tot.mean$reef.zone, fec.tot.mean$treatment)
+
+Fec2018 <- ggplot(fec.tot.mean, aes(x=Transplant.Site, y=total.plan.sa2, group=reef.treatment)) + 
+  geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
+  geom_errorbar(aes(ymin=total.plan.sa2-se, ymax=total.plan.sa2+se), width=.1, position=pd, color="black") + #Error bars
+  #  ylim(1,4)+
+  xlab("Transplant Site") + ylab(expression("Mean larval release " (cm^{-2})))+ #Axis titles
+  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+Fec2018
+ggsave(file = "output/Graphs/A2018.Fec.pdf", Fec2018, width = 11, height = 11, units = c("in"))
+
+
+### Residual Analysis ###
 #Adding timepoint values
 pr.data.2018.TPatch <- pr.data.2018 %>%
   filter(Transplant.Site == "Patch")
@@ -140,7 +206,7 @@ fec.resid.mean <- summarySE(fec.2018.comp, measurevar="resid.1", groupvars=c("tr
 
 pd <- position_dodge(0.1) # moves object .05 to the left and right
 resid.fecundity<- ggplot(fec.resid.mean, aes(x=treatment.x, y=resid.1, group=reef.zone.x, shape = reef.zone.x)) + 
-  geom_line(position=pd, color="black")+
+  geom_line(position=pd, color="black", linetype = "3313")+
   geom_errorbar(aes(ymin=resid.1-se, ymax=resid.1+se), width=.1, position=pd, color="black") + #Error bars
   geom_hline(yintercept = 0,linetype="dashed") +
 #  ylim(0,16)+

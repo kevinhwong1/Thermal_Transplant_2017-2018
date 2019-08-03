@@ -64,4 +64,25 @@ write.csv(coral.frag.2017, 'data/2017/Surface.Area/Adult.Frag.2017.Calculated.cs
 
 ### 2018 Fragment Surface Area ### 
 
+frag.2018.standard <- read.csv("data/2018/Surface.Area/SA_Standard_Foil_CurveFrag2018.csv") #loading data
 
+plot.frag.2018.standard<- ggplot(data = frag.2018.standard, aes(x=Surface.area.cm2, y=Weight.avg))+
+  ylab("Mass (g)")+ xlab("Surface Area (cm2)") + 
+  geom_point()+
+  geom_smooth(method = "lm") +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+lm.frag.2018.standard <- lm (Surface.area.cm2 ~ Weight.avg, data = frag.2018.standard) #creating a linear model off of standard curve
+lm.frag.2018.summary <- summary(lm.frag.2018.standard) #creating a summary outfut for the linear model
+lm.frag.2018.summary 
+ 
+# Calculating fragment surface area from weight
+
+coral.frag.2018 <- read.csv("data/2018/Surface.Area/Adult.frag.processing.2018.csv")
+coral.frag.2018$Weight.avg <- (coral.frag.2018$Mass.1 + coral.frag.2018$Mass.2 + coral.frag.2018$Mass.3)/3
+
+coral.frag.2018$Surface.Area <- predict(lm.frag.2018.standard, newdata = coral.frag.2018) #using model to get surface area
+write.csv(coral.frag.2018, 'data/2018/Surface.Area/Adult.Frag.2018.Calculated.csv')
