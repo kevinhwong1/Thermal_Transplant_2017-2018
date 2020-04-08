@@ -74,6 +74,21 @@ Violin.L2017.Size <- ggplot(L2017.vol.patch.mean, aes(x=Treatment.1, y=Volume_1,
 
 ggsave(file = "output/Graphs/L2017.Patch.size.pdf", Violin.L2017.Size, width = 11, height = 11, units = c("in"))
 
+Box.L2017.Size <- ggplot(L2017.vol.patch.mean, aes(x=Treatment.1, y=Volume_1, fill = Treatment.1)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Larval Volume " (mm^{3}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.Patch.size.box.pdf", Box.L2017.Size, width = 11, height = 11, units = c("in"))
+
 # size.2017.bar <- ggplot(L2017.vol.mean, aes(x=Treatment.1, y=Volume_1, fill=Treatment.1)) + 
 #   geom_bar(position=position_dodge(), stat="identity", color = "black") +
 #   geom_errorbar(aes(ymin=Volume_1-se, ymax=Volume_1+se),

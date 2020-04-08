@@ -487,6 +487,22 @@ ggsave(file = "output/Graphs/L2017.TP.Patch.size.pdf", Violin.L2017.TP, width = 
 
 capture.output(t.test(Conc.calcS.mg.mm3~Treatment.1, data = L2017.TP.Patch.meta.1), file = "output/Statistics/L2017.TP.size.csv")
 
+#Boxplot with jitter
+Box.L2017.TP <- ggplot(L2017.TP.Patch.meta.1, aes(x=Treatment.1, y=Conc.calcS.mg.mm3, fill = Treatment.1)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Total Protein " (mg ~ mm^{-3}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.TP.Patch.size.box.pdf", Box.L2017.TP, width = 11, height = 11, units = c("in"))
+
 
 #Plotting reaction norm
 pd <- position_dodge(0.1) # moves object .05 to the left and right

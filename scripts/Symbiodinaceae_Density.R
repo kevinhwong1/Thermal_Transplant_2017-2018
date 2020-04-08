@@ -243,6 +243,20 @@ ggsave(file = "output/Graphs/L2017.Zoox.Patch.size.pdf", Violin.L2017.Zoox, widt
 
 capture.output(t.test(Cells.x3.mm3~Treatment.1, data = L2017.zoox.Patch.size), file = "output/Statistics/L2017.Zoox.size.csv")
 
+Box.L2017.Zoox <- ggplot(L2017.zoox.Patch.size, aes(x=Treatment.1, y=Cells.x3.mm3, fill = Treatment.1)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size =4) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Cell Density " (10^{3} ~ mm^{-3}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.Zoox.Patch.size.box.pdf", Box.L2017.Zoox, width = 11, height = 11, units = c("in"))
 
 
 
