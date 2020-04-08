@@ -1,0 +1,10 @@
+Analysis of Variance Table
+
+Response: resid.A.Zoox
+                     Df Sum Sq Mean Sq F value  Pr(>F)  
+Origin.x              1 1.7269 1.72692  7.4291 0.01496 *
+Treatment.x           1 0.0305 0.03053  0.1313 0.72180  
+Origin.x:Treatment.x  1 0.1218 0.12183  0.5241 0.47955  
+Residuals            16 3.7193 0.23245                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

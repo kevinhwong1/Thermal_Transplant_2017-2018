@@ -171,8 +171,8 @@ Resp$umol.cm2.hr<-(Resp$umol.sec.corr*3600) / Resp$Surface_Area
 write.csv(Photo, file="output/Photo_Resp_Output/Photosynthesis.rates.2019.csv")
 write.csv(Resp, file="output/Photo_Resp_Output/Respiration.rates2019.csv")
 
-Photo <- read_csv("output/Photo_Resp_Output/Photosynthesis.rates.2019.csv")
-Resp <- read_csv("output/Photo_Resp_Output/Respiration.rates2019.csv")
+Photo <- read.csv("output/Photo_Resp_Output/Photosynthesis.rates.2019.csv")
+Resp <- read.csv("output/Photo_Resp_Output/Respiration.rates2019.csv")
 
 #calculate gross photosynthesis Pnet -- Rdark
 resp.data <- merge(Photo[,c(1,10,11,12,13,25)],Resp[,c(1,25)], by="Fragment.ID")
@@ -238,7 +238,7 @@ Fig.Pg <-  ggplot(AllMeans.2018, aes(x=Transplant.Site, y=Pgross.mean,  color=Tr
   geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
   xlab("Treatment") + #label x axis
   ylab(expression("Gross Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#  ylim(0, 1)+
+  ylim(0.5, 2.2)+
   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
                      name = "Reef Zone")+
@@ -261,8 +261,8 @@ Fig.Rd <-  ggplot(AllMeans.2018, aes(x=Transplant.Site, y=Rdark.mean.abs,  color
   geom_errorbar(aes(x=Transplant.Site, ymax=Rdark.mean.abs+Rdark.se, ymin=Rdark.mean.abs-Rdark.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
   geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
   xlab("Treatment") + #label x axis
-  ylab(expression("Dark Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-  ylim(0.6, 1.3)+
+  ylab(expression("Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
+  ylim(0.4, 1.4)+
   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
                      name = "Reef Zone")+
@@ -322,30 +322,34 @@ anova(Rdark2018anova)
 capture.output(anova(Rdark2018anova), file = "output/Statistics/A2018.Rdark.csv")
 
 
-# ## Making residuals 
-# resp.data.2018 <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
-# 
-# resp.data.2018.TPatch <- resp.data.2018 %>%
-#   filter(Transplant.Site == "Patch")
-# 
-# resp.data.2018.TRim <- resp.data.2018 %>%
-#   filter(Transplant.Site == "Rim")
-# 
-# resp.data.2018.TPatch$coral.id <- resp.data.2018.TPatch$Fragment.ID %>% str_replace("-A","")
-# resp.data.2018.TRim$coral.id <- resp.data.2018.TRim$Fragment.ID %>% str_replace("-B","")
-# 
-# resp.2018.comp <- merge(resp.data.2018.TPatch, resp.data.2018.TRim, by = "coral.id")
-# 
-# # residual calculation
-# resp.2018.comp$resid.Pnet <- resid(lm(resp.2018.comp$Pnet_umol.cm2.hr.y - resp.2018.comp$Pnet_umol.cm2.hr.x ~0))
-# resp.2018.comp$resid.Rdark <- resid(lm(resp.2018.comp$Rdark_umol.cm2.hr.y - resp.2018.comp$Rdark_umol.cm2.hr.x ~0))
-# resp.2018.comp$resid.Pgross <- resid(lm(resp.2018.comp$Pgross_umol.cm2.hr.y - resp.2018.comp$Pgross_umol.cm2.hr.x ~0))
-# 
-# # Summarizing residuals
-# Pnet.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pnet", groupvars=c("Treatment.x", "Origin.x"))
-# Rdark.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Rdark", groupvars=c("Treatment.x", "Origin.x"))
-# Pgross.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pgross", groupvars=c("Treatment.x", "Origin.x"))
-# 
+## Making residuals
+resp.data.2018 <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
+
+resp.data.2018.TPatch <- resp.data.2018 %>%
+  filter(Transplant.Site == "Patch")
+
+resp.data.2018.TRim <- resp.data.2018 %>%
+  filter(Transplant.Site == "Rim")
+
+resp.data.2018.TPatch$coral.id <- resp.data.2018.TPatch$Fragment.ID %>% str_replace("-A","")
+resp.data.2018.TRim$coral.id <- resp.data.2018.TRim$Fragment.ID %>% str_replace("-B","")
+
+resp.2018.comp <- merge(resp.data.2018.TPatch, resp.data.2018.TRim, by = "coral.id")
+
+# residual calculation
+resp.2018.comp$resid.Pnet <- resid(lm(resp.2018.comp$Pnet_umol.cm2.hr.y - resp.2018.comp$Pnet_umol.cm2.hr.x ~0))
+resp.2018.comp$resid.Rdark <- resid(lm(resp.2018.comp$Rdark_umol.cm2.hr.y - resp.2018.comp$Rdark_umol.cm2.hr.x ~0))
+resp.2018.comp$resid.Pgross <- resid(lm(resp.2018.comp$Pgross_umol.cm2.hr.y - resp.2018.comp$Pgross_umol.cm2.hr.x ~0))
+
+# Summarizing residuals
+Pnet.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pnet", groupvars=c("Treatment.x", "Origin.x"))
+Rdark.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Rdark", groupvars=c("Treatment.x", "Origin.x"))
+Pgross.resid.2018.mean <- summarySE(resp.2018.comp, measurevar="resid.Pgross", groupvars=c("Treatment.x", "Origin.x"))
+
+write.csv(Pnet.resid.2018.mean, file ="output/Residual_Analysis/Resid.Pnet.csv")
+write.csv(Rdark.resid.2018.mean, file ="output/Residual_Analysis/Resid.Rdark.csv")
+write.csv(Pgross.resid.2018.mean, file ="output/Residual_Analysis/Resid.Pgross.csv")
+
 # # Plotting 
 # 
 # ##Pnet residuals plot

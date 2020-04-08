@@ -1,0 +1,14 @@
+Analysis of Variance Table
+
+Response: Chla.ng.mm3
+                                  Df Sum Sq Mean Sq F value    Pr(>F)    
+Origin                             1    637     637  0.8624    0.3540    
+Treatment                          1  13886   13886 18.8101 2.105e-05 ***
+Transplant.Site                    1  66163   66163 89.6226 < 2.2e-16 ***
+Origin:Treatment                   1     10      10  0.0130    0.9092    
+Origin:Transplant.Site             1  13525   13525 18.3206 2.673e-05 ***
+Treatment:Transplant.Site          1  12674   12674 17.1683 4.702e-05 ***
+Origin:Treatment:Transplant.Site   1     79      79  0.1073    0.7435    
+Residuals                        247 182344     738                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

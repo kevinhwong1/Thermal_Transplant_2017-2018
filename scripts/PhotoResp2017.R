@@ -547,7 +547,7 @@ Fig.Rd <-  ggplot(AllMeans2, aes(x=Treatment, y=Rdark.mean.abs,  color=Treatment
   geom_errorbar(aes(x=Treatment, ymax=Rdark.mean.abs+Rdark.se, ymin=Rdark.mean.abs-Rdark.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
   geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
   xlab("Treatment") + #label x axis
-  ylab(expression("Dark Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
+  ylab(expression("Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
   ylim(0.25, 0.6)+
   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),

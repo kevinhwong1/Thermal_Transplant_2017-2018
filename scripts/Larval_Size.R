@@ -7,6 +7,11 @@
 library(dbplyr)
 library(tidyverse)
 library(readr)
+library(stringr)
+library(gridExtra)
+library(grid)
+library(ggplot2)
+library(lattice)
 library(Rmisc)
 
 ### 2017 Larval Size ###
@@ -18,6 +23,13 @@ colnames(L2017.vol.data)[colnames(L2017.vol.data)=='Colony']<-'coral.id' #changi
 
 L2017.vol.data<- subset(L2017.vol.data, Reef=="Patch")
 L2017.vol.T1 <- subset(L2017.vol.data, Timepoint=="T1") #Subsetting T1 from T2 and creating a variable for T1
+
+#Summarizing for export
+L2017.vol.patch.mean  <- summarySE(L2017.vol.T1, measurevar="Volume_1", groupvars=c("Treatment.1","Date.Release", "coral.id")) 
+
+L2017.vol.patch.mean$Date.coral.ID <- paste(L2017.vol.patch.mean$Date.Release, L2017.vol.patch.mean$coral.id, sep = "-")
+
+write.csv(L2017.vol.patch.mean, "data/2017/Larval.Size/Patch_mean_Larvalsize.csv")
 
 # Summarizing
 L2017.vol.mean <- summarySE(L2017.vol.T1, measurevar="Volume_1", groupvars=c("Treatment.1","Reef")) #summarize vol by treatment and reef
@@ -47,6 +59,20 @@ larval.size.2017 <- ggplot(L2017.vol.mean, aes(x=Treatment.1, y=Volume_1, group 
 
 ggsave(file = "output/Graphs/L2017.Vol.pdf", larval.size.2017, width = 11, height = 11, units = c("in"))
 
+Violin.L2017.Size <- ggplot(L2017.vol.patch.mean, aes(x=Treatment.1, y=Volume_1, fill = Treatment.1)) +
+  geom_violin(position = position_dodge(width = 0.9)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Larval Volume " (mm^{3}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.Patch.size.pdf", Violin.L2017.Size, width = 11, height = 11, units = c("in"))
 
 # size.2017.bar <- ggplot(L2017.vol.mean, aes(x=Treatment.1, y=Volume_1, fill=Treatment.1)) + 
 #   geom_bar(position=position_dodge(), stat="identity", color = "black") +
@@ -92,6 +118,13 @@ L2018.vol.data$b <- L2018.vol.data$Width/2
 L2018.vol.data$a <- L2018.vol.data$Length/2
 L2018.vol.data$Volume <- 4/3*pi*L2018.vol.data$a*(L2018.vol.data$b^2) 
 
+L2018.vol.data.mean  <- summarySE(L2018.vol.data, measurevar="Volume", groupvars=c("Date", "coral.id")) 
+L2018.vol.data.mean$Date.coral.ID <- paste(L2018.vol.data.mean$Date, L2018.vol.data.mean$coral.id, sep = "-")
+L2018.vol.data$Date.coral.ID <- paste(L2018.vol.data$Date, L2018.vol.data$coral.id, sep = "-")
+
+write.csv(L2018.vol.data.mean, "data/2018/Larval.Size/Mean_Larvalsize_ColDay.csv")
+
+
 #adding sample info
 L2018.vol.info <- merge(L2018.vol.data, colony.info.2018, by="coral.id")
 
@@ -107,6 +140,8 @@ L2018.vol.info <- L2018.vol.info %>%
 
 #Mean Sizes by colony
 L2018.vol.mean.col <- summarySE(L2018.vol.info, measurevar="Volume", groupvars=c("coral.id","coral.id.orig","Origin", "Treatment", "Origin.Treatment", "Transplant.Site")) #summarize vol by treatment and reef
+
+write.csv(L2018.vol.mean.col, file ="data/2018/Larval.Size/L.Size.2018.csv")
 
 #Mean size by histories 
 L2018.vol.mean.LL <- summarySE(L2018.vol.info, measurevar="Volume", groupvars=c("Origin", "Treatment","Transplant.Site")) #summarize vol by treatment and reef
@@ -139,20 +174,25 @@ Size2018Larvae
 ggsave(file = "output/Graphs/L2018.Size.pdf", Size2018Larvae, width = 11, height = 11, units = c("in"))
 
 ## Statistics
-SIZE2018Larvae.anova <- lm(Volume~Origin*Treatment*Transplant.Site, data = L2018.vol.mean.col)
+
+L2018.vol.info$Origin <- factor(L2018.vol.info$Origin)
+L2018.vol.info$Treatment <- factor(L2018.vol.info$Treatment)
+L2018.vol.info$Transplant.Site <- factor(L2018.vol.info$Transplant.Site)
+
+SIZE2018Larvae.anova <- lm(Volume~Origin*Treatment*Transplant.Site, data = L2018.vol.info)
 qqnorm(resid(SIZE2018Larvae.anova))
 qqline(resid(SIZE2018Larvae.anova)) 
 
-boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.mean.col$Origin)
-boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.mean.col$Treatment) 
-boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.mean.col$Transplant.Site)
+boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Origin)
+boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Treatment) 
+boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Transplant.Site)
 
 anova(SIZE2018Larvae.anova)
 
 capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.csv")
 
 
-# #reformat dataframe
+# #Residual Analysis
 # L2018.vol.TPatch <- L2018.vol.mean.col %>%
 #   filter(Transplant.Site == "Patch")
 # 
@@ -167,9 +207,15 @@ capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.
 # #Summarizing residuals
 # L2018.vol.resid.mean <- summarySE(L2018.vol.comp, measurevar="resid.1", groupvars=c("Treatment.x", "Origin.x"))
 # 
+# colnames(L2018.vol.resid.mean) [1] <- "Treatment"
+# colnames(L2018.vol.resid.mean) [2] <- "Origin"
+# 
+# write.csv(L2018.vol.resid.mean, file ="output/Residual_Analysis/Resid.L.Size.csv")
+# 
+# 
 # #Plotting
 # pd <- position_dodge(0.1) # moves object .05 to the left and right
-# size.resid.2018<- ggplot(L2018.vol.resid.mean, aes(x=Treatment.x, y=resid.1, group=Origin.x, shape = Origin.x)) + 
+# size.resid.2018<- ggplot(L2018.vol.resid.mean, aes(x=Treatment.x, y=resid.1, group=Origin.x, shape = Origin.x)) +
 #   geom_line(position=pd, color="black", linetype = "3313")+
 #   geom_errorbar(aes(ymin=resid.1-se, ymax=resid.1+se), width=.1, position=pd, color="black") + #Error bars
 #   geom_hline(yintercept = 0,linetype="dashed") +
@@ -178,8 +224,8 @@ capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.
 #   geom_point(aes(shape=Origin.x), position=pd, color ="black", fill = "black", size=4)+
 #   scale_shape_manual(values=c(16,17),
 #                      name = "Origin") +
-#   annotate("text", x = 1, y = 0.25, label = "Rim > Patch") + 
-#   annotate("text", x = 1, y = -0.25, label = "Rim < Patch") + 
+#   annotate("text", x = 1, y = 0.25, label = "Rim > Patch") +
+#   annotate("text", x = 1, y = -0.25, label = "Rim < Patch") +
 #   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
 #                      panel.grid.minor = element_blank(), axis.line = element_blank())+
 #   theme(axis.text = element_text(size = 16, color = "black"),
@@ -188,13 +234,13 @@ capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.
 # 
 # ggsave(file = "output/Graphs/L2018.vol.pdf", size.resid.2018)
 # 
-# # Statistics 
+# # Statistics
 # L2018.vol.comp$Origin.x<-droplevels(L2018.vol.comp$Origin.x)
 # L2018.vol.comp$Treatment.x<-droplevels(L2018.vol.comp$Treatment.x)
 # 
 # vol.resid.2018.anova <- lm(resid.1~Origin.x*Treatment.x, data = L2018.vol.comp)
 # qqnorm(resid(vol.resid.2018.anova))
-# qqline(resid(vol.resid.2018.anova)) 
+# qqline(resid(vol.resid.2018.anova))
 # 
 # boxplot(resid(vol.resid.2018.anova)~L2018.vol.comp$Origin.x)
 # boxplot(resid(vol.resid.2018.anova)~L2018.vol.comp$Treatment.x) #not normal
