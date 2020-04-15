@@ -407,7 +407,7 @@ L2018.zoox.meta.size$Origin <- factor(L2018.zoox.meta.size$Origin)
 L2018.zoox.meta.size$Treatment.y <- factor(L2018.zoox.meta.size$Treatment.y)
 L2018.zoox.meta.size$Transplant.Site <- factor(L2018.zoox.meta.size$Transplant.Site)
 
-Zoox2018Larvae.2018.anova2 <- lm(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.zoox.meta.size)
+Zoox2018Larvae.2018.anova2 <- aov(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.zoox.meta.size)
 qqnorm(resid(Zoox2018Larvae.2018.anova2))
 qqline(resid(Zoox2018Larvae.2018.anova2)) 
 
@@ -420,7 +420,10 @@ anova(Zoox2018Larvae.2018.anova2)
 
 capture.output(anova(Zoox2018Larvae.2018.anova2), file = "output/Statistics/L2018.Zoox.vol.csv")
 
+# Post-Hoc 
 
+L.2018.Zoox.PH <- TukeyHSD(Zoox2018Larvae.2018.anova2, conf.level = 0.95)
+capture.output(L.2018.Zoox.PH, file = "output/Statistics/L2018.Zoox.PH.csv")
 
 # 
 # ## Making residuals
@@ -533,7 +536,7 @@ ggsave(file = "output/Graphs/A2018.Zoox.pdf", zoox.adult.2018, width = 11, heigh
 
 
 #Statistics
-Zoox2018Adult.anova <- lm(Cells.cm2.x6~Origin*Treatment*Transplant.Site, data = A2018.zoox.meta)
+Zoox2018Adult.anova <- aov(Cells.cm2.x6~Origin*Treatment*Transplant.Site, data = A2018.zoox.meta)
 qqnorm(resid(Zoox2018Adult.anova))
 qqline(resid(Zoox2018Adult.anova)) 
 
@@ -541,10 +544,15 @@ boxplot(resid(Zoox2018Adult.anova)~A2018.zoox.meta$Origin)
 boxplot(resid(Zoox2018Adult.anova)~A2018.zoox.meta$Treatment) 
 boxplot(resid(Zoox2018Adult.anova)~A2018.zoox.meta$Transplant.Site)
 
+summary(Zoox2018Adult.anova)
 anova(Zoox2018Adult.anova)
 
 capture.output(anova(Zoox2018Adult.anova), file = "output/Statistics/A2018.Zoox.csv")
 
+# Post-Hoc 
+
+A.2018.Zoox.PH.OxTrans <- TukeyHSD(Zoox2018Adult.anova, conf.level = 0.95)
+capture.output(A.2018.Zoox.PH.OxTrans, file = "output/Statistics/A2018.Zoox.PH.csv")
 
 # ## Making residuals
 # A.Zoox.2018.TPatch <- A2018.zoox.meta %>%

@@ -755,7 +755,7 @@ L2018.Chla.meta.size$Origin <- factor(L2018.Chla.meta.size$Origin)
 L2018.Chla.meta.size$Treatment <- factor(L2018.Chla.meta.size$Treatment)
 L2018.Chla.meta.size$Transplant.Site <- factor(L2018.Chla.meta.size$Transplant.Site)
 
-Chla2018Larvae.2018.anova2 <- lm(Chla.ng.mm3~Origin*Treatment*Transplant.Site, data = L2018.Chla.meta.size)
+Chla2018Larvae.2018.anova2 <- aov(Chla.ng.mm3~Origin*Treatment*Transplant.Site, data = L2018.Chla.meta.size)
 qqnorm(resid(Chla2018Larvae.2018.anova2))
 qqline(resid(Chla2018Larvae.2018.anova2)) 
 
@@ -767,6 +767,10 @@ boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Transplant.Site)
 anova(Chla2018Larvae.2018.anova2)
 
 capture.output(anova(Chla2018Larvae.2018.anova2), file = "output/Statistics/L2018.Chla.vol.csv")
+
+# Post Hoc
+L.2018.Chla.PH <- TukeyHSD(Chla2018Larvae.2018.anova2, conf.level = 0.95)
+capture.output(L.2018.Chla.PH, file = "output/Statistics/L2018.Chla.PH.csv")
 
 
 

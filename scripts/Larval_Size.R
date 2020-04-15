@@ -194,7 +194,7 @@ L2018.vol.info$Origin <- factor(L2018.vol.info$Origin)
 L2018.vol.info$Treatment <- factor(L2018.vol.info$Treatment)
 L2018.vol.info$Transplant.Site <- factor(L2018.vol.info$Transplant.Site)
 
-SIZE2018Larvae.anova <- lm(Volume~Origin*Treatment*Transplant.Site, data = L2018.vol.info)
+SIZE2018Larvae.anova <- aov(Volume~Origin*Treatment*Transplant.Site, data = L2018.vol.info)
 qqnorm(resid(SIZE2018Larvae.anova))
 qqline(resid(SIZE2018Larvae.anova)) 
 
@@ -205,6 +205,10 @@ boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Transplant.Site)
 anova(SIZE2018Larvae.anova)
 
 capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.csv")
+
+# Post Hoc
+L.2018.vol.PH <- TukeyHSD(SIZE2018Larvae.anova, conf.level = 0.95)
+capture.output(L.2018.vol.PH, file = "output/Statistics/L2018.vol.PH.csv")
 
 
 # #Residual Analysis

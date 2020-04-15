@@ -1,0 +1,75 @@
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Volume ~ Origin * Treatment * Transplant.Site, data = L2018.vol.info)
+
+$Origin
+               diff        lwr       upr p adj
+Rim-Patch 0.0968718 0.08609049 0.1076531     0
+
+$Treatment
+                  diff        lwr       upr     p adj
+Hot-Ambient 0.01413814 0.00339078 0.0248855 0.0099554
+
+$Transplant.Site
+                  diff         lwr         upr     p adj
+Rim-Patch -0.003562959 -0.01455656 0.007430647 0.5251018
+
+$`Origin:Treatment`
+                                  diff          lwr         upr     p adj
+Rim:Ambient-Patch:Ambient  0.083431470  0.062650488  0.10421245 0.0000000
+Patch:Hot-Patch:Ambient    0.001330987 -0.017846662  0.02050864 0.9979821
+Rim:Hot-Patch:Ambient      0.113720019  0.092305372  0.13513467 0.0000000
+Patch:Hot-Rim:Ambient     -0.082100483 -0.101003451 -0.06319752 0.0000000
+Rim:Hot-Rim:Ambient        0.030288549  0.009119537  0.05145756 0.0013738
+Rim:Hot-Patch:Hot          0.112389033  0.092791582  0.13198648 0.0000000
+
+$`Origin:Transplant.Site`
+                               diff         lwr         upr     p adj
+Rim:Patch-Patch:Patch  0.0948006943  0.07664841  0.11295298 0.0000000
+Patch:Rim-Patch:Patch -0.0061798053 -0.02569758  0.01333797 0.8478174
+Rim:Rim-Patch:Patch    0.0943740966  0.07418976  0.11455843 0.0000000
+Patch:Rim-Rim:Patch   -0.1009804996 -0.12179560 -0.08016540 0.0000000
+Rim:Rim-Rim:Patch     -0.0004265977 -0.02186797  0.02101477 0.9999519
+Rim:Rim-Patch:Rim      0.1005539019  0.07794482  0.12316298 0.0000000
+
+$`Treatment:Transplant.Site`
+                                  diff          lwr         upr     p adj
+Hot:Patch-Ambient:Patch    0.025187607  0.007254549 0.043120664 0.0017743
+Ambient:Rim-Ambient:Patch  0.012471696 -0.009280829 0.034224220 0.4533341
+Hot:Rim-Ambient:Patch      0.009161349 -0.010447776 0.028770474 0.6260704
+Ambient:Rim-Hot:Patch     -0.012715911 -0.034206709 0.008774887 0.4247687
+Hot:Rim-Hot:Patch         -0.016026258 -0.035344640 0.003292123 0.1429970
+Hot:Rim-Ambient:Rim       -0.003310347 -0.026218372 0.019597679 0.9824932
+
+$`Origin:Treatment:Transplant.Site`
+                                              diff          lwr          upr     p adj
+Rim:Ambient:Patch-Patch:Ambient:Patch  0.073089612  0.042633058  0.103546167 0.0000000
+Patch:Hot:Patch-Patch:Ambient:Patch    0.004273558 -0.023827003  0.032374119 0.9998026
+Rim:Hot:Patch-Patch:Ambient:Patch      0.126085571  0.093531028  0.158640113 0.0000000
+Patch:Ambient:Rim-Patch:Ambient:Patch -0.001770046 -0.039343377  0.035803284 0.9999999
+Rim:Ambient:Rim-Patch:Ambient:Patch    0.098781525  0.063785556  0.133777495 0.0000000
+Patch:Hot:Rim-Patch:Ambient:Patch     -0.004674377 -0.035898921  0.026550167 0.9998224
+Rim:Hot:Rim-Patch:Ambient:Patch        0.097614373  0.063239160  0.131989587 0.0000000
+Patch:Hot:Patch-Rim:Ambient:Patch     -0.068816054 -0.097266853 -0.040365256 0.0000000
+Rim:Hot:Patch-Rim:Ambient:Patch        0.052995958  0.020138620  0.085853296 0.0000294
+Patch:Ambient:Rim-Rim:Ambient:Patch   -0.074859659 -0.112695641 -0.037023676 0.0000001
+Rim:Ambient:Rim-Rim:Ambient:Patch      0.025691913 -0.009585903  0.060969730 0.3461404
+Patch:Hot:Rim-Rim:Ambient:Patch       -0.077763989 -0.109304100 -0.046223879 0.0000000
+Rim:Hot:Rim-Rim:Ambient:Patch          0.024524761 -0.010137347  0.059186870 0.3850426
+Rim:Hot:Patch-Patch:Hot:Patch          0.121812013  0.091125787  0.152498238 0.0000000
+Patch:Ambient:Rim-Patch:Hot:Patch     -0.006043604 -0.042010275  0.029923066 0.9996165
+Rim:Ambient:Rim-Patch:Hot:Patch        0.094507967  0.061242909  0.127773026 0.0000000
+Patch:Hot:Rim-Patch:Hot:Patch         -0.008947935 -0.038219395  0.020323525 0.9834328
+Rim:Hot:Rim-Patch:Hot:Patch            0.093340816  0.060729444  0.125952187 0.0000000
+Patch:Ambient:Rim-Rim:Hot:Patch       -0.127855617 -0.167399998 -0.088311236 0.0000000
+Rim:Ambient:Rim-Rim:Hot:Patch         -0.027304045 -0.064408234  0.009800144 0.3323780
+Patch:Hot:Rim-Rim:Hot:Patch           -0.130759947 -0.164330397 -0.097189498 0.0000000
+Rim:Hot:Rim-Rim:Hot:Patch             -0.028471197 -0.064990483  0.008048089 0.2590401
+Rim:Ambient:Rim-Patch:Ambient:Rim      0.100551572  0.058974201  0.142128943 0.0000000
+Patch:Hot:Rim-Patch:Ambient:Rim       -0.002904331 -0.041361216  0.035552555 0.9999983
+Rim:Hot:Rim-Patch:Ambient:Rim          0.099384420  0.058328176  0.140440664 0.0000000
+Patch:Hot:Rim-Rim:Ambient:Rim         -0.103455902 -0.139398839 -0.067512965 0.0000000
+Rim:Hot:Rim-Rim:Ambient:Rim           -0.001167152 -0.039878622  0.037544318 1.0000000
+Rim:Hot:Rim-Patch:Hot:Rim              0.102288750  0.066949931  0.137627570 0.0000000
+

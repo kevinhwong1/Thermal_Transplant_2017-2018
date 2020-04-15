@@ -1,0 +1,75 @@
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Chla.ng.mm3 ~ Origin * Treatment * Transplant.Site, data = L2018.Chla.meta.size)
+
+$Origin
+              diff       lwr      upr     p adj
+Rim-Patch 3.282596 -3.679653 10.24484 0.3539803
+
+$Treatment
+                 diff       lwr       upr    p adj
+Hot-Ambient -15.74901 -22.94734 -8.550688 2.37e-05
+
+$Transplant.Site
+              diff     lwr      upr p adj
+Rim-Patch 35.52376 28.0789 42.96862     0
+
+$`Origin:Treatment`
+                                diff       lwr        upr     p adj
+Rim:Ambient-Patch:Ambient   2.087966 -13.62696 17.8028924 0.9860147
+Patch:Hot-Patch:Ambient   -15.614766 -27.94257 -3.2869635 0.0065630
+Rim:Hot-Patch:Ambient     -14.362757 -28.37746 -0.3480586 0.0422242
+Patch:Hot-Rim:Ambient     -17.702732 -31.09731 -4.3081585 0.0040783
+Rim:Hot-Rim:Ambient       -16.450723 -31.41240 -1.4890501 0.0247590
+Rim:Hot-Patch:Hot           1.252009 -10.09997 12.6039892 0.9918895
+
+$`Origin:Transplant.Site`
+                           diff         lwr       upr     p adj
+Rim:Patch-Patch:Patch  10.20402  -0.7303083 21.138343 0.0771031
+Patch:Rim-Patch:Patch  47.87880  35.2788276 60.478772 0.0000000
+Rim:Rim-Patch:Patch    27.22798  12.8822801 41.573679 0.0000099
+Patch:Rim-Rim:Patch    37.67478  23.6748134 51.674752 0.0000000
+Rim:Rim-Rim:Patch      17.02396   1.4342564 32.613669 0.0261716
+Rim:Rim-Patch:Rim     -20.65082 -37.4507834 -3.850857 0.0089735
+
+$`Treatment:Transplant.Site`
+                                diff        lwr       upr     p adj
+Hot:Patch-Ambient:Patch   -26.932912 -37.867237 -15.99859 0.0000000
+Ambient:Rim-Ambient:Patch  11.949553  -6.833377  30.73248 0.3550710
+Hot:Rim-Ambient:Patch      17.660570   4.627308  30.69383 0.0030274
+Ambient:Rim-Hot:Patch      38.882465  21.118495  56.64643 0.0000002
+Hot:Rim-Hot:Patch          44.593482  33.077142  56.10982 0.0000000
+Hot:Rim-Ambient:Rim         5.711017 -13.416583  24.83862 0.8669104
+
+$`Origin:Treatment:Transplant.Site`
+                                             diff        lwr        upr     p adj
+Rim:Ambient:Patch-Patch:Ambient:Patch  15.0694772  -7.130071  37.269025 0.4339268
+Patch:Hot:Patch-Patch:Ambient:Patch   -27.0156047 -42.913031 -11.118178 0.0000117
+Rim:Hot:Patch-Patch:Ambient:Patch     -21.5766089 -39.702464  -3.450754 0.0079050
+Patch:Ambient:Rim-Patch:Ambient:Patch   8.3474434 -41.292256  57.987142 0.9995843
+Rim:Ambient:Rim-Patch:Ambient:Patch     9.1346467 -15.850121  34.119414 0.9524965
+Patch:Hot:Rim-Patch:Ambient:Patch      27.2296349   8.758494  45.700776 0.0002698
+Rim:Hot:Rim-Patch:Ambient:Patch        11.4892631 -13.495504  36.474030 0.8539849
+Patch:Hot:Patch-Rim:Ambient:Patch     -42.0850819 -62.505696 -21.664468 0.0000000
+Rim:Hot:Patch-Rim:Ambient:Patch       -36.6460862 -58.845634 -14.446538 0.0000238
+Patch:Ambient:Rim-Rim:Ambient:Patch    -6.7220338 -57.989694  44.545627 0.9999214
+Rim:Ambient:Rim-Rim:Ambient:Patch      -5.9348305 -34.015285  22.145624 0.9981587
+Patch:Hot:Rim-Rim:Ambient:Patch        12.1601576 -10.322199  34.642514 0.7170480
+Rim:Hot:Rim-Rim:Ambient:Patch          -3.5802141 -31.660668  24.500240 0.9999349
+Rim:Hot:Patch-Patch:Hot:Patch           5.4389957 -10.458431  21.336422 0.9667912
+Patch:Ambient:Rim-Patch:Hot:Patch      35.3630481 -13.506997  84.233093 0.3480721
+Rim:Ambient:Rim-Patch:Hot:Patch        36.1502514  12.731879  59.568623 0.0001067
+Patch:Hot:Rim-Patch:Hot:Patch          54.2452395  37.955225  70.535254 0.0000000
+Rim:Hot:Rim-Patch:Hot:Patch            38.5048678  15.086496  61.923240 0.0000262
+Patch:Ambient:Rim-Rim:Hot:Patch        29.9240524 -19.715647  79.563751 0.5914296
+Rim:Ambient:Rim-Rim:Hot:Patch          30.7112556   5.726488  55.696023 0.0051927
+Patch:Hot:Rim-Rim:Hot:Patch            48.8062438  30.335103  67.277384 0.0000000
+Rim:Hot:Rim-Rim:Hot:Patch              33.0658721   8.081105  58.050639 0.0017684
+Rim:Ambient:Rim-Patch:Ambient:Rim       0.7872033 -51.746516  53.320923 1.0000000
+Patch:Hot:Rim-Patch:Ambient:Rim        18.8821914 -30.884626  68.649009 0.9423213
+Rim:Hot:Rim-Patch:Ambient:Rim           3.1418197 -49.391900  55.675539 0.9999996
+Patch:Hot:Rim-Rim:Ambient:Rim          18.0949882  -7.141394  43.331371 0.3601823
+Rim:Hot:Rim-Rim:Ambient:Rim             2.3546164 -27.975741  32.684973 0.9999978
+Rim:Hot:Rim-Patch:Hot:Rim             -15.7403717 -40.976754   9.496011 0.5475852
+

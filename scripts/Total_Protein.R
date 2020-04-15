@@ -984,7 +984,7 @@ L2018.TP.meta.size$Origin <- factor(L2018.TP.meta.size$Origin)
 L2018.TP.meta.size$Treatment.y <- factor(L2018.TP.meta.size$Treatment.y)
 L2018.TP.meta.size$Transplant.Site <- factor(L2018.TP.meta.size$Transplant.Site)
 
-TP2018Larvae.2018.anova2 <- lm(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.TP.meta.size)
+TP2018Larvae.2018.anova2 <- aov(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.TP.meta.size)
 qqnorm(resid(TP2018Larvae.2018.anova2))
 qqline(resid(TP2018Larvae.2018.anova2)) 
 
@@ -996,7 +996,9 @@ anova(TP2018Larvae.2018.anova2)
 
 capture.output(anova(TP2018Larvae.2018.anova2), file = "output/Statistics/L2018.TP.vol.csv")
 
-
+# Post Hoc
+L.2018.TP.PH <- TukeyHSD(TP2018Larvae.2018.anova2, conf.level = 0.95)
+capture.output(L.2018.TP.PH, file = "output/Statistics/L2018.TP.PH.csv")
 
 
 
