@@ -13,7 +13,7 @@ library(grid)
 library(ggplot2)
 library(lattice)
 library(Rmisc)
-
+library(lsmeans)
 ### 2017 Larval Size ###
 
 #load data
@@ -210,6 +210,21 @@ capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.
 L.2018.vol.PH <- TukeyHSD(SIZE2018Larvae.anova, conf.level = 0.95)
 capture.output(L.2018.vol.PH, file = "output/Statistics/L2018.vol.PH.csv")
 
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.vol.lsm <- lsmeans(SIZE2018Larvae.anova, ~ Origin*Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.vol.pairs.LSM <- multcomp::cld(L.2018.vol.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.vol.pairs.LSM #view results
+capture.output(L.2018.vol.pairs.LSM, file = "output/Statistics/L.2018.vol.pairs.3way.csv")
+
+L.2018.vol.OxTre <- lsmeans(SIZE2018Larvae.anova, ~ Origin*Treatment, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.vol.pairs.OxTre <- multcomp::cld(L.2018.vol.OxTre, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.vol.pairs.OxTre #view results
+capture.output(L.2018.vol.pairs.OxTre, file = "output/Statistics/L.2018.vol.pairs.OxTre.csv")
+
+L.2018.vol.TreTrans <- lsmeans(SIZE2018Larvae.anova, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.vol.pairs.TreTrans <- multcomp::cld(L.2018.vol.TreTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.vol.pairs.TreTrans #view results
+capture.output(L.2018.vol.pairs.TreTrans, file = "output/Statistics/L.2018.vol.pairs.TreTrans.csv")
 
 # #Residual Analysis
 # L2018.vol.TPatch <- L2018.vol.mean.col %>%

@@ -772,5 +772,14 @@ capture.output(anova(Chla2018Larvae.2018.anova2), file = "output/Statistics/L201
 L.2018.Chla.PH <- TukeyHSD(Chla2018Larvae.2018.anova2, conf.level = 0.95)
 capture.output(L.2018.Chla.PH, file = "output/Statistics/L2018.Chla.PH.csv")
 
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.Chla.TreatTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.Chla.pairs.TreatTrans <- multcomp::cld(L.2018.Chla.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.Chla.pairs.TreatTrans #view results
+capture.output(L.2018.Chla.pairs.TreatTrans, file = "output/Statistics/L.2018.Chla.pairs.TreatTrans.csv")
 
-
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.Chla.OxTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.Chla.pairs.OxTrans <- multcomp::cld(L.2018.Chla.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.Chla.pairs.OxTrans #view results
+capture.output(L.2018.Chla.pairs.OxTrans, file = "output/Statistics/L.2018.Chla.pairs.OxTrans.csv")

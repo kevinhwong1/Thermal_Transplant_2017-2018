@@ -1,0 +1,10 @@
+ Treatment Transplant.Site lsmean      SE   df lower.CL upper.CL .group
+ Ambient   Patch            0.231 0.00502 1891    0.221    0.241  a    
+ Hot       Rim              0.241 0.00582 1891    0.229    0.252  ab   
+ Ambient   Rim              0.243 0.00685 1891    0.229    0.256  ab   
+ Hot       Patch            0.259 0.00506 1891    0.250    0.269   b   
+
+Results are averaged over the levels of: Origin 
+Confidence level used: 0.95 
+P value adjustment: tukey method for comparing a family of 4 estimates 
+significance level used: alpha = 0.05 

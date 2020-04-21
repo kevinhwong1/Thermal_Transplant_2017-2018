@@ -1000,10 +1000,23 @@ capture.output(anova(TP2018Larvae.2018.anova2), file = "output/Statistics/L2018.
 L.2018.TP.PH <- TukeyHSD(TP2018Larvae.2018.anova2, conf.level = 0.95)
 capture.output(L.2018.TP.PH, file = "output/Statistics/L2018.TP.PH.csv")
 
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.TP.lsm <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.TP.pairs.LSM <- multcomp::cld(L.2018.TP.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.TP.pairs.LSM #view results
+capture.output(L.2018.TP.pairs.LSM, file = "output/Statistics/L.2018.TP.pairs.3way.csv")
 
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.TP.OxTrans <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.TP.pairs.OxTrans <- multcomp::cld(L.2018.TP.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.TP.pairs.OxTrans #view results
+capture.output(L.2018.TP.pairs.OxTrans, file = "output/Statistics/L.2018.TP.pairs.OxTrans.csv")
 
-
-
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.TP.OxTreat <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.TP.pairs.OxTreat <- multcomp::cld(L.2018.TP.OxTreat, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.TP.pairs.OxTreat #view results
+capture.output(L.2018.TP.pairs.OxTreat, file = "output/Statistics/L.2018.TP.pairs.OxTreat.csv")
 
 
 # 

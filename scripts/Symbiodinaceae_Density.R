@@ -425,6 +425,12 @@ capture.output(anova(Zoox2018Larvae.2018.anova2), file = "output/Statistics/L201
 L.2018.Zoox.PH <- TukeyHSD(Zoox2018Larvae.2018.anova2, conf.level = 0.95)
 capture.output(L.2018.Zoox.PH, file = "output/Statistics/L2018.Zoox.PH.csv")
 
+#PostHoc Tukey adjustment comparison of least-squares means
+L.2018.Zoox.TreatTrans <- lsmeans(Zoox2018Larvae.2018.anova2, ~ Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+L.2018.Zoox.pairs.TreatTrans <- multcomp::cld(L.2018.Zoox.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+L.2018.Zoox.pairs.TreatTrans #view results
+capture.output(L.2018.Zoox.pairs.TreatTrans, file = "output/Statistics/L.2018.Zoox.pairs.TreatTrans.csv")
+
 # 
 # ## Making residuals
 # 
@@ -553,6 +559,12 @@ capture.output(anova(Zoox2018Adult.anova), file = "output/Statistics/A2018.Zoox.
 
 A.2018.Zoox.PH.OxTrans <- TukeyHSD(Zoox2018Adult.anova, conf.level = 0.95)
 capture.output(A.2018.Zoox.PH.OxTrans, file = "output/Statistics/A2018.Zoox.PH.csv")
+
+#PostHoc Tukey adjustment comparison of least-squares means
+A.2018.Zoox.OxTrans <- lsmeans(Zoox2018Adult.anova, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+A.2018.Zoox.pairs.OxTrans <- multcomp::cld(A.2018.Zoox.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+A.2018.Zoox.pairs.OxTrans #view results
+capture.output(A.2018.Zoox.pairs.OxTrans, file = "output/Statistics/A.2018.Zoox.pairs.OxTrans.csv")
 
 # ## Making residuals
 # A.Zoox.2018.TPatch <- A2018.zoox.meta %>%
