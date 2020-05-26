@@ -339,6 +339,89 @@ Violin.A2017.TP <- ggplot(mean.A2017.TP.Col.T2, aes(x=reef.zone, y=Total.Protein
 ggsave(file = "output/Graphs/A2017.TP.violin.pdf", Violin.A2017.TP, width = 11, height = 11, units = c("in"))
 
 
+# T1 base plot 
+mean.A2017.col.TP <- summarySE(A2017.TP.final, measurevar="Total.Protein.mgcm2", groupvars=c("coral.id", "treatment", "reef.zone", "timepoint"))
+mean.A2017.TP.T1 <- summarySE(mean.A2017.col.TP, measurevar="Total.Protein.mgcm2", groupvars=c("timepoint", "reef.zone"))
+mean.A2017.TP.T1$timepoint <- factor(mean.A2017.TP.T1$timepoint, levels = c("Pre-Treatment","Post-Treatment"))
+
+# Plotting
+pd <- position_dodge(0.3) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+TP2017Adult.T1 <- ggplot(mean.A2017.TP.T1, aes(x=timepoint, y=Total.Protein.mgcm2, group=reef.zone)) + 
+  #  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
+  geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, size = 1, position=pd, color="black") + #Error bars
+  #  ylim(0,5.0)+
+  xlab("Timepoint") + ylab(expression("Total Protein " (mg~cm^{-2}))) + #Axis titles
+  geom_point(aes(shape=reef.zone), fill = "black", size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  #  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+  #                    name = "Treatment")+ #colour modification
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
+  annotate("rect", xmin=0, xmax=1.5, ymin = 1, ymax=3, alpha = 0.2) + 
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/A2017.TP.T1.pdf", TP2017Adult.T1, width = 11, height = 11, units = c("in"))
+
+# T1 Statistics
+
+A2017.TP.T1 <- mean.A2017.col.TP %>%
+  filter(timepoint == "Pre-Treatment")
+
+A2017.TP.T1.anova <- lm(Total.Protein.mgcm2~reef.zone, data = A2017.TP.T1)
+qqnorm(resid(A2017.TP.T1.anova))
+qqline(resid(A2017.TP.T1.anova))
+
+boxplot(resid(A2017.TP.T1.anova)~A2017.TP.T1$reef.zone)
+
+t.test(Total.Protein.mgcm2~reef.zone, data = A2017.TP.T1)
+
+capture.output(t.test(Total.Protein.mgcm2~reef.zone, data = A2017.TP.T1), file = "output/Statistics/A2017.TP.T1.csv")
+
+
+
+# Plotting T2 
+A2017.TP.T2 <- mean.A2017.col.TP %>%
+  filter(timepoint == "Post-Treatment")
+
+
+# Gross photosynthesis 
+mean.A2017.TP.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("treatment", "reef.zone"))
+
+# Plotting
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+TP2017Adult.T2 <- ggplot(mean.A2017.TP.T2, aes(x=treatment, y=Total.Protein.mgcm2, group=reef.zone)) + 
+  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
+  geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, size = 1, position=pd, color="black") + #Error bars
+#  ylim(0,1)+
+  xlab("Timepoint") + ylab(expression("Total Protein " (mg~cm^{-2})))+ #Axis titles
+  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
+  annotate("rect", xmin=0, xmax=0.75, ymin = 1, ymax=3, alpha = 0.2) + 
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/A2017.TP.T2.pdf", TP2017Adult.T2, width = 11, height = 11, units = c("in"))
+
+
+
+
 ### 2017 Larval Total Protein ###
 
 L2017.TP <- read.csv("data/2017/Protein/Total_Protein_Larvae.csv")
@@ -469,6 +552,9 @@ L2017.TP.Patch.meta$Conc.calcS.size <- L2017.TP.Patch.meta$Conc.calcS/L2017.TP.P
 L2017.TP.Patch.meta$Conc.calcS.mg.mm3 <- L2017.TP.Patch.meta$Conc.calcS.size/100
 
 L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
+L2017.TP.Final <- summarySE(L2017.TP.Patch.meta.1, measurevar="Conc.calcS.mg.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
+
+
 
 Violin.L2017.TP <- ggplot(L2017.TP.Patch.meta.1, aes(x=Treatment.1, y=Conc.calcS.mg.mm3, fill = Treatment.1)) +
   geom_violin(position = position_dodge(width = 0.9)) +
@@ -488,9 +574,10 @@ ggsave(file = "output/Graphs/L2017.TP.Patch.size.pdf", Violin.L2017.TP, width = 
 capture.output(t.test(Conc.calcS.mg.mm3~Treatment.1, data = L2017.TP.Patch.meta.1), file = "output/Statistics/L2017.TP.size.csv")
 
 #Boxplot with jitter
-Box.L2017.TP <- ggplot(L2017.TP.Patch.meta.1, aes(x=Treatment.1, y=Conc.calcS.mg.mm3, fill = Treatment.1)) +
+Box.L2017.TP <- ggplot(L2017.TP.Final, aes(x=treatment, y=Conc.calcS.mg.mm3, fill = treatment)) +
   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
   geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
   #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
   #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
   scale_fill_manual(values=c("#FFFFFF", "#999999")) +
@@ -502,6 +589,21 @@ Box.L2017.TP <- ggplot(L2017.TP.Patch.meta.1, aes(x=Treatment.1, y=Conc.calcS.mg
   theme(legend.position = "none")
 
 ggsave(file = "output/Graphs/L2017.TP.Patch.size.box.pdf", Box.L2017.TP, width = 11, height = 11, units = c("in"))
+
+# Statistics
+
+# Statistics
+L2017.TP.Patch.anova <- lm(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final)
+qqnorm(resid(L2017.TP.Patch.anova))
+qqline(resid(L2017.TP.Patch.anova))
+
+boxplot(resid(L2017.TP.Patch.anova)~L2017.TP.Final$treatment)
+
+t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final)
+
+capture.output(t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final), file = "output/Statistics/L2017.TP.Patch.csv")
+
+
 
 
 #Plotting reaction norm
@@ -579,16 +681,6 @@ ggsave(file = "output/Graphs/L2017.TP.Patch.pdf", L2017.TP.Patch.plot, width = 1
 #         axis.title.x = element_blank()) +
 #   theme(legend.position = "none")
 
-# Statistics
-L2017.TP.Patch.anova <- lm(Conc.calcS~treatment, data = L2017.TP.Patch.Col.mean)
-qqnorm(resid(L2017.TP.Patch.anova))
-qqline(resid(L2017.TP.Patch.anova))
-
-boxplot(resid(L2017.TP.Patch.anova)~L2017.TP.Patch.Col.mean$treatment)
-
-t.test(Conc.calcS~treatment, data = L2017.TP.Patch.Col.mean)
-
-capture.output(t.test(Conc.calcS~treatment, data = L2017.TP.Patch.Col.mean), file = "output/Statistics/L2017.TP.Patch.csv")
 
 
 ### Total protein Adult 2018 ###
@@ -734,7 +826,7 @@ pd <- position_dodge(0.1) # moves object .05 to the left and right
 TP2018Adult <- ggplot(mean.TP.A2018, aes(x=Transplant.Site, y=Total.Protein.mgcm2, group=reef.treatment)) + 
   geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
   geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(0.5,1.9)+
+  ylim(0.5,2.2)+
   xlab("Transplant Site") + ylab(expression("Total Protein " (mg~cm^{-2}))) + #Axis titles
   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),

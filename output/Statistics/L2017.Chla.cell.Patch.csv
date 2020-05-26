@@ -1,0 +1,12 @@
+
+	Welch Two Sample t-test
+
+data:  Chla.cell by treatment.x
+t = -0.067981, df = 25.352, p-value = 0.9463
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.6277292  0.5875858
+sample estimates:
+mean in group Ambient     mean in group Hot 
+             2.606066              2.626138 
+

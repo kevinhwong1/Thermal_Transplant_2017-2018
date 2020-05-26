@@ -1,0 +1,7 @@
+
+	Wilcoxon rank sum test
+
+data:  Pgross_umol.cm2.hr by Origin
+W = 5, p-value = 0.1508
+alternative hypothesis: true location shift is not equal to 0
+

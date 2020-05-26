@@ -1,0 +1,8 @@
+Analysis of Variance Table
+
+Response: chla.cell
+                        Df  Sum Sq Mean Sq F value Pr(>F)
+reef.zone.y              1   0.178  0.1778  0.0398 0.8431
+treatment.y              1   8.237  8.2372  1.8454 0.1835
+reef.zone.y:treatment.y  1   4.705  4.7052  1.0541 0.3120
+Residuals               33 147.302  4.4637               

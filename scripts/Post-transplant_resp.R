@@ -192,6 +192,73 @@ write.csv(resp.data, file ="data/2018/Colony_Respirometry/All.resp.data2018.csv"
 
 resp.data <- read.csv("data/2018/Colony_Respirometry/All.resp.data2018.csv")
 
+### Gross Photosynthesis 
+
+mean.PGross.A2018 <- summarySE(resp.data, measurevar="Pgross_umol.cm2.hr", groupvars=c("Origin", "Treatment", "Transplant.Site"))
+mean.PGross.A2018$reef.treatment <- paste(mean.PGross.A2018$Origin, mean.PGross.A2018$Treatment)
+
+#Plotting 
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+PGross2018Adult <- ggplot(mean.PGross.A2018, aes(x=Transplant.Site, y=Pgross_umol.cm2.hr, group=reef.treatment)) + 
+  geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
+  geom_errorbar(aes(ymin=Pgross_umol.cm2.hr-se, ymax=Pgross_umol.cm2.hr+se), width=.1, position=pd, color="black") + #Error bars
+  ylim(0.5,2.5)+
+  xlab("Transplant Site") + ylab(expression("Gross Photosynthetic Rate " (mu*mol ~ cm^{-2} ~ h^{-1}))) + #Axis titles
+  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+PGross2018Adult
+ggsave(file = "output/Graphs/A2018.PGross.pdf", PGross2018Adult,  width = 11, height = 11, units = c("in"))
+
+
+
+### Respiration
+
+resp.data$abs.resp <- -(resp.data$Rdark_umol.cm2.hr)
+mean.Resp.A2018 <- summarySE(resp.data, measurevar="abs.resp", groupvars=c("Origin", "Treatment", "Transplant.Site"))
+mean.Resp.A2018$reef.treatment <- paste(mean.Resp.A2018$Origin, mean.Resp.A2018$Treatment)
+
+#Plotting 
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+Resp2018Adult <- ggplot(mean.Resp.A2018, aes(x=Transplant.Site, y=abs.resp, group=reef.treatment)) + 
+  geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
+  geom_errorbar(aes(ymin=abs.resp-se, ymax=abs.resp+se), width=.1, position=pd, color="black") + #Error bars
+  ylim(0.4,1.5)+
+  xlab("Transplant Site") + ylab(expression("Respiration Rate " (mu*mol ~ cm^{-2} ~ h^{-1}))) + #Axis titles
+  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+Resp2018Adult
+ggsave(file = "output/Graphs/A2018.Resp.pdf", Resp2018Adult,  width = 11, height = 11, units = c("in"))
+
+
+
 #Calculate means
 AllMeans.2018 <- ddply(resp.data, c('Origin','Treatment','Transplant.Site'), summarize, #take out treatment?
                    #pnet

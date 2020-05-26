@@ -1,0 +1,7 @@
+
+	Wilcoxon rank sum test
+
+data:  abs.resp by Origin
+W = 10, p-value = 0.6905
+alternative hypothesis: true location shift is not equal to 0
+

@@ -1,0 +1,12 @@
+
+	Welch Two Sample t-test
+
+data:  Total.Protein.mgcm2 by reef.zone
+t = -2.3918, df = 32.849, p-value = 0.02265
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.92763336 -0.07479659
+sample estimates:
+mean in group Patch   mean in group Rim 
+           1.731183            2.232398 
+

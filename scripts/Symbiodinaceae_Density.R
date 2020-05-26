@@ -49,6 +49,8 @@ A2017.zoox.meta$Cells.mL.vol <- A2017.zoox.meta$Cells.mL*A2017.zoox.meta$homo.vo
 A2017.zoox.meta$Cells.cm2 <- A2017.zoox.meta$Cells.mL.vol/A2017.zoox.meta$Surface.Area 
 A2017.zoox.meta$Cells.cm2.x6 <- A2017.zoox.meta$Cells.cm2 / 1000000
 
+write.csv(A2017.zoox.meta, 'data/2017/Zoox/A2017.zoox.calc.csv')
+
 #Summarizing
 A2017.zoox.mean <- summarySE(A2017.zoox.meta, measurevar="Cells.cm2.x6", groupvars=c("treatment", "reef.zone", "timepoint"))
 A2017.zoox.mean$reef.treatment <- paste(A2017.zoox.mean$reef.zone, A2017.zoox.mean$treatment)
@@ -81,6 +83,53 @@ zoox2017Adult
 ggsave(file = "output/Graphs/A2017.Zoox.pdf", zoox2017Adult)
 
 
+# Plotting T1
+
+#Plotting 
+
+A2017.zoox.mean2 <- summarySE(A2017.zoox.meta, measurevar="Cells.cm2.x6", groupvars=c("reef.zone", "timepoint"))
+
+#Reordering factors
+A2017.zoox.mean2$timepoint <- factor(A2017.zoox.mean2$timepoint, levels = c("Pre-Treatment","Post-Treatment"))
+pd <- position_dodge(0.3) # moves object .05 to the left and right
+
+Zoox2017Adult.T1 <- ggplot(A2017.zoox.mean2, aes(x=timepoint, y=Cells.cm2.x6, group=reef.zone)) + 
+#  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
+  geom_errorbar(aes(ymin=Cells.cm2.x6-se, ymax=Cells.cm2.x6+se), width=.1, size = 1, position=pd, color="black") + #Error bars
+  ylim(0,1.6)+
+  xlab("Timepoint") + ylab(expression("Cell Density " (10^{6} ~ cm^{-2})))+ #Axis titles
+  geom_point(aes(shape=reef.zone), fill = "black", size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+#  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+#                    name = "Treatment")+ #colour modification
+  annotate("rect", xmin=0, xmax=1.5, ymin = 0, ymax=1.5, alpha = 0.2) + 
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/A2017.Zoox.T1.pdf", Zoox2017Adult.T1, width = 11, height = 11, units = c("in"))
+
+# T1 Statistics
+
+A2017.zoox.T1 <- A2017.zoox.meta %>%
+  filter(timepoint == "Pre-Treatment")
+
+A2017.zoox.T1.anova <- lm(Cells.cm2.x6~reef.zone, data = A2017.zoox.T1)
+qqnorm(resid(A2017.zoox.T1.anova))
+qqline(resid(A2017.zoox.T1.anova))
+
+boxplot(resid(A2017.zoox.T1.anova)~A2017.zoox.T1$reef.zone)
+
+t.test(Cells.cm2.x6~reef.zone, data = A2017.zoox.T1)
+
+capture.output(t.test(Cells.cm2.x6~reef.zone, data = A2017.zoox.T1), file = "output/Statistics/A2017.Zoox.T1.csv")
+
+
 ##T2 analysis 
 
 A2017.zoox.T2 <- A2017.zoox.meta %>%
@@ -102,6 +151,7 @@ Zoox2017Adult.T2 <- ggplot(mean.A2017.zoox.T2, aes(x=treatment, y=Cells.cm2.x6, 
                      name = "Reef Zone")+
   scale_fill_manual(values=c("#FFFFFF", "#999999"),
                     name = "Treatment")+ #colour modification
+  annotate("rect", xmin=0, xmax=0.75, ymin = 0, ymax=1.5, alpha = 0.2) + 
   theme_bw() + theme(panel.grid.major = element_blank(), 
                      panel.grid.minor = element_blank(),
                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
@@ -223,6 +273,9 @@ L.Size.2017.Patch <- read.csv("data/2017/Larval.Size/Patch_mean_Larvalsize.csv")
 L2017.zoox.Patch.size <- merge(L.Size.2017.Patch, L2017.zoox.patch, by = "Date.coral.ID")
 
 L2017.zoox.Patch.size$Cells.x3.mm3 <- L2017.zoox.Patch.size$Cells.larvae.x3/L2017.zoox.Patch.size$Volume_1
+
+mean.L2017.zoox.size <- summarySE(L2017.zoox.Patch.size, measurevar="Cells.x3.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
+write.csv(mean.L2017.zoox.size, file = "data/2017/Zoox/L2017_zoox.vol.csv")
 
 #L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
 
@@ -370,6 +423,8 @@ L2018.zoox.meta.size <- merge(L.Size.2018, L2018.zoox.clean3, by = "Date.coral.I
 L2018.zoox.meta.size$Cells.x3.mm3 <- L2018.zoox.meta.size$Cells.larvae.x3/L2018.zoox.meta.size$Volume
 
 # Summarizing 
+L2018.zoox.mean.col.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Date.coral.ID", "Origin", "Treatment.y", "Transplant.Site"))
+write.csv(L2018.zoox.mean.col.size, file = "data/2018/Zoox/L2018_Zoox_calc.csv")
 L2018.zoox.mean.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
 
 #mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
@@ -509,8 +564,11 @@ A2018.zoox.meta$Cells.mL.vol <- A2018.zoox.meta$Cell.ml.DF*A2018.zoox.meta$Homo.
 A2018.zoox.meta$Cells.cm2 <- A2018.zoox.meta$Cells.mL.vol/A2018.zoox.meta$Surface.Area 
 A2018.zoox.meta$Cells.cm2.x6 <- A2018.zoox.meta$Cells.cm2 / 1000000
 
+write.csv(A2018.zoox.meta, file="data/2018/Zoox/A2018_Zoox_Calc.csv")
+
 #Summarizing
 A2018.zoox.meta.mean <- summarySE(A2018.zoox.meta, measurevar="Cells.cm2.x6", groupvars=c("Origin", "Treatment", "Transplant.Site"))
+
 
 A2018.zoox.meta.mean$reef.treatment <- paste(A2018.zoox.meta.mean$Origin, A2018.zoox.meta.mean$Treatment)
 

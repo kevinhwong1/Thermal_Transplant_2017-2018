@@ -1,0 +1,12 @@
+
+	Welch Two Sample t-test
+
+data:  Cells.cm2.x6 by reef.zone
+t = -2.1464, df = 31.028, p-value = 0.03977
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.47795231 -0.01220992
+sample estimates:
+mean in group Patch   mean in group Rim 
+          0.8006509           1.0457320 
+

@@ -1,0 +1,12 @@
+
+	Welch Two Sample t-test
+
+data:  chla.cell by reef.zone.y
+t = 1.1024, df = 34.02, p-value = 0.278
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.4261361  1.4365698
+sample estimates:
+mean in group Patch   mean in group Rim 
+           4.715084            4.209867 
+
