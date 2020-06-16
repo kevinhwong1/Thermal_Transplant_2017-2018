@@ -29,6 +29,7 @@ library("lubridate")
 library("chron")
 library('plyr')
 library('dplyr')
+library('Rmisc')
 
 
 ##### PHOTOSYNTHESIS Time 0 #####
@@ -165,10 +166,10 @@ write.csv(Resp, file="output/Photo_Resp_Output/Respiration.rates.T1.csv")
 
 #calculate gross photosynthesis Pnet -- Rdark
 
-Photo <- read_csv("~/MyProjects/Thermal_Acclimation_2017/Output/Colony_Photo_Resp_Output/Photosynthesis.rates.T1.csv")
-Resp <- read_csv("~/MyProjects/Thermal_Acclimation_2017/Output/Colony_Photo_Resp_Output/Respiration.rates.T1.csv")
+Photo <- read.csv("output/Photo_Resp_Output/Photosynthesis.rates.T1.csv")
+Resp <- read.csv("output/Photo_Resp_Output/Respiration.rates.T1.csv")
 
-resp.data <- merge(Photo[,c(1,10,11,12,19)],Resp[,c(1,19)], by="Fragment.ID")
+resp.data <- merge(Photo[,c(2,11,12,13,20)],Resp[,c(2,20)], by="Fragment.ID")
 
 #rename the columns
 names(resp.data)[names(resp.data) == "umol.cm2.hr.x"]<- "Pnet_umol.cm2.hr" 
@@ -623,6 +624,7 @@ qqnorm(resid(A2017.Pgross.T1.anova))
 qqline(resid(A2017.Pgross.T1.anova))
 
 boxplot(resid(A2017.Pgross.T1.anova)~A2017.respall.T1$Origin) # not equal
+
 
 wilcox.test(Pgross_umol.cm2.hr~Origin, data = A2017.respall.T1)
 

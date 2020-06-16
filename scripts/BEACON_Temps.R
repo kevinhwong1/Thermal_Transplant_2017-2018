@@ -14,7 +14,11 @@ library(lattice)
 library(Rmisc)
 library(doBy)
 library(devtools)
-
+devtools::install_github("ricardo-bion/ggradar", dependencies = TRUE)
+library(ggradar)
+library(ggiraphExtra)
+library(tidyverse)
+library(scales)
 
 ##### 2012-2016 field temps #####
 #Import data
@@ -97,12 +101,22 @@ temp.subset <- temp.all %>% # removing extra rim datapoints
   filter(Date < "2018-06-10")
 
 raw.2017.2018 <- ggplot(temp.subset, aes(x=Date, y = SST_C, group = Reef, color = Reef)) +
+  geom_point() + 
                     geom_line() +
+  ylab("Temperature °C")+
                     scale_color_manual(values=c("tomato3", "dodgerblue3")) +
-                    scale_x_date(date_breaks = "1 month", date_labels= "%b %Y") +
-                    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                       panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
-                                       axis.text.x=element_text(angle=60, hjust=1))
+                    scale_x_date(date_breaks = "2 month", date_labels= "%b %Y") +
+  scale_y_continuous(limits = c(17, 32), breaks = seq(17, 32, by = 2)) +
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1)) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/2017.2018.temp.pdf", raw.2017.2018, width = 20, height = 11, units = c("in"))
+
 
 # Mean by Date and reef
 mean.temps <- summarySE(temp.all, measurevar="SST_C", groupvars=c("Date", "Reef"))
@@ -216,21 +230,37 @@ BDA.2011.2013$Date <- as.Date(BDA.2011.2013$Date, "%m/%d/%Y")
 BDA.2011.2013.clean <- BDA.2011.2013 %>% 
   filter(Temp != -9999) %>%
   filter(Light != -9999) %>%
-  filter(Temp < 32)
+  filter(Temp < 32)  %>%
+  filter(Date < "2012-09-05") %>%
+  filter(Date > " 2010-10-18")
 
 # Mean Temp by date
-mean.temps.2011.2013 <- summarySE(BDA.2011.2013.clean, measurevar="Temp", groupvars=c("Date", "Site"))
+mean.temps.2011.2013 <- summarySE(BDA.2011.2013.clean, measurevar="Temp", groupvars=c("Date","Site"))
+mean.temps.2011.2013.select <- mean.temps.2011.2013 %>%
+  filter(Date < "2012-09-05") %>%
+  filter(Date > " 2010-10-18")
 
-Mean.temp.20112013.plot <- ggplot(mean.temps.2011.2013, aes(x=Date, y = Temp, group = Site, color = Site)) + 
+Mean.temp.20112013.plot <- ggplot(mean.temps.2011.2013.select, aes(x=Date, y = Temp, group = Site, color = Site)) + 
                             geom_point() + 
                             geom_line() +
-#                            geom_ribbon(aes(ymin=(mean.temps.2011.2013$Temp - mean.temps.2011.2013$ci), ymax=(mean.temps.2011.2013$Temp + mean.temps.2011.2013$ci)), linetype=2, alpha=0.1) +
-                            scale_x_date(date_breaks = "1 month", date_labels= "%b %Y") +
+#                            geom_ribbon(aes(ymin=(Temp - ci), ymax=(Temp + ci)), linetype=2, alpha=0.1) +
+                            ylab("Temperature °C")+
+                            scale_x_date(date_breaks = "3 month", date_labels= "%b %Y") +
+                            scale_y_continuous(limits = c(17, 32), breaks = seq(17, 32, by = 2)) +
                             scale_shape_manual(values=c(21,24),
                                                name = "Site")+
-                            theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                               panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
-                            theme(axis.text.x=element_text(angle=60, hjust=1)) 
+                            scale_color_manual(values=c("tomato3", "dodgerblue3")) +
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1)) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/2010.2012.temp.pdf", Mean.temp.20112013.plot, width = 20, height = 11, units = c("in"))
+
+
                           
 # Mean light by date
 mean.light.2011.2013 <- summarySE(BDA.2011.2013.clean, measurevar="Light", groupvars=c("Date", "Site"))
@@ -246,20 +276,69 @@ Mean.light.20112013.plot <- ggplot(mean.light.2011.2013, aes(x=Date, y = Light, 
                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
   theme(axis.text.x=element_text(angle=60, hjust=1)) 
 
+
 # Summary statistics 
 library(doBy)
-summaryBy(Temp + Light ~ Site, data = BDA.2011.2013.clean,
-          FUN = function(x) { c(m = mean(x), s = sd(x), max = max(x), min = min(x)) } )
+temp.summary<- summaryBy(Temp ~ Site, data = BDA.2011.2013.clean,
+          FUN = function(x) { c(max = max(x), min = min(x)) } )
+temp.summary$Temp.seasonal <- temp.summary$Temp.max - temp.summary$Temp.min
 
 # Daily Range
 Daily.range <- summaryBy(Temp ~ Date + Site, data=BDA.2011.2013.clean, FUN=c(max,min,mean,sd))
 
-Daily.range$range <- Daily.range$Temp.max - Daily.range$Temp.min
+Daily.range$temp.daily.range <- Daily.range$Temp.max - Daily.range$Temp.min
 
-t.test(Daily.range$range ~ Daily.range$Site)
+temp.d.range <- summaryBy(temp.daily.range ~ Site, data = Daily.range,
+                          FUN = function(x) { c(mean = mean(x)) } )
 
-# Number of Days above 29
-Daily.range$Temp.29 <- ifelse(Daily.range$Temp.max>=29, 1, 0)
+temp.d.30 <- summaryBy(Temp.max ~ Site, data = Daily.range,
+                          FUN = function(x) { c(d.above.30 = count(x>30)) } )
+Temp.days.30 <- c(70, 4)
+
+light.summary<- summaryBy(Light ~ Site, data = BDA.2011.2013.clean,
+                         FUN = function(x) { c(m = mean(x), var = sd(x), max = max(x)) } )
+
+temp.summary2 <- merge(temp.summary, temp.d.range, by = "Site")
+temp.summary3 <- data.frame(temp.summary2, Temp.days.30)
+
+temp.light.summary <- merge(temp.summary3, light.summary, by = "Site")
+temp.light.summary2 <- temp.light.summary[c(2:9)]
+
+fn <- function(x) x * 100/max(x, na.rm = TRUE)
+fn(c(0,1,0))
+
+## to all columns of your data frame
+rad.data <- data.frame(lapply(temp.light.summary2, fn))
+rownames(rad.data) <- c("Patch", "Rim")
+colnames(rad.data) <- c("Maximum Temperature", "Minimum Temperature", "Mean Seasonal Temperature Range", "Mean Daily Temperature Range", "Days above 30°C", "Mean Seasonal Light Level", "Light Variability", "Maximum Light Level")
+rad.data <- rad.data[,c(1,2,5,4,3,6,7,8)]
+
+# To use the fmsb package, I have to add 2 lines to the dataframe: the max and min of each variable to show on the plot!
+rad.data <- rbind(rep(100,5) , rep(0,5) , rad.data)
+
+# Color vector
+colors_border=c("tomato3", "dodgerblue3")
+colors_in=c("tomato3", "dodgerblue3")
+
+# Color vector
+colors_border=c( rgb(0.9,0,0,0.9), rgb(0,0,0.9,0.9) )
+colors_in=c( rgb(0.9,0,0,0.4), rgb(0,0,0.9,0.4))
+
+library(fmsb)
+# plot with default options:
+radarchart(rad.data, axistype=1 , 
+            #custom polygon
+            pcol=colors_border , pfcol=colors_in , plwd=4 , plty=1,
+            #custom the grid
+            cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,100,25), cglwd=0.8,
+            #custom labels
+            vlcex=0.9
+)
+
+# Add a legend
+legend(x=0.9, y=0.9, legend = rownames(rad.data[-c(1,2),]), bty = "n", pch=20 , col=colors_border , text.col = "black", cex=1.2, pt.cex=3)
+
+
 
 
 
@@ -346,23 +425,48 @@ Log_data$Tank<- as.factor(Log_data$Tank) #Converting tank number from a numeric 
 #Temperature Data avg per day
 Log_data_sum <- summarySE(Log_data, measurevar="Temp", groupvars=c("Date","Treatment")) #Summarizing by date and tank
 
-ggplot(Log_data_sum,aes(x=Date, y=Temp, colour=Treatment))+
-  geom_errorbar(aes(ymin=Temp-se, ymax=Temp+se), width=.1, colour="black") +
-  ylab("Temperature")+
-  scale_x_date(date_labels="%b %d",date_breaks  ="1 day") + #modifies how many dates are shown on the x axis
-  geom_point()+
-  geom_line(aes(group=Treatment))+
-  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+tank.treat.time <- ggplot(Log_data_sum,aes(x=Date, y=Temp, colour=Treatment))+
+#  geom_errorbar(aes(ymin=Temp-se, ymax=Temp+se), width=.1, colour="black") +
+  ylab("Temperature °C")+
+  scale_x_date(date_labels="%b %d",date_breaks  ="5 day") + #modifies how many dates are shown on the x axis
+  scale_y_continuous(limits = c(28, 32), breaks = seq(28, 32, by = 1)) +
+#  geom_point(size = 12)+
+  geom_line(aes(group=Treatment), size = 3)+
+  geom_ribbon(aes(ymin=(Temp - ci), ymax=(Temp + ci)), linetype=2, alpha=0.1) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1)) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+
+ggsave(file = "output/Graphs/Treatment.Time.temp.pdf", tank.treat.time, width = 15, height = 11, units = c("in"))
+
 
 
 #Totals
-ggplot(Log_data, aes(x=Tank, y=Temp))+ #boxplot of all data
+treatment.box <- ggplot(Log_data, aes(x=Treatment, y=Temp, fill = Treatment))+ #boxplot of all data
   geom_boxplot() +
-  ylab("Temperature")+
-  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  ylab("Temperature °C")+
+  scale_y_continuous(limits = c(27, 34), breaks = seq(27, 34, by = 1)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1)) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/Treatment.box.temp.pdf", treatment.box, width = 11, height = 11, units = c("in"))
+
 
 #Tank Stats
 #Testing Assumptions

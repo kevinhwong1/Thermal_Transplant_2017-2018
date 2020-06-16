@@ -171,6 +171,15 @@ anova(fec.2017.anova)
 capture.output(anova(fec.2017.anova), file = "output/Statistics/A2017.Fec.csv")
 
 
+######### Statistics 2020 analysis on 2017 fecundity data #########
+
+## Question 1: What was the probability of releasing larvae based on reef site and treatment? 
+# Binary logistic regression 
+
+
+
+
+
 ### 2018 data ###
 
 pr.data2018<-read.csv('data/2018/Larval.Release/Larval.Release.Transp.csv', header=TRUE, sep=",")
