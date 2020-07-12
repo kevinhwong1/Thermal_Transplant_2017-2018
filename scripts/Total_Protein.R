@@ -978,7 +978,7 @@ L2018.TP.meta <- L2018.TP.meta %>%
 # Standardization (DL = 4)
 L2018.TP.meta$Conc.calcS <- (L2018.TP.meta$ConcentrationS * 4 / L2018.TP.meta$Sample.Size) #Calculating concentration
 
-# Summarizing 
+# Summarizing per larva
 mean.TP.col.L2018 <- summarySE(L2018.TP.meta, measurevar="Conc.calcS", groupvars=c("coral.id","Origin", "Treatment.y", "Transplant.Site"))
 
 mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
@@ -1039,10 +1039,11 @@ L2018.TP.meta.size$Conc.calcS.mg.mm3 <- L2018.TP.meta.size$Conc.calcS.ug.mm3/100
 #L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
 
 # Summarizing 
-L2018.TP.mean.size <- summarySE(L2018.TP.meta.size, measurevar="Conc.calcS.mg.mm3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
+L2018.TP.mean.size.col.day <- summarySE(L2018.TP.meta.size, measurevar="Conc.calcS.mg.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
 
-#mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
-L2018.TP.mean.size$reef.treatment <- paste(L2018.TP.mean.size$Origin, L2018.TP.mean.size$Treatment)
+L2018.TP.mean.size <- summarySE(L2018.TP.mean.size.col.day, measurevar="Conc.calcS.mg.mm3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
+
+L2018.TP.mean.size$reef.treatment <- paste(L2018.TP.mean.size$Origin, L2018.TP.mean.size$Treatment.y)
 
 #Plotting 
 pd <- position_dodge(0.1) # moves object .05 to the left and right
@@ -1072,43 +1073,64 @@ ggsave(file = "output/Graphs/L2018.TP.vol.pdf", TP2018Larvae.size, width = 11, h
 
 ## Statistics
 
-L2018.TP.meta.size$Origin <- factor(L2018.TP.meta.size$Origin)
-L2018.TP.meta.size$Treatment.y <- factor(L2018.TP.meta.size$Treatment.y)
-L2018.TP.meta.size$Transplant.Site <- factor(L2018.TP.meta.size$Transplant.Site)
+L2018.TP.mean.size.col.day <- summarySE(L2018.TP.meta.size, measurevar="Conc.calcS.mg.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
+write.csv(L2018.TP.mean.size.col.day, file = "data/2018/Protein/L2018.TP.Vol.Means.csv")
 
-TP2018Larvae.2018.anova2 <- aov(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.TP.meta.size)
+L2018.TP.mean.size.col.day$Origin <- factor(L2018.TP.mean.size.col.day$Origin)
+L2018.TP.mean.size.col.day$Treatment.y <- factor(L2018.TP.mean.size.col.day$Treatment.y)
+L2018.TP.mean.size.col.day$Transplant.Site <- factor(L2018.TP.mean.size.col.day$Transplant.Site)
+
+TP2018Larvae.2018.anova2 <- aov(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.TP.mean.size.col.day)
 qqnorm(resid(TP2018Larvae.2018.anova2))
 qqline(resid(TP2018Larvae.2018.anova2)) 
 
-boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.meta.size$Origin)
-boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.meta.size$Treatment.y) 
-boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.meta.size$Transplant.Site)
+boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.mean.size.col.day$Origin)
+boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.mean.size.col.day$Treatment.y) 
+boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.mean.size.col.day$Transplant.Site)
 
 anova(TP2018Larvae.2018.anova2)
 
 capture.output(anova(TP2018Larvae.2018.anova2), file = "output/Statistics/L2018.TP.vol.csv")
 
-# Post Hoc
-L.2018.TP.PH <- TukeyHSD(TP2018Larvae.2018.anova2, conf.level = 0.95)
-capture.output(L.2018.TP.PH, file = "output/Statistics/L2018.TP.PH.csv")
+### orthogonal random effect design 
 
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.TP.lsm <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.TP.pairs.LSM <- multcomp::cld(L.2018.TP.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.TP.pairs.LSM #view results
-capture.output(L.2018.TP.pairs.LSM, file = "output/Statistics/L.2018.TP.pairs.3way.csv")
+library(lme4)
+library(jtools)
+library(car)
 
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.TP.OxTrans <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.TP.pairs.OxTrans <- multcomp::cld(L.2018.TP.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.TP.pairs.OxTrans #view results
-capture.output(L.2018.TP.pairs.OxTrans, file = "output/Statistics/L.2018.TP.pairs.OxTrans.csv")
+TP2018Larvae.2018.anova3 <- lmer(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site + (1|Date), data = L2018.TP.mean.size.col.day, REML=FALSE)
+summary(TP2018Larvae.2018.anova3)
+Anova(TP2018Larvae.2018.anova3, type = "III")
 
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.TP.OxTreat <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.TP.pairs.OxTreat <- multcomp::cld(L.2018.TP.OxTreat, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.TP.pairs.OxTreat #view results
-capture.output(L.2018.TP.pairs.OxTreat, file = "output/Statistics/L.2018.TP.pairs.OxTreat.csv")
+capture.output(Anova(TP2018Larvae.2018.anova3, type = "III"), file = "output/Statistics/L.2018.TP.lmer.csv")
+
+#Posthoc
+TP2018LarvaePH <- lsmeans(TP2018Larvae.2018.anova3, pairwise~Origin*Treatment.y*Transplant.Site, adjust="tukey")
+capture.output(TP2018LarvaePH, file = "output/Statistics/L.2018.TP.PH.csv")
+
+
+# 
+# # Post Hoc
+# L.2018.TP.PH <- TukeyHSD(TP2018Larvae.2018.anova2, conf.level = 0.95)
+# capture.output(L.2018.TP.PH, file = "output/Statistics/L2018.TP.PH.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.TP.lsm <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.TP.pairs.LSM <- multcomp::cld(L.2018.TP.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.TP.pairs.LSM #view results
+# capture.output(L.2018.TP.pairs.LSM, file = "output/Statistics/L.2018.TP.pairs.3way.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.TP.OxTrans <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.TP.pairs.OxTrans <- multcomp::cld(L.2018.TP.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.TP.pairs.OxTrans #view results
+# capture.output(L.2018.TP.pairs.OxTrans, file = "output/Statistics/L.2018.TP.pairs.OxTrans.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.TP.OxTreat <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.TP.pairs.OxTreat <- multcomp::cld(L.2018.TP.OxTreat, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.TP.pairs.OxTreat #view results
+# capture.output(L.2018.TP.pairs.OxTreat, file = "output/Statistics/L.2018.TP.pairs.OxTreat.csv")
 
 
 # 

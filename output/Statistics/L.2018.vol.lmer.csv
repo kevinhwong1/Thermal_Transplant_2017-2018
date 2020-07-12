@@ -1,0 +1,13 @@
+Analysis of Deviance Table (Type,II Wald,chi,square test,s)
+,,,,
+Response: Volume,,,,
+,Chisq,Df,Pr(>Chisq),
+Origin,63.251,1,1.82E-15,***
+Treatment,2.3503,1,0.12526,
+Transplant.Site,3.6095,1,0.05745,.
+Origin:Treatment,3.5917,1,0.05807,.
+Origin:Transplant.Site,0.0038,1,0.95076,
+Treatment:Transplant.Site,1.255,1,0.2626,
+Origin:Treatment:Transplant.Site,2.5272,1,0.1119,
+---,,,,
+Signif. codes:  0 ‘***’ 0.00,1 ‘**�,�� 0,.01 ‘*’,0.05 ‘.’ 0.1 ‘ ’ 1

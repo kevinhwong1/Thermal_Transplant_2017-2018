@@ -21,67 +21,67 @@ library(tidyverse)
 library(scales)
 
 ##### 2012-2016 field temps #####
-#Import data
-Crescent.2010 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Nov2010_Feb2012.csv") 
-Crescent.2012 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Feb2012_Feb2013.csv") 
-Crescent.2013 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Apr2013_Mar2014.csv")
-Crescent.2014 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Jul2014_Jul2015.csv")
-Crescent.2015 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Jul2015_Apr2016.csv")
-
-Hog.2010 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Dec2010_Jan2012.csv")
-Hog.2012 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Feb2012_Mar2013.csv")
-Hog.2013 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Apr2013_Jun2014.csv")
-Hog.2014.a <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Jul2014_Oct2014.csv")
-Hog.2014.b <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Oct2014_Jan2015.csv")
-Hog.2015 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Jul2015_Aug2016.csv")
-
-# Selecting Columns 
-Crescent.2010.1 <- Crescent.2010 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Crescent.2012.1 <- Crescent.2012 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Crescent.2013.1 <- Crescent.2013 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Crescent.2014.1 <- Crescent.2014 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Crescent.2015.1 <- Crescent.2015 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-
-Hog.2010.1 <- Hog.2010 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Hog.2012.1 <- Hog.2012 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Hog.2013.1 <- Hog.2013 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Hog.2014.a1 <- Hog.2014.a %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Hog.2014.b1 <- Hog.2014.b %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-Hog.2015.1 <- Hog.2015 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-
-#Binding Data by reef site 
-Crescent.2010.2015 <- rbind(Crescent.2010.1, Crescent.2012.1, Crescent.2013.1, Crescent.2014.1, Crescent.2015.1)
-Hog.2010.2015 <- rbind(Hog.2010.1, Hog.2012.1, Hog.2013.1, Hog.2014.a1, Hog.2014.b1, Hog.2015.1)
-
-#Adding reef zone
-Crescent.2010.2015$Reef <- "Patch"
-Hog.2010.2015$Reef <- "Rim"
-
-#Binding all datasets together
-bda.2010.2015 <- rbind(Crescent.2010.2015, Hog.2010.2015)
-
-#Changing date format 
-bda.2010.2015$Date <- as.Date(bda.2010.2015$Date, "%m/%d/%Y")
-
-#Removing NAs
-bda.2010.2015 <- na.omit(bda.2010.2015)
-
-#Removing rows with -999 values 
-bda.2010.2015.clean <- bda.2010.2015 %>% 
-  filter(SST_C != -999) 
-
-#Raw temp plot
-raw.2010.2015 <- ggplot(bda.2010.2015.clean, aes(x=Date, y = SST_C, group = Reef, color = Reef)) +
-  geom_line() +
-  scale_color_manual(values=c("tomato3", "dodgerblue3")) +
-  scale_x_date(date_breaks = "1 year", date_labels= "%Y") +
-  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
-                     axis.text.x=element_text())
-
-
-
-
+# #Import data
+# Crescent.2010 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Nov2010_Feb2012.csv") 
+# Crescent.2012 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Feb2012_Feb2013.csv") 
+# Crescent.2013 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Apr2013_Mar2014.csv")
+# Crescent.2014 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Jul2014_Jul2015.csv")
+# Crescent.2015 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Jul2015_Apr2016.csv")
+# 
+# Hog.2010 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Dec2010_Jan2012.csv")
+# Hog.2012 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Feb2012_Mar2013.csv")
+# Hog.2013 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Apr2013_Jun2014.csv")
+# Hog.2014.a <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Jul2014_Oct2014.csv")
+# Hog.2014.b <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Oct2014_Jan2015.csv")
+# Hog.2015 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Jul2015_Aug2016.csv")
+# 
+# # Selecting Columns 
+# Crescent.2010.1 <- Crescent.2010 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Crescent.2012.1 <- Crescent.2012 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Crescent.2013.1 <- Crescent.2013 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Crescent.2014.1 <- Crescent.2014 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Crescent.2015.1 <- Crescent.2015 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# 
+# Hog.2010.1 <- Hog.2010 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Hog.2012.1 <- Hog.2012 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Hog.2013.1 <- Hog.2013 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Hog.2014.a1 <- Hog.2014.a %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Hog.2014.b1 <- Hog.2014.b %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# Hog.2015.1 <- Hog.2015 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
+# 
+# #Binding Data by reef site 
+# Crescent.2010.2015 <- rbind(Crescent.2010.1, Crescent.2012.1, Crescent.2013.1, Crescent.2014.1, Crescent.2015.1)
+# Hog.2010.2015 <- rbind(Hog.2010.1, Hog.2012.1, Hog.2013.1, Hog.2014.a1, Hog.2014.b1, Hog.2015.1)
+# 
+# #Adding reef zone
+# Crescent.2010.2015$Reef <- "Patch"
+# Hog.2010.2015$Reef <- "Rim"
+# 
+# #Binding all datasets together
+# bda.2010.2015 <- rbind(Crescent.2010.2015, Hog.2010.2015)
+# 
+# #Changing date format 
+# bda.2010.2015$Date <- as.Date(bda.2010.2015$Date, "%m/%d/%Y")
+# 
+# #Removing NAs
+# bda.2010.2015 <- na.omit(bda.2010.2015)
+# 
+# #Removing rows with -999 values 
+# bda.2010.2015.clean <- bda.2010.2015 %>% 
+#   filter(SST_C != -999) 
+# 
+# #Raw temp plot
+# raw.2010.2015 <- ggplot(bda.2010.2015.clean, aes(x=Date, y = SST_C, group = Reef, color = Reef)) +
+#   geom_line() +
+#   scale_color_manual(values=c("tomato3", "dodgerblue3")) +
+#   scale_x_date(date_breaks = "1 year", date_labels= "%Y") +
+#   theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
+#                      axis.text.x=element_text())
+# 
+# 
+# 
+# 
 
 
 ##### 2017-2018 field temps #####
@@ -98,7 +98,8 @@ temp.all <- rbind(Crescent, Hog)
 temp.all$Date <- as.Date(temp.all$Date, "%m/%d/%Y")
 temp.all <- na.omit(temp.all)
 temp.subset <- temp.all %>% # removing extra rim datapoints 
-  filter(Date < "2018-06-10")
+  filter(Date < "2018-06-10") %>%
+  filter(Date > "2017-08-27")
 
 raw.2017.2018 <- ggplot(temp.subset, aes(x=Date, y = SST_C, group = Reef, color = Reef)) +
   geom_point() + 
@@ -133,89 +134,123 @@ ggplot(mean.temps.corrected, aes(x=Date, y = SST_C, group = Reef, color = Reef))
                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
   theme(axis.text.x=element_text(angle=60, hjust=1)) 
 
-#Lolipop graph 
-
-mean.temps.patch <- summarySE(Crescent, measurevar="SST_C", groupvars=c("Date", "Reef"))
-mean.temps.patch <-na.omit(mean.temps.patch) 
-mean.temps.rim <- summarySE(Hog, measurevar="SST_C", groupvars=c("Date", "Reef"))
-mean.temps.patch$Date <- as.Date(mean.temps.patch$Date, "%m/%d/%Y")
-mean.temps.rim$Date <- as.Date(mean.temps.rim$Date, "%m/%d/%Y")
-
-merge.temps <- merge(mean.temps.patch, mean.temps.rim, by = "Date")
-merge.temps$mean.difference <- merge.temps$SST_C.x - merge.temps$SST_C.y
-
-ggplot(merge.temps, aes(x=Date, y=mean.difference)) +
-  geom_segment( aes(x=Date, xend=Date, y=0, yend=mean.difference), color="grey") +
-  geom_point( color="orange", size=4) +
-  theme_light() +
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.border = element_blank(),
-    axis.ticks.x = element_blank()
-  ) +
-  xlab("") +
-  ylab("Mean Temperature Difference")
 
 
-# Daily tempertaure range --> variability 
-Daily.range <- summaryBy(SST_C ~ Date + Reef, data=temp.all, FUN=c(max,min,mean,sd))
+# Summary statistics 
+library(doBy)
+temp.summary<- summaryBy(SST_C ~ Reef, data = temp.subset,
+                         FUN = function(x) { c(max = max(x), min = min(x)) } )
+temp.summary$Temp.seasonal <- temp.summary$SST_C.max - temp.summary$SST_C.min
 
-Daily.range$range <- Daily.range$SST_C.max - Daily.range$SST_C.min
-Daily.range.edit <- Daily.range[3:635,] #removing unmatched data points between rim and patch
+# Daily Range
+Daily.range <- summaryBy(SST_C ~ Date + Reef, data=temp.subset, FUN=c(max,min,mean,sd))
 
-Daily_range_density <- ggplot(data=Daily.range.edit, aes(x=range, group=Reef, fill=Reef)) +
-  geom_density(adjust=1.5, alpha=.4) 
+Daily.range$temp.daily.range <- Daily.range$SST_C.max - Daily.range$SST_C.min
 
-Daily_range_2 <- ggplot(data=Daily.range.edit, aes(x=range, group=Reef, fill=Reef, color = Reef)) +
-  geom_histogram(binwidth=.05, alpha = 0.5, position="identity", color = "black") +
-  scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
-#  xlim(17,30) + 
-  theme_classic() +
-  theme(legend.position="top")
+temp.d.range <- summaryBy(temp.daily.range ~ Reef, data = Daily.range,
+                          FUN = function(x) { c(mean = mean(x)) } )
 
+temp.d.30 <- summaryBy(Temp.max ~ Site, data = Daily.range,
+                       FUN = function(x) { c(d.above.30 = count(x>30)) } )
+Temp.days.30 <- c(70, 4)
 
-range.2017.2018 <- ggplot(Daily.range.edit, aes(x=Date, y = range, group = Reef, color = Reef)) +
-  geom_line() +
-  scale_color_manual(values=c("tomato3", "dodgerblue3")) +
-  scale_x_date(date_breaks = "1 month", date_labels= "%b %Y") +
-  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
-                     axis.text.x=element_text(angle=60, hjust=1))
+light.summary<- summaryBy(Light ~ Site, data = BDA.2011.2013.clean,
+                          FUN = function(x) { c(m = mean(x), var = sd(x), max = max(x)) } )
 
+temp.summary2 <- merge(temp.summary, temp.d.range, by = "Site")
+temp.summary3 <- data.frame(temp.summary2, Temp.days.30)
 
-# mean Daily temperature categories 
-
-which.max(density(Daily.range.edit$waiting)$y)
+temp.light.summary <- merge(temp.summary3, light.summary, by = "Site")
+temp.light.summary2 <- temp.light.summary[c(2:9)]
 
 
-Daily_mean_density <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef)) +
-  geom_density(adjust=1.5, alpha=.4) + 
-  scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
-  xlim(13,34) + 
-  theme_classic() +
-  theme(legend.position="top")
 
-# mean Daily temperature categories 
-Daily_mean_hist1 <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef, color = Reef)) +
-  geom_histogram(binwidth=.5, alpha = 0.5, position="identity", color = "black") +
-  scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
-  xlim(17,30) + 
-  theme_classic() +
-  theme(legend.position="top")
 
-Daily_mean_hist3 <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef, color = Reef)) +
-  geom_freqpoly(binwidth=.5, alpha = 0.5, position="identity") +
-  scale_color_manual(values=c("tomato3", "dodgerblue3")) +
-  xlim(17,30) + 
-  theme_classic() +
-  theme(legend.position="top")
 
-Daily_mean_hist2 <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef, color = Reef)) +
-  geom_histogram(binwidth=.5, position="identity", color = "black") +
-  scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
-  xlim(17,30) + 
-  theme_classic() +
-  theme(legend.position="top")
+
+# #Lolipop graph 
+# 
+# mean.temps.patch <- summarySE(Crescent, measurevar="SST_C", groupvars=c("Date", "Reef"))
+# mean.temps.patch <-na.omit(mean.temps.patch) 
+# mean.temps.rim <- summarySE(Hog, measurevar="SST_C", groupvars=c("Date", "Reef"))
+# mean.temps.patch$Date <- as.Date(mean.temps.patch$Date, "%m/%d/%Y")
+# mean.temps.rim$Date <- as.Date(mean.temps.rim$Date, "%m/%d/%Y")
+# 
+# merge.temps <- merge(mean.temps.patch, mean.temps.rim, by = "Date")
+# merge.temps$mean.difference <- merge.temps$SST_C.x - merge.temps$SST_C.y
+# 
+# ggplot(merge.temps, aes(x=Date, y=mean.difference)) +
+#   geom_segment( aes(x=Date, xend=Date, y=0, yend=mean.difference), color="grey") +
+#   geom_point( color="orange", size=4) +
+#   theme_light() +
+#   theme(
+#     panel.grid.major.x = element_blank(),
+#     panel.border = element_blank(),
+#     axis.ticks.x = element_blank()
+#   ) +
+#   xlab("") +
+#   ylab("Mean Temperature Difference")
+# # 
+# 
+# # Daily tempertaure range --> variability 
+# Daily.range <- summaryBy(SST_C ~ Date + Reef, data=temp.all, FUN=c(max,min,mean,sd))
+# 
+# Daily.range$range <- Daily.range$SST_C.max - Daily.range$SST_C.min
+# Daily.range.edit <- Daily.range[3:635,] #removing unmatched data points between rim and patch
+# 
+# Daily_range_density <- ggplot(data=Daily.range.edit, aes(x=range, group=Reef, fill=Reef)) +
+#   geom_density(adjust=1.5, alpha=.4) 
+# 
+# Daily_range_2 <- ggplot(data=Daily.range.edit, aes(x=range, group=Reef, fill=Reef, color = Reef)) +
+#   geom_histogram(binwidth=.05, alpha = 0.5, position="identity", color = "black") +
+#   scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
+# #  xlim(17,30) + 
+#   theme_classic() +
+#   theme(legend.position="top")
+# 
+# 
+# range.2017.2018 <- ggplot(Daily.range.edit, aes(x=Date, y = range, group = Reef, color = Reef)) +
+#   geom_line() +
+#   scale_color_manual(values=c("tomato3", "dodgerblue3")) +
+#   scale_x_date(date_breaks = "1 month", date_labels= "%b %Y") +
+#   theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
+#                      axis.text.x=element_text(angle=60, hjust=1))
+# 
+# 
+# # mean Daily temperature categories 
+# 
+# which.max(density(Daily.range.edit$waiting)$y)
+# 
+# 
+# Daily_mean_density <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef)) +
+#   geom_density(adjust=1.5, alpha=.4) + 
+#   scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
+#   xlim(13,34) + 
+#   theme_classic() +
+#   theme(legend.position="top")
+# 
+# # mean Daily temperature categories 
+# Daily_mean_hist1 <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef, color = Reef)) +
+#   geom_histogram(binwidth=.5, alpha = 0.5, position="identity", color = "black") +
+#   scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
+#   xlim(17,30) + 
+#   theme_classic() +
+#   theme(legend.position="top")
+# 
+# Daily_mean_hist3 <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef, color = Reef)) +
+#   geom_freqpoly(binwidth=.5, alpha = 0.5, position="identity") +
+#   scale_color_manual(values=c("tomato3", "dodgerblue3")) +
+#   xlim(17,30) + 
+#   theme_classic() +
+#   theme(legend.position="top")
+# 
+# Daily_mean_hist2 <- ggplot(data=Daily.range.edit, aes(x=SST_C.mean, group=Reef, fill=Reef, color = Reef)) +
+#   geom_histogram(binwidth=.5, position="identity", color = "black") +
+#   scale_fill_manual(values=c("tomato3", "dodgerblue3")) +
+#   xlim(17,30) + 
+#   theme_classic() +
+#   theme(legend.position="top")
 
 
 ##### 2011-2013 Temp and light #####
@@ -291,6 +326,8 @@ Daily.range$temp.daily.range <- Daily.range$Temp.max - Daily.range$Temp.min
 temp.d.range <- summaryBy(temp.daily.range ~ Site, data = Daily.range,
                           FUN = function(x) { c(mean = mean(x)) } )
 
+
+
 temp.d.30 <- summaryBy(Temp.max ~ Site, data = Daily.range,
                           FUN = function(x) { c(d.above.30 = count(x>30)) } )
 Temp.days.30 <- c(70, 4)
@@ -303,6 +340,9 @@ temp.summary3 <- data.frame(temp.summary2, Temp.days.30)
 
 temp.light.summary <- merge(temp.summary3, light.summary, by = "Site")
 temp.light.summary2 <- temp.light.summary[c(2:9)]
+
+
+#### RADAR PLOT ####
 
 fn <- function(x) x * 100/max(x, na.rm = TRUE)
 fn(c(0,1,0))
@@ -422,6 +462,14 @@ Log_data$date.time<- paste(Log_data$Date, Log_data$Time, sep=" ") #combining dat
 
 Log_data$Tank<- as.factor(Log_data$Tank) #Converting tank number from a numeric to a variable factor
 
+## Subsetting acclimation and treatment 
+
+acclim <- Log_data %>%
+  filter(Date < "0017-07-05")
+
+treatment <- Log_data %>%
+  filter(Date > "0017-07-05")
+
 #Temperature Data avg per day
 Log_data_sum <- summarySE(Log_data, measurevar="Temp", groupvars=c("Date","Treatment")) #Summarizing by date and tank
 
@@ -448,13 +496,11 @@ tank.treat.time <- ggplot(Log_data_sum,aes(x=Date, y=Temp, colour=Treatment))+
 
 ggsave(file = "output/Graphs/Treatment.Time.temp.pdf", tank.treat.time, width = 15, height = 11, units = c("in"))
 
-
-
 #Totals
-treatment.box <- ggplot(Log_data, aes(x=Treatment, y=Temp, fill = Treatment))+ #boxplot of all data
+treatment.box <- ggplot(treatment, aes(x=Treatment, y=Temp, fill = Treatment))+ #boxplot of all data
   geom_boxplot() +
   ylab("Temperature °C")+
-  scale_y_continuous(limits = c(27, 34), breaks = seq(27, 34, by = 1)) +
+  scale_y_continuous(limits = c(28, 32), breaks = seq(27, 34, by = 1)) +
   scale_fill_manual(values=c("#FFFFFF", "#999999"),
                     name = "Treatment")+ #colour modification
   theme_bw() + theme(panel.grid.major = element_blank(), 
@@ -468,22 +514,87 @@ treatment.box <- ggplot(Log_data, aes(x=Treatment, y=Temp, fill = Treatment))+ #
 ggsave(file = "output/Graphs/Treatment.box.temp.pdf", treatment.box, width = 11, height = 11, units = c("in"))
 
 
+
 #Tank Stats
 #Testing Assumptions
+###ACCLIMATION###
 #Normality  
-hist(Log_data$Temp)
+hist(acclim$Temp)
 
-logtemp<-log(Log_data$Temp)
+logtemp<-log(acclim$Temp)
 hist(logtemp)
 
 #Homogeneity of Variance
 library(car)
-leveneTest(Log_data$Temp~Log_data$Tank)
+leveneTest(treatment$Temp~treatment$Tank)
+leveneTest(logtemp~Log_data$Tank)
+
+# Wilcox.test 
+wilcox.test(Temp~Tank, data=acclim)
+
+###TREATMENT###
+#Normality  
+hist(treatment$Temp)
+
+logtemp<-log(treatment$Temp)
+hist(logtemp)
+
+#Homogeneity of Variance
+library(car)
+leveneTest(treatment$Temp~treatment$Tank)
 leveneTest(logtemp~Log_data$Tank)
 
 #Nonparametric stats
-kruskal.test(Temp~Tank, data=Log_data)
+kruskal.test(Temp~Tank, data=treatment)
 library(PMCMR)
-posthoc.kruskal.nemenyi.test(Temp~Tank, data=Log_data,dist = "Tukey")
+posthoc.kruskal.nemenyi.test(Temp~Tank, data=treatment,dist = "Tukey")
+
+# Wilcox.test 
+wilcox.test(Temp~Treatment, data=treatment)
+
+
+#Summary statistics 
+Treatment.summary <- summarySE(treatment, measurevar="Temp", groupvars="Treatment")
+
+Acc.summary <- summarySE(acclim, measurevar="Temp", groupvars="Treatment")
+
+### Saility, pH, PAR
+
+tank.env <- read.csv("data/2017/Tank.Measurements/Daily_Tank_Measures_Outside.csv")
+
+tank.env.acc <- tank.env %>%
+  filter(Experiment.Stage == "Acclimation")
+
+acc.env.sal <- summarySE(tank.env.acc, measurevar="Salinity", groupvars="Experiment.Stage")
+acc.env.pH <- summarySE(tank.env.acc, measurevar="pH", groupvars="Experiment.Stage")
+
+
+tank.env.treat <- tank.env %>%
+  filter(Experiment.Stage == "Treatment")
+
+tank.1 <- tank.env.treat %>%
+  filter(Tank == "Tank1")
+
+tank.2 <- tank.env.treat %>%
+  filter(Tank == "Tank2")
+
+tank.3 <- tank.env.treat %>%
+  filter(Tank == "Tank3")
+
+tank.4 <- tank.env.treat %>%
+  filter(Tank == "Tank4")
+
+tank.1$Treatment <- "Ambient"
+tank.2$Treatment <- "Ambient"
+tank.3$Treatment <- "Hot"
+tank.4$Treatment <- "Hot"
+
+tank.env.treat.all <- rbind(tank.1, tank.2, tank.3, tank.4)
+tank.env.treat.all$Treatment <- as.factor(tank.env.treat.all$Treatment)
+tank.env.treat.all$Light.PAR.corr <- tank.env.treat.all$Light.PAR * 1.32
+
+treat.env.sal <- summarySE(tank.env.treat.all, measurevar="Salinity", groupvars="Treatment")
+treat.env.pH <- summarySE(tank.env.treat.all, measurevar="pH", groupvars="Treatment")
+treat.env.PAR <- summarySE(tank.env.treat.all, measurevar="Light.PAR.corr", groupvars="Treatment")
 
 

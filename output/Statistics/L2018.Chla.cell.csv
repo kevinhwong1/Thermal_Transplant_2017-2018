@@ -1,14 +1,12 @@
-Analysis of Variance Table
-
-Response: chla.cell
-                                  Df  Sum Sq Mean Sq F value  Pr(>F)  
-Origin                             1   5.645  5.6445  4.7352 0.03062 *
-Treatment                          1   5.062  5.0619  4.2465 0.04051 *
-Transplant.Site                    1   3.434  3.4340  2.8808 0.09105 .
-Origin:Treatment                   1   0.289  0.2894  0.2428 0.62267  
-Origin:Transplant.Site             1   0.134  0.1343  0.1127 0.73744  
-Treatment:Transplant.Site          1   2.366  2.3661  1.9849 0.16028  
-Origin:Treatment:Transplant.Site   1   1.689  1.6888  1.4168 0.23522  
-Residuals                        220 262.244  1.1920                  
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Analysis of Variance Table,,,,,
+,,,,,
+Response: chla.cell,,,,,
+,Df,Sum Sq,Mean Sq,F value,Pr(>F)
+Origin,1,6.387,6.3872,2.0483,0.1572
+Treatment,1,4.257,4.2575,1.3653,0.247
+Transplant.Site,1,4.372,4.372,1.402,0.2408
+Origin:Treatment,1,0.214,0.2138,0.0686,0.7943
+Origin:Transplant.Site,1,0.325,0.3253,0.1043,0.7478
+Treatment:Transplant.Site,1,2.249,2.2489,0.7212,0.3989
+Origin:Treatment:Transplant.Site,1,1.295,1.2947,0.4152,0.5216
+Residuals,64,199.574,3.1184,,

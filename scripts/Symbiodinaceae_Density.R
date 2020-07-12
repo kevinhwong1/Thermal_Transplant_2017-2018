@@ -13,6 +13,7 @@ library(ggplot2)
 library(lattice)
 library(Rmisc)
 
+
 ### 2017 Adult Symbiodinaceae Densities ###
 
 #Import Data
@@ -364,7 +365,7 @@ L2018.zoox.clean3 <- merge(L2018.zoox.clean, A2018.meta, by = "coral.id")
 L2018.zoox.clean3$Cells.larvae.x3 <-  L2018.zoox.clean3$Cells.larvae / 1000
 
 #Summarizing
-L2018.zoox.col.mean <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("coral.id", "Origin", "Treatment.y", "Transplant.Site"))
+L2018.zoox.colday <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("coral.id", "Date.x", "Origin", "Treatment.y", "Transplant.Site"))
 
 L2018.zoox.mean <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
 L2018.zoox.mean$reef.treatment <- paste(L2018.zoox.mean$Origin, L2018.zoox.mean$Treatment)
@@ -423,7 +424,7 @@ L2018.zoox.meta.size <- merge(L.Size.2018, L2018.zoox.clean3, by = "Date.coral.I
 L2018.zoox.meta.size$Cells.x3.mm3 <- L2018.zoox.meta.size$Cells.larvae.x3/L2018.zoox.meta.size$Volume
 
 # Summarizing 
-L2018.zoox.mean.col.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Date.coral.ID", "Origin", "Treatment.y", "Transplant.Site"))
+L2018.zoox.mean.col.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
 write.csv(L2018.zoox.mean.col.size, file = "data/2018/Zoox/L2018_Zoox_calc.csv")
 L2018.zoox.mean.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
 
@@ -458,33 +459,110 @@ ggsave(file = "output/Graphs/L2018.Zoox.vol.pdf", Zoox2018Larvae.size, width = 1
 
 ## Statistics
 
-L2018.zoox.meta.size$Origin <- factor(L2018.zoox.meta.size$Origin)
-L2018.zoox.meta.size$Treatment.y <- factor(L2018.zoox.meta.size$Treatment.y)
-L2018.zoox.meta.size$Transplant.Site <- factor(L2018.zoox.meta.size$Transplant.Site)
+L2018.zoox.mean.col.size
 
-Zoox2018Larvae.2018.anova2 <- aov(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.zoox.meta.size)
-qqnorm(resid(Zoox2018Larvae.2018.anova2))
-qqline(resid(Zoox2018Larvae.2018.anova2)) 
+### orthogonal random effect design 
+
+library(lme4)
+library(jtools)
+library(car)
+
+#Three way model with date and coral ID as random factor
+Zoox2018Larvae.2018.lmer <- lmer(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site + (1|Date)  +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
+
+qqnorm(resid(Zoox2018Larvae.2018.lmer)) # Normality
+qqline(resid(Zoox2018Larvae.2018.lmer)) # Normal
+
+boxplot(resid(Zoox2018Larvae.2018.lmer)~L2018.zoox.mean.col.size$Origin) # Variance 
+boxplot(resid(Zoox2018Larvae.2018.lmer)~L2018.zoox.mean.col.size$Treatment.y)
+boxplot(resid(Zoox2018Larvae.2018.lmer)~L2018.zoox.mean.col.size$Transplant.Site)
+
+summary(Zoox2018Larvae.2018.lmer)
+Anova(Zoox2018Larvae.2018.lmer)
+
+capture.output(Anova(Zoox2018Larvae.2018.lmer, type = "III"), file = "output/Statistics/L.2018.zoox.lmer.csv")
+
+#extract model parameters (= means)
+fixef(Zoox2018Larvae.2018.lmer)
+summary(Zoox2018Larvae.2018.lmer)
+confint1<-confint(Zoox2018Larvae.2018.lmer)
+confint1
+lrt(Zoox2018Larvae.2018.lmer2, Zoox2018Larvae.2018.lmer)
+
+#Three way model with date as random factor
+Zoox2018Larvae.2018.lmer2 <- lmer(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site + (1|Date) , data = L2018.zoox.mean.col.size, REML=FALSE)
+qqnorm(resid(Zoox2018Larvae.2018.lmer2)) # Normality
+qqline(resid(Zoox2018Larvae.2018.lmer2)) # Normal
+
+boxplot(resid(Zoox2018Larvae.2018.lmer2)~L2018.zoox.mean.col.size$Origin) # Variance 
+boxplot(resid(Zoox2018Larvae.2018.lmer2)~L2018.zoox.mean.col.size$Treatment.y)
+boxplot(resid(Zoox2018Larvae.2018.lmer2)~L2018.zoox.mean.col.size$Transplant.Site)
+
+summary(Zoox2018Larvae.2018.lmer2)
+Anova(Zoox2018Larvae.2018.lmer2, type = "III")
+
+#Three way model with coral.id as random factor
+Zoox2018Larvae.2018.lmer3 <- lmer(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site + (1|coral.id.x) , data = L2018.zoox.mean.col.size, REML=FALSE)
+qqnorm(resid(Zoox2018Larvae.2018.lmer3)) # Normality
+qqline(resid(Zoox2018Larvae.2018.lmer3)) # Normal
+
+boxplot(resid(Zoox2018Larvae.2018.lmer3)~L2018.zoox.mean.col.size$Origin) # Variance 
+boxplot(resid(Zoox2018Larvae.2018.lmer3)~L2018.zoox.mean.col.size$Treatment.y)
+boxplot(resid(Zoox2018Larvae.2018.lmer3)~L2018.zoox.mean.col.size$Transplant.Site)
+
+summary(Zoox2018Larvae.2018.lmer3)
+Anova(Zoox2018Larvae.2018.lmer3, type = "III")
+
+lrt(Zoox2018Larvae.2018.lmer3, Zoox2018Larvae.2018.lmer)
 
 
-boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Origin)
-boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Treatment.y) 
-boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Transplant.Site)
+#Two way model
+Zoox2018Larvae.2018.OxT <- lmer(Cells.x3.mm3~Origin*Treatment.y + (1|Date) +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
+summary(Zoox2018Larvae.2018.OxT)
+Anova(Zoox2018Larvae.2018.OxT, type = "III")
 
-anova(Zoox2018Larvae.2018.anova2)
+Zoox2018Larvae.2018.OxTS <- lmer(Cells.x3.mm3~Origin*Transplant.Site + (1|Date) +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
+summary(Zoox2018Larvae.2018.OxTS)
+Anova(Zoox2018Larvae.2018.OxTS, type = "III")
 
-capture.output(anova(Zoox2018Larvae.2018.anova2), file = "output/Statistics/L2018.Zoox.vol.csv")
+Zoox2018Larvae.2018.TxTS <- lmer(Cells.x3.mm3~Treatment.y*Transplant.Site + (1|Date) +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
+summary(Zoox2018Larvae.2018.TxTS)
+Anova(Zoox2018Larvae.2018.TxTS, type = "III")
 
-# Post-Hoc 
 
-L.2018.Zoox.PH <- TukeyHSD(Zoox2018Larvae.2018.anova2, conf.level = 0.95)
-capture.output(L.2018.Zoox.PH, file = "output/Statistics/L2018.Zoox.PH.csv")
+#Posthoc
+Zoox2018LarvaePH <- lsmeans(Zoox2018Larvae.2018.lmer, pairwise~Origin*Treatment.y*Transplant.Site, adjust="tukey")
+capture.output(Zoox2018LarvaePH, file = "output/Statistics/L.2018.zoox.PH.csv")
 
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.Zoox.TreatTrans <- lsmeans(Zoox2018Larvae.2018.anova2, ~ Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.Zoox.pairs.TreatTrans <- multcomp::cld(L.2018.Zoox.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.Zoox.pairs.TreatTrans #view results
-capture.output(L.2018.Zoox.pairs.TreatTrans, file = "output/Statistics/L.2018.Zoox.pairs.TreatTrans.csv")
+
+# 
+# L2018.zoox.meta.size$Origin <- factor(L2018.zoox.meta.size$Origin)
+# L2018.zoox.meta.size$Treatment.y <- factor(L2018.zoox.meta.size$Treatment.y)
+# L2018.zoox.meta.size$Transplant.Site <- factor(L2018.zoox.meta.size$Transplant.Site)
+# 
+# Zoox2018Larvae.2018.anova2 <- aov(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.zoox.meta.size)
+# qqnorm(resid(Zoox2018Larvae.2018.anova2))
+# qqline(resid(Zoox2018Larvae.2018.anova2)) 
+# 
+# 
+# boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Origin)
+# boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Treatment.y) 
+# boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Transplant.Site)
+# 
+# anova(Zoox2018Larvae.2018.anova2)
+# 
+# capture.output(anova(Zoox2018Larvae.2018.anova2), file = "output/Statistics/L2018.Zoox.vol.csv")
+# 
+# # Post-Hoc 
+# 
+# L.2018.Zoox.PH <- TukeyHSD(Zoox2018Larvae.2018.anova2, conf.level = 0.95)
+# capture.output(L.2018.Zoox.PH, file = "output/Statistics/L2018.Zoox.PH.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.Zoox.TreatTrans <- lsmeans(Zoox2018Larvae.2018.anova2, ~ Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.Zoox.pairs.TreatTrans <- multcomp::cld(L.2018.Zoox.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.Zoox.pairs.TreatTrans #view results
+# capture.output(L.2018.Zoox.pairs.TreatTrans, file = "output/Statistics/L.2018.Zoox.pairs.TreatTrans.csv")
 
 # 
 # ## Making residuals

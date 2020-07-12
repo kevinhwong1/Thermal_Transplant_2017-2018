@@ -1,14 +1,14 @@
-Analysis of Variance Table
-
-Response: Volume
-                                   Df  Sum Sq Mean Sq  F value    Pr(>F)    
-Origin                              1  4.3937  4.3937 310.5304 < 2.2e-16 ***
-Treatment                           1  0.0958  0.0958   6.7721  0.009332 ** 
-Transplant.Site                     1  0.0058  0.0058   0.4073  0.523423    
-Origin:Treatment                    1  0.0961  0.0961   6.7951  0.009213 ** 
-Origin:Transplant.Site              1  0.0037  0.0037   0.2617  0.609043    
-Treatment:Transplant.Site           1  0.0919  0.0919   6.4918  0.010916 *  
-Origin:Treatment:Transplant.Site    1  0.0593  0.0593   4.1936  0.040715 *  
-Residuals                        1891 26.7557  0.0141                       
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Analysis of Variance Table,,,,,,,,
+,,,,,,,,
+Response: Volume,,,,,,,,
+,,Df,Sum Sq,Mean Sq,F value,Pr(>F),,
+Origin,,1,0.43776,0.43776,54.9352,4.39E-12,*,**
+Treatment,,1,0.01006,0.01006,1.2629,0.2626,,
+Transplant.Site,,1,0.00047,0.00047,0.0592,0.8081,,
+Origin:Treatment,,1,0.00786,0.00786,0.9866,0.3219,,
+Origin:Transplant.Site,,1,0.00068,0.00068,0.0859,0.7697,,
+Treatment:Transplant.Site,,1,0.00769,0.00769,0.9646,0.3273,,
+Origin:Treatment:Transplant,.Site,1,0.00412,0.00412,0.5176,0.4728,,
+Residuals,,184,1.46622,0.00797,,,,
+---,,,,,,,,
+Signif. codes:  0 ‘***’,0,1 �,�**’ 0,.01 ‘*,’ 0.05,‘.’ 0,0.1,‘ ’ 1

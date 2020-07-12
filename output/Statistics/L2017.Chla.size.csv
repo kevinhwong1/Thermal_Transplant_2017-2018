@@ -1,12 +1,12 @@
 
 	Welch Two Sample t-test
 
-data:  chla.ng.mm3 by Treatment.1
-t = -4.6939, df = 71.684, p-value = 1.253e-05
+data:  chla.ng.mm3 by treatment
+t = -2.7734, df = 22.507, p-value = 0.01094
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- -44.2945 -17.8853
+ -92.99250 -13.47975
 sample estimates:
 mean in group Ambient     mean in group Hot 
-             53.32233              84.41222 
+             91.30535             144.54148 
 

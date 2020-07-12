@@ -61,9 +61,9 @@ A2017.frag <- A2017.frag %>%
 
 A2017.chla.data.meta <- merge(A2017.chla.data.vial, A2017.frag, by = "coral.tp")
 
-#Subtracting 750 (blank) from 630 and 633 values
-A2017.chla.data.meta$abs.630.corr <- A2017.chla.data.meta$`Chl.630` - A2017.chla.data.meta$`Chl.750`
-A2017.chla.data.meta$abs.663.corr <- A2017.chla.data.meta$`Chl.663` - A2017.chla.data.meta$`Chl.750`
+#Subtracting 750 (blank) from 630 and 633 values, and accounting for path length (0.584 cm)
+A2017.chla.data.meta$abs.630.corr <- (A2017.chla.data.meta$`Chl.630` - A2017.chla.data.meta$`Chl.750`) / 0.584
+A2017.chla.data.meta$abs.663.corr <- (A2017.chla.data.meta$`Chl.663` - A2017.chla.data.meta$`Chl.750`) / 0.584
 
 #Chlorphyll A concentration equation 
 A2017.chla.data.meta$chlA.ug.sample <- 11.43*A2017.chla.data.meta$abs.663.corr - 0.64*A2017.chla.data.meta$abs.630.corr
@@ -81,41 +81,41 @@ mean.chla.A2017$reef.treatment <- paste(mean.chla.A2017$reef.zone, mean.chla.A20
 #Reordering factors
 mean.chla.A2017$timepoint <- factor(mean.chla.A2017$timepoint, levels = c("Pre-Treatment","Post-Treatment"))
 
-#Plotting 
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-Chla2017Adult <- ggplot(mean.chla.A2017, aes(x=timepoint, y=ChlA.ugcm2, group=reef.treatment)) + 
-  geom_line(position=pd, color="black")+
-  geom_errorbar(aes(ymin=ChlA.ugcm2-se, ymax=ChlA.ugcm2+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(1,6)+
-  xlab("Timepoint") + ylab(expression("Chlorophyll a " (mu*g ~ cm^{-2}))) + #Axis titles
-  geom_point(aes(shape=reef.zone, color=treatment), size=4, position=pd)+
-  scale_shape_manual(values=c(16,17),
-                     name = "Reef Zone")+
-  scale_color_manual(values=c("dodgerblue3", "tomato1"),
-                     name = "Treatment")+ #colour modification
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 16, color = "black"),
-        axis.title = element_text(size = 18, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = c(0.9,0.8))
+# #Plotting 
+# pd <- position_dodge(0.1) # moves object .05 to the left and right
+# #legend.title <- "Treatment"
+# Chla2017Adult <- ggplot(mean.chla.A2017, aes(x=timepoint, y=ChlA.ugcm2, group=reef.treatment)) + 
+#   geom_line(position=pd, color="black")+
+#   geom_errorbar(aes(ymin=ChlA.ugcm2-se, ymax=ChlA.ugcm2+se), width=.1, position=pd, color="black") + #Error bars
+#   ylim(1,6)+
+#   xlab("Timepoint") + ylab(expression("Chlorophyll a " (mu*g ~ cm^{-2}))) + #Axis titles
+#   geom_point(aes(shape=reef.zone, color=treatment), size=4, position=pd)+
+#   scale_shape_manual(values=c(16,17),
+#                      name = "Reef Zone")+
+#   scale_color_manual(values=c("dodgerblue3", "tomato1"),
+#                      name = "Treatment")+ #colour modification
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
+#   theme(axis.text = element_text(size = 16, color = "black"),
+#         axis.title = element_text(size = 18, color = "black"),
+#         axis.title.x = element_blank()) +
+#   theme(legend.position = c(0.9,0.8))
+# 
+# Chla2017Adult
+# ggsave(file = "output/Graphs/A2017.Chla.pdf", Chla2017Adult)
 
-Chla2017Adult
-ggsave(file = "output/Graphs/A2017.Chla.pdf", Chla2017Adult)
-
-# Statistics
-
-A2017.Chla.anova <- lm(ChlA.ugcm2~reef.zone*treatment*timepoint, data = A2017.chla.final)
-qqnorm(resid(A2017.Chla.anova))
-qqline(resid(A2017.Chla.anova))
-
-boxplot(resid(A2017.Chla.anova)~A2017.chla.final$reef.zone)
-boxplot(resid(A2017.Chla.anova)~A2017.chla.final$treatment)
-boxplot(resid(A2017.Chla.anova)~A2017.chla.final$timepoint)
-anova(A2017.Chla.anova)
-
-capture.output(anova(A2017.Chla.anova), file = "output/Statistics/A2017.Chla.csv")
+# # Statistics
+# 
+# A2017.Chla.anova <- lm(ChlA.ugcm2~reef.zone*treatment*timepoint, data = A2017.chla.final)
+# qqnorm(resid(A2017.Chla.anova))
+# qqline(resid(A2017.Chla.anova))
+# 
+# boxplot(resid(A2017.Chla.anova)~A2017.chla.final$reef.zone)
+# boxplot(resid(A2017.Chla.anova)~A2017.chla.final$treatment)
+# boxplot(resid(A2017.Chla.anova)~A2017.chla.final$timepoint)
+# anova(A2017.Chla.anova)
+# 
+# capture.output(anova(A2017.Chla.anova), file = "output/Statistics/A2017.Chla.csv")
 
 
 # Plotting just T1
@@ -129,7 +129,7 @@ pd <- position_dodge(0.3) # moves object .05 to the left and right
 Chla2017Adult.T1 <- ggplot(mean.A2017.chla.T1, aes(x=timepoint, y=ChlA.ugcm2, group=reef.zone)) + 
 #  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
   geom_errorbar(aes(ymin=ChlA.ugcm2-se, ymax=ChlA.ugcm2+se), width=.1, size = 1, position=pd, color="black") + #Error bars
-  ylim(0,5.0)+
+  ylim(0,8.0)+
   xlab("Timepoint") + ylab(expression("Chlorophyll a " (mu*g ~ cm^{-2})))+ #Axis titles
   geom_point(aes(shape=reef.zone), fill = "black", size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
@@ -137,7 +137,7 @@ Chla2017Adult.T1 <- ggplot(mean.A2017.chla.T1, aes(x=timepoint, y=ChlA.ugcm2, gr
 #  scale_fill_manual(values=c("#FFFFFF", "#999999"),
 #                    name = "Treatment")+ #colour modification
   scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
-  annotate("rect", xmin=0, xmax=1.5, ymin = 0, ymax=6, alpha = 0.2) + 
+  annotate("rect", xmin=0, xmax=1.5, ymin = 0, ymax=8, alpha = 0.2) + 
   theme_bw() + theme(panel.grid.major = element_blank(), 
                      panel.grid.minor = element_blank(),
                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
@@ -187,7 +187,7 @@ Chla2017Adult.T2 <- ggplot(mean.A2017.chla.T2, aes(x=treatment, y=ChlA.ugcm2, gr
   scale_fill_manual(values=c("#FFFFFF", "#999999"),
                     name = "Treatment")+ #colour modification
   scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
-  annotate("rect", xmin=0, xmax=0.75, ymin = 0, ymax=6, alpha = 0.2) + 
+  annotate("rect", xmin=0, xmax=0.75, ymin = 0, ymax=9, alpha = 0.2) + 
   theme_bw() + theme(panel.grid.major = element_blank(), 
                      panel.grid.minor = element_blank(),
                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
@@ -210,22 +210,22 @@ boxplot(resid(A2017.Chla.anova.T2)~mean.A2017.col.chla.T2$treatment)
 anova(A2017.Chla.anova.T2)
 
 capture.output(anova(A2017.Chla.anova.T2), file = "output/Statistics/A2017.Chla.T2.csv")
-
-#Violin plot
-Violin.A2017.Chla <- ggplot(mean.A2017.col.chla.T2, aes(x=reef.zone, y=ChlA.ugcm2, fill = treatment)) +
-  geom_violin(position = position_dodge(width = 0.9)) +
-  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
-  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
-  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
-  xlab("Reef Zone") + ylab(expression("Chlorophyll a " (ug ~ cm^{-2}))) + #Axis titles
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black")) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/A2017.Chla.violin.pdf", Violin.A2017.Chla, width = 11, height = 11, units = c("in"))
+# 
+# #Violin plot
+# Violin.A2017.Chla <- ggplot(mean.A2017.col.chla.T2, aes(x=reef.zone, y=ChlA.ugcm2, fill = treatment)) +
+#   geom_violin(position = position_dodge(width = 0.9)) +
+#   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+#   #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+#   #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+#   scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+#   xlab("Reef Zone") + ylab(expression("Chlorophyll a " (ug ~ cm^{-2}))) + #Axis titles
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
+#   theme(axis.text = element_text(size = 30, color = "black"),
+#         axis.title = element_text(size = 36, color = "black")) +
+#   theme(legend.position = "none")
+# 
+# ggsave(file = "output/Graphs/A2017.Chla.violin.pdf", Violin.A2017.Chla, width = 11, height = 11, units = c("in"))
 
 
 # Chla / cell 
@@ -256,7 +256,7 @@ pd <- position_dodge(0.3) # moves object .05 to the left and right
 Chla.cell2017Adult.T1 <- ggplot(mean.A2017.chla.cell.T1, aes(x=timepoint.y, y=chla.cell, group=reef.zone.y)) + 
   #  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
   geom_errorbar(aes(ymin=chla.cell-se, ymax=chla.cell+se), width=.1, size = 1, position=pd, color="black") + #Error bars
-  annotate("rect", xmin=0, xmax=1.5, ymin = 2, ymax=7, alpha = 0.2) + 
+  annotate("rect", xmin=0, xmax=1.5, ymin = 4, ymax=12, alpha = 0.2) + 
   ylim(2,7)+
   xlab("Timepoint") + ylab(expression("Chlorophyll a " (pg ~ cell^{-1})))+ #Axis titles
   geom_point(aes(shape=reef.zone.y), fill = "black", size=14, position=pd, color = "black")+
@@ -326,7 +326,7 @@ Chla.cell2017Adult.T2 <- ggplot(mean.A2017.chla.cell.T2.edit, aes(x=treatment.y,
   scale_fill_manual(values=c("#FFFFFF", "#999999"),
                     name = "Treatment")+ #colour modification
   scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
-  annotate("rect", xmin=0, xmax=0.75, ymin = 2, ymax=7, alpha = 0.2) + 
+  annotate("rect", xmin=0, xmax=0.75, ymin = 4, ymax=12, alpha = 0.2) + 
   theme_bw() + theme(panel.grid.major = element_blank(), 
                      panel.grid.minor = element_blank(),
                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
@@ -408,9 +408,9 @@ L2017.chla.data.vial <- L2017.chla.data.vial %>%
 L2017.chla.data.vial$coral.tp <- paste(L2017.chla.data.vial$coral.id, L2017.chla.data.vial$timepoint)
 L2017.chla.data.vial$'Chl.630' <- as.numeric(L2017.chla.data.vial$'Chl.630') #set Chl630 as numeric values
 
-#Subtracting 750 (blank) from 630 and 633 values
-L2017.chla.data.vial$abs.630.corr <- L2017.chla.data.vial$`Chl.630` - L2017.chla.data.vial$`Chl.750`
-L2017.chla.data.vial$abs.663.corr <- L2017.chla.data.vial$`Chl.663` - L2017.chla.data.vial$`Chl.750`
+#Subtracting 750 (blank) from 630 and 633 values, and correcting for path length (0.584 cm)
+L2017.chla.data.vial$abs.630.corr <- (L2017.chla.data.vial$`Chl.630` - L2017.chla.data.vial$`Chl.750`) / 0.584
+L2017.chla.data.vial$abs.663.corr <- (L2017.chla.data.vial$`Chl.663` - L2017.chla.data.vial$`Chl.750`) / 0.584
 
 #Chlorphyll A concentration equation 
 L2017.chla.data.vial$chlA.ug.sample <- 11.43*L2017.chla.data.vial$abs.663.corr - 0.64*L2017.chla.data.vial$abs.630.corr
@@ -432,43 +432,43 @@ mean.chla.L2017$Timepoint <- factor(mean.chla.L2017$Timepoint, levels = c("Pre-T
 mean.chla.L2017.patch <- mean.chla.L2017 %>% 
   filter(reef.zone == "Patch")
 
-#Plotting 
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-Chla2017Larvae <- ggplot(mean.chla.L2017.patch, aes(x=treatment, y=chlA.nglarv, group = reef.zone)) + 
-  geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
-  geom_errorbar(aes(ymin=chlA.nglarv-se, ymax=chlA.nglarv+se), width=.1, position=pd, color="black") + #Error bars
-  #ylim(1,6)+
-  xlab("Treatment") + ylab(expression("Chlorophyll a " (ng~larva^{-1}))) + #Axis titles
-  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-  
-Chla2017Larvae
-ggsave(file = "output/Graphs/L2017.Chla.pdf", Chla2017Larvae, width = 11, height = 11, units = c("in"))
-
-#Statistics
-L2017.Chla.Patch.anova <- lm(chlA.nglarv~treatment, data = mean.chla.col.L2017)
-qqnorm(resid(L2017.Chla.Patch.anova))
-qqline(resid(L2017.Chla.Patch.anova))
-
-boxplot(resid(L2017.Chla.Patch.anova)~mean.chla.col.L2017$treatment)
-
-t.test(chlA.nglarv~treatment, data = mean.chla.col.L2017)
-
-capture.output(t.test(chlA.nglarv~treatment, data = mean.chla.col.L2017), file = "output/Statistics/L2017.Chla.Patch.csv")
-
+# #Plotting 
+# pd <- position_dodge(0.1) # moves object .05 to the left and right
+# #legend.title <- "Treatment"
+# Chla2017Larvae <- ggplot(mean.chla.L2017.patch, aes(x=treatment, y=chlA.nglarv, group = reef.zone)) + 
+#   geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
+#   geom_errorbar(aes(ymin=chlA.nglarv-se, ymax=chlA.nglarv+se), width=.1, position=pd, color="black") + #Error bars
+#   #ylim(1,6)+
+#   xlab("Treatment") + ylab(expression("Chlorophyll a " (ng~larva^{-1}))) + #Axis titles
+#   geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
+#   scale_shape_manual(values=c(21,24),
+#                      name = "Reef Zone")+
+#   scale_fill_manual(values=c("#FFFFFF", "#999999"),
+#                     name = "Treatment")+ #colour modification
+#   scale_color_manual(values=c("black", "#999999"),
+#                      name = "Treatment")+
+#   theme_bw() + theme(panel.grid.major = element_blank(), 
+#                      panel.grid.minor = element_blank(),
+#                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+#   theme(axis.text = element_text(size = 30, color = "black"),
+#         axis.title = element_text(size = 36, color = "black"),
+#         axis.title.x = element_blank()) +
+#   theme(legend.position = "none")
+#   
+# Chla2017Larvae
+# ggsave(file = "output/Graphs/L2017.Chla.pdf", Chla2017Larvae, width = 11, height = 11, units = c("in"))
+# 
+# #Statistics
+# L2017.Chla.Patch.anova <- lm(chlA.nglarv~treatment, data = mean.chla.col.L2017)
+# qqnorm(resid(L2017.Chla.Patch.anova))
+# qqline(resid(L2017.Chla.Patch.anova))
+# 
+# boxplot(resid(L2017.Chla.Patch.anova)~mean.chla.col.L2017$treatment)
+# 
+# t.test(chlA.nglarv~treatment, data = mean.chla.col.L2017)
+# 
+# capture.output(t.test(chlA.nglarv~treatment, data = mean.chla.col.L2017), file = "output/Statistics/L2017.Chla.Patch.csv")
+# 
 
 ### Chla standardized by larval volume 
 
@@ -484,23 +484,22 @@ mean.chla.final.size <- summarySE(L2017.chla.final.size, measurevar="chla.ng.mm3
 
 
 #L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
+# 
+# Violin.L2017.Chla <- ggplot(L2017.chla.final.size, aes(x=Treatment.1, y=chla.ng.mm3, fill = Treatment.1)) +
+#   geom_violin(position = position_dodge(width = 0.9)) +
+#   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+#   #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+#   #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+#   scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+#   xlab("Parental Treatment") + ylab(expression("Chlorophyll a " (ng ~ mm^{-3}))) + #Axis titles
+#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+#                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
+#   theme(axis.text = element_text(size = 30, color = "black"),
+#         axis.title = element_text(size = 36, color = "black")) +
+#   theme(legend.position = "none")
+# 
+# ggsave(file = "output/Graphs/L2017.Chla.Patch.size.pdf", Violin.L2017.Chla, width = 11, height = 11, units = c("in"))
 
-Violin.L2017.Chla <- ggplot(L2017.chla.final.size, aes(x=Treatment.1, y=chla.ng.mm3, fill = Treatment.1)) +
-  geom_violin(position = position_dodge(width = 0.9)) +
-  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
-  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
-  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
-  xlab("Parental Treatment") + ylab(expression("Chlorophyll a " (ng ~ mm^{-3}))) + #Axis titles
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black")) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/L2017.Chla.Patch.size.pdf", Violin.L2017.Chla, width = 11, height = 11, units = c("in"))
-
-capture.output(t.test(chla.ng.mm3~Treatment.1, data = L2017.chla.final.size), file = "output/Statistics/L2017.Chla.size.csv")
 
 Box.L2017.Chla <- ggplot(mean.chla.final.size, aes(x=treatment, y=chla.ng.mm3, fill = treatment)) +
   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
@@ -509,6 +508,7 @@ Box.L2017.Chla <- ggplot(mean.chla.final.size, aes(x=treatment, y=chla.ng.mm3, f
   #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
   scale_fill_manual(values=c("#FFFFFF", "#999999")) +
   xlab("Parental Treatment") + ylab(expression("Chlorophyll a " (ng ~ mm^{-3}))) + #Axis titles
+  ylim(40,250) +
   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
   theme(axis.text = element_text(size = 30, color = "black"),
@@ -562,11 +562,6 @@ boxplot(resid(L2017.Chla.cell.Patch.anova)~L2017.chla.cell$treatment.x)
 t.test(Chla.cell~treatment.x, data = L2017.chla.cell)
 
 capture.output(t.test(Chla.cell~treatment.x, data = L2017.chla.cell), file = "output/Statistics/L2017.Chla.cell.Patch.csv")
-
-
-
-
-
 
 
 
@@ -685,9 +680,9 @@ A2018.vol <- A2018.vol %>%
   select(coral.id, Homo.Vol.mL)
 A2018.chla.data.meta <- merge(A2018.chla.data.sa, A2018.vol, by = "coral.id")
 
-#Subtracting 750 (blank) from 630 and 633 values
-A2018.chla.data.meta$abs.630.corr <- A2018.chla.data.meta$`Chl.630` - A2018.chla.data.meta$`Chl.750`
-A2018.chla.data.meta$abs.663.corr <- A2018.chla.data.meta$`Chl.663` - A2018.chla.data.meta$`Chl.750`
+#Subtracting 750 (blank) from 630 and 633 values and correcting for path  length (0.584)
+A2018.chla.data.meta$abs.630.corr <- (A2018.chla.data.meta$`Chl.630` - A2018.chla.data.meta$`Chl.750`) /0.584
+A2018.chla.data.meta$abs.663.corr <- (A2018.chla.data.meta$`Chl.663` - A2018.chla.data.meta$`Chl.750`) /0.584
 
 #Chlorphyll A concentration equation 
 A2018.chla.data.meta$chlA.ug.sample <- 11.43*A2018.chla.data.meta$abs.663.corr - 0.64*A2018.chla.data.meta$abs.630.corr
@@ -713,7 +708,7 @@ pd <- position_dodge(0.1) # moves object .05 to the left and right
 Chla2018Adult <- ggplot(mean.chla.A2018, aes(x=Transplant.Site, y=ChlA.ugcm2, group=reef.treatment)) + 
   geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
   geom_errorbar(aes(ymin=ChlA.ugcm2-se, ymax=ChlA.ugcm2+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(1.5,3)+
+  ylim(2.5,5.5)+
   xlab("Transplant Site") + ylab(expression("Chlorophyll a " (mu*g ~ cm^{-2}))) + #Axis titles
   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
@@ -748,11 +743,11 @@ anova(Chla2018Adult.2018.anova)
 
 capture.output(anova(Chla2018Adult.2018.anova), file = "output/Statistics/A2018.Chla.csv")
 
-#Nested model accounting for coral id
-fit <- aov(ChlA.ugcm2~Origin*Treatment*Transplant.Site + Error(orig.coral.id), data=mean.chla.col.A2018)
-summary(fit)
-
-capture.output(summary(fit), file = "output/Statistics/A2018.Chla.nested.csv")
+# #Nested model accounting for coral id
+# fit <- aov(ChlA.ugcm2~Origin*Treatment*Transplant.Site + Error(orig.coral.id), data=mean.chla.col.A2018)
+# summary(fit)
+# 
+# capture.output(summary(fit), file = "output/Statistics/A2018.Chla.nested.csv")
 
 
 #### CHLA/Cell 
@@ -771,7 +766,7 @@ pd <- position_dodge(0.1) # moves object .05 to the left and right
 Chlacell2018Adult <- ggplot(mean.chla.cell.A2018, aes(x=Transplant.Site.x, y=chla.cell, group=reef.treatment)) + 
   geom_line(position=pd, aes(linetype=Origin.x, color = Treatment.x), size = 2)+
   geom_errorbar(aes(ymin=chla.cell-se, ymax=chla.cell+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(1.1,4.2)+
+  ylim(2.5,7)+
   xlab("Transplant Site") + ylab(expression("Chlorophyll a " (pg ~ cell^{-1}))) + #Axis titles
   geom_point(aes(fill=Treatment.x, shape=Origin.x), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
@@ -925,9 +920,9 @@ L2018.chla.data.vial2 <- merge(L2018.chla.data.vial, A2018.meta, by = "coral.id"
 L2018.chla.data.vial2 <- L2018.chla.data.vial2 %>%
   select(coral.id,Vial,Date.x,`Chl.630`, `Chl.663`, `Chl.750`, Origin, Treatment.y, Transplant.Site)
 
-#Subtracting 750 (blank) from 630 and 633 values
-L2018.chla.data.vial2$abs.630.corr <- L2018.chla.data.vial2$`Chl.630` - L2018.chla.data.vial2$`Chl.750`
-L2018.chla.data.vial2$abs.663.corr <- L2018.chla.data.vial2$`Chl.663` - L2018.chla.data.vial2$`Chl.750`
+#Subtracting 750 (blank) from 630 and 633 values, and accounting for path length (0.584)
+L2018.chla.data.vial2$abs.630.corr <- (L2018.chla.data.vial2$`Chl.630` - L2018.chla.data.vial2$`Chl.750`) / 0.584
+L2018.chla.data.vial2$abs.663.corr <- (L2018.chla.data.vial2$`Chl.663` - L2018.chla.data.vial2$`Chl.750`) / 0.584
 
 #Chlorphyll A concentration equation 
 L2018.chla.data.vial2$chlA.ug.sample <- 11.43*L2018.chla.data.vial2$abs.663.corr - 0.64*L2018.chla.data.vial2$abs.630.corr
@@ -944,44 +939,44 @@ mean.chla.col.L2018$orig.coral.id <- mean.chla.col.L2018$coral.id %>% str_replac
 mean.chla.L2018 <- summarySE(L2018.chla.data.vial2, measurevar="chlA.nglarv", groupvars=c("Origin", "Treatment", "Transplant.Site"))
 mean.chla.L2018$reef.treatment <- paste(mean.chla.L2018$Origin, mean.chla.L2018$Treatment)
 
-#Plotting 
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-Chla2018Larvae <- ggplot(mean.chla.L2018, aes(x=Transplant.Site, y=chlA.nglarv, group=reef.treatment)) + 
-  geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
-  geom_errorbar(aes(ymin=chlA.nglarv-se, ymax=chlA.nglarv+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(8,30)+
-  xlab("Transplant Site") + ylab(expression("Chlorophyll a " (ng  ~ Larva^{-1}))) + #Axis titles
-  geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-Chla2018Larvae
-ggsave(file = "output/Graphs/L2018.Chla.pdf", Chla2018Larvae, width = 11, height = 11, units = c("in"))
-
-## Statistics
-Chla2018larvae.2018.anova <- lm(chlA.nglarv~Origin*Treatment*Transplant.Site, data = mean.chla.col.L2018)
-qqnorm(resid(Chla2018larvae.2018.anova))
-qqline(resid(Chla2018larvae.2018.anova)) 
-
-boxplot(resid(Chla2018larvae.2018.anova)~mean.chla.col.L2018$Origin)
-boxplot(resid(Chla2018larvae.2018.anova)~mean.chla.col.L2018$Treatment) 
-boxplot(resid(Chla2018larvae.2018.anova)~mean.chla.col.L2018$Transplant.Site)
-
-anova(Chla2018larvae.2018.anova)
-
-capture.output(anova(Chla2018larvae.2018.anova), file = "output/Statistics/L2018.Chla.csv")
+# #Plotting 
+# pd <- position_dodge(0.1) # moves object .05 to the left and right
+# #legend.title <- "Treatment"
+# Chla2018Larvae <- ggplot(mean.chla.L2018, aes(x=Transplant.Site, y=chlA.nglarv, group=reef.treatment)) + 
+#   geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
+#   geom_errorbar(aes(ymin=chlA.nglarv-se, ymax=chlA.nglarv+se), width=.1, position=pd, color="black") + #Error bars
+#   ylim(0,60)+
+#   xlab("Transplant Site") + ylab(expression("Chlorophyll a " (ng  ~ Larva^{-1}))) + #Axis titles
+#   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
+#   scale_shape_manual(values=c(21,24),
+#                      name = "Reef Zone")+
+#   scale_fill_manual(values=c("#FFFFFF", "#999999"),
+#                     name = "Treatment")+ #colour modification
+#   scale_color_manual(values=c("black", "#999999"),
+#                      name = "Treatment")+
+#   theme_bw() + theme(panel.grid.major = element_blank(), 
+#                      panel.grid.minor = element_blank(),
+#                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+#   theme(axis.text = element_text(size = 30, color = "black"),
+#         axis.title = element_text(size = 36, color = "black"),
+#         axis.title.x = element_blank()) +
+#   theme(legend.position = "none")
+# 
+# Chla2018Larvae
+# ggsave(file = "output/Graphs/L2018.Chla.pdf", Chla2018Larvae, width = 11, height = 11, units = c("in"))
+# 
+# ## Statistics
+# Chla2018larvae.2018.anova <- lm(chlA.nglarv~Origin*Treatment*Transplant.Site, data = mean.chla.col.L2018)
+# qqnorm(resid(Chla2018larvae.2018.anova))
+# qqline(resid(Chla2018larvae.2018.anova)) 
+# 
+# boxplot(resid(Chla2018larvae.2018.anova)~mean.chla.col.L2018$Origin)
+# boxplot(resid(Chla2018larvae.2018.anova)~mean.chla.col.L2018$Treatment) 
+# boxplot(resid(Chla2018larvae.2018.anova)~mean.chla.col.L2018$Transplant.Site)
+# 
+# anova(Chla2018larvae.2018.anova)
+# 
+# capture.output(anova(Chla2018larvae.2018.anova), file = "output/Statistics/L2018.Chla.csv")
 
 # #Nested ANOVA
 # Nested.L2018 <- aov(chlA.nglarv~Origin*Treatment*Transplant.Site + Error(orig.coral.id), data=mean.chla.col.L2018)
@@ -997,8 +992,6 @@ L.Size.2018 <- read.csv("data/2018/Larval.Size/Mean_Larvalsize_ColDay.csv")
 L2018.Chla.meta.size <- merge(L.Size.2018, L2018.chla.data.vial2, by = "Date.coral.ID")
 
 L2018.Chla.meta.size$Chla.ng.mm3 <- L2018.Chla.meta.size$chlA.nglarv/L2018.Chla.meta.size$Volume
-
-# Summarizing 
 
 L2018.Chla.mean.size <- summarySE(L2018.Chla.meta.size, measurevar="Chla.ng.mm3", groupvars=c("Origin", "Treatment", "Transplant.Site"))
 
@@ -1033,46 +1026,107 @@ ggsave(file = "output/Graphs/L2018.Chla.vol.pdf", Chla2018Larvae.size, width = 1
 
 ## Statistics
 
-L2018.Chla.meta.size$Origin <- factor(L2018.Chla.meta.size$Origin)
-L2018.Chla.meta.size$Treatment <- factor(L2018.Chla.meta.size$Treatment)
-L2018.Chla.meta.size$Transplant.Site <- factor(L2018.Chla.meta.size$Transplant.Site)
+# ## by vial replicate
+# L2018.Chla.meta.size$Origin <- factor(L2018.Chla.meta.size$Origin)
+# L2018.Chla.meta.size$Treatment <- factor(L2018.Chla.meta.size$Treatment)
+# L2018.Chla.meta.size$Transplant.Site <- factor(L2018.Chla.meta.size$Transplant.Site)
+# 
+# Chla2018Larvae.2018.anova2 <- aov(Chla.ng.mm3~Origin*Treatment*Transplant.Site, data = L2018.Chla.meta.size)
+# qqnorm(resid(Chla2018Larvae.2018.anova2))
+# qqline(resid(Chla2018Larvae.2018.anova2)) 
+# 
+# 
+# boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Origin)
+# boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Treatment) 
+# boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Transplant.Site)
+# 
+# anova(Chla2018Larvae.2018.anova2)
+# 
+# capture.output(anova(Chla2018Larvae.2018.anova2), file = "output/Statistics/L2018.Chla.vol.csv")
+# 
+# # Post Hoc
+# L.2018.Chla.PH <- TukeyHSD(Chla2018Larvae.2018.anova2, conf.level = 0.95)
+# capture.output(L.2018.Chla.PH, file = "output/Statistics/L2018.Chla.PH.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.Chla.TreatTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.Chla.pairs.TreatTrans <- multcomp::cld(L.2018.Chla.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.Chla.pairs.TreatTrans #view results
+# capture.output(L.2018.Chla.pairs.TreatTrans, file = "output/Statistics/L.2018.Chla.pairs.TreatTrans.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.Chla.OxTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.Chla.pairs.OxTrans <- multcomp::cld(L.2018.Chla.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.Chla.pairs.OxTrans #view results
+# capture.output(L.2018.Chla.pairs.OxTrans, file = "output/Statistics/L.2018.Chla.pairs.OxTrans.csv")
 
-Chla2018Larvae.2018.anova2 <- aov(Chla.ng.mm3~Origin*Treatment*Transplant.Site, data = L2018.Chla.meta.size)
-qqnorm(resid(Chla2018Larvae.2018.anova2))
-qqline(resid(Chla2018Larvae.2018.anova2)) 
+
+# ### Merged by colony by day
+# L2018.Chla.mean.size2 <- summarySE(L2018.Chla.meta.size, measurevar="Chla.ng.mm3", groupvars=c("Date.coral.ID", "Origin", "Treatment", "Transplant.Site"))
+# 
+# L2018.Chla.mean.size2$Origin <- factor(L2018.Chla.mean.size2$Origin)
+# L2018.Chla.mean.size2$Treatment <- factor(L2018.Chla.mean.size2$Treatment)
+# L2018.Chla.mean.size2$Transplant.Site <- factor(L2018.Chla.mean.size2$Transplant.Site)
+# 
+# Chla2018Larvae.2018.anova3 <- aov(Chla.ng.mm3~Origin*Treatment*Transplant.Site, data = L2018.Chla.mean.size2)
+# qqnorm(resid(Chla2018Larvae.2018.anova3))
+# qqline(resid(Chla2018Larvae.2018.anova3)) 
+# 
+# 
+# boxplot(resid(Chla2018Larvae.2018.anova3)~L2018.Chla.mean.size2$Origin)
+# boxplot(resid(Chla2018Larvae.2018.anova3)~L2018.Chla.mean.size2$Treatment) 
+# boxplot(resid(Chla2018Larvae.2018.anova3)~L2018.Chla.mean.size2$Transplant.Site)
+# 
+# anova(Chla2018Larvae.2018.anova3)
+# 
+# capture.output(anova(Chla2018Larvae.2018.anova3), file = "output/Statistics/L2018.Chla.vol.csv")
+
+### Mixed-model approach
+library(lme4)
+library(jtools)
+library(car)
+library(lsmeans)
+
+L2018.Chla.col.day <- summarySE(L2018.Chla.meta.size, measurevar="Chla.ng.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment", "Transplant.Site"))
+write.csv(L2018.Chla.col.day, file = "data/2018/Chlorophyll/L2018.Chlavol.mean.COLDAY.csv")
 
 
-boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Origin)
-boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Treatment) 
-boxplot(resid(Chla2018Larvae.2018.anova2)~L2018.Chla.meta.size$Transplant.Site)
+Chla2018Larvae.2018.lmer <- lmer(Chla.ng.mm3~Origin*Treatment*Transplant.Site + (1|Date) + (1|coral.id.x), data = L2018.Chla.col.day, REML=FALSE)
+summary(Chla2018Larvae.2018.lmer)
+Anova(Chla2018Larvae.2018.lmer, type = "III")
 
-anova(Chla2018Larvae.2018.anova2)
+capture.output(Anova(Chla2018Larvae.2018.lmer, type = "III"), file = "output/Statistics/L.2018.Chla.vol.lmer.csv")
 
-capture.output(anova(Chla2018Larvae.2018.anova2), file = "output/Statistics/L2018.Chla.vol.csv")
+#Posthoc
+Chla2018LarvaePH <- lsmeans(Chla2018Larvae.2018.lmer, pairwise~Origin*Treatment*Transplant.Site, adjust="tukey")
+capture.output(Chla2018LarvaePH, file = "output/Statistics/L.2018.Chla.vol.PH.csv")
 
-# Post Hoc
-L.2018.Chla.PH <- TukeyHSD(Chla2018Larvae.2018.anova2, conf.level = 0.95)
-capture.output(L.2018.Chla.PH, file = "output/Statistics/L2018.Chla.PH.csv")
-
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.Chla.TreatTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.Chla.pairs.TreatTrans <- multcomp::cld(L.2018.Chla.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.Chla.pairs.TreatTrans #view results
-capture.output(L.2018.Chla.pairs.TreatTrans, file = "output/Statistics/L.2018.Chla.pairs.TreatTrans.csv")
-
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.Chla.OxTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.Chla.pairs.OxTrans <- multcomp::cld(L.2018.Chla.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.Chla.pairs.OxTrans #view results
-capture.output(L.2018.Chla.pairs.OxTrans, file = "output/Statistics/L.2018.Chla.pairs.OxTrans.csv")
+# # Post Hoc
+# L.2018.Chla.PH <- TukeyHSD(Chla2018Larvae.2018.anova2, conf.level = 0.95)
+# capture.output(L.2018.Chla.PH, file = "output/Statistics/L2018.Chla.PH.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.Chla.TreatTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.Chla.pairs.TreatTrans <- multcomp::cld(L.2018.Chla.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.Chla.pairs.TreatTrans #view results
+# capture.output(L.2018.Chla.pairs.TreatTrans, file = "output/Statistics/L.2018.Chla.pairs.TreatTrans.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.Chla.OxTrans <- lsmeans(Chla2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.Chla.pairs.OxTrans <- multcomp::cld(L.2018.Chla.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.Chla.pairs.OxTrans #view results
+# capture.output(L.2018.Chla.pairs.OxTrans, file = "output/Statistics/L.2018.Chla.pairs.OxTrans.csv")
+# 
 
 
 ##### Chla/cell 
-
 L2018.zoox <- read.csv("data/2018/Zoox/L2018_Zoox_calc.csv")
+
+L2018.zoox$Date.coral.ID <- paste(L2018.zoox$Date, L2018.zoox$coral.id.x, sep = "-")
+
 L2018.zoox <-L2018.zoox %>%
   select(Date.coral.ID, Cells.x3.mm3)
-  
+
 L2018.chal.cell <- merge(L2018.Chla.meta.size, L2018.zoox, by = "Date.coral.ID")
 L2018.chal.cell$chla.cell <- L2018.chal.cell$Chla.ng.mm3 / L2018.chal.cell$Cells.x3.mm3
 
@@ -1088,7 +1142,7 @@ pd <- position_dodge(0.1) # moves object .05 to the left and right
 Chlacell2018Larvae.size <- ggplot(L2018.Chlacell.mean.size, aes(x=Transplant.Site, y=chla.cell, group=reef.treatment)) + 
   geom_line(position=pd, aes(linetype=Origin, color = Treatment), size = 2)+
   geom_errorbar(aes(ymin=chla.cell-se, ymax=chla.cell+se), width=.1, position=pd, color="black") + #Error bars
-    ylim(1,5)+
+    ylim(3,8)+
   xlab("Transplant Site") + ylab(expression("Chlorophyll a " (mu*g  ~ cell^{-1})))+ #Axis titles
   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
@@ -1110,19 +1164,44 @@ ggsave(file = "output/Graphs/L2018.Chla.cell.pdf", Chlacell2018Larvae.size, widt
 
 ## Statistics
 
-L2018.chal.cell$Origin <- factor(L2018.chal.cell$Origin)
-L2018.chal.cell$Treatment <- factor(L2018.chal.cell$Treatment)
-L2018.chal.cell$Transplant.Site <- factor(L2018.chal.cell$Transplant.Site)
+L2018.chal.cell2 <- summarySE(L2018.chal.cell, measurevar="chla.cell", groupvars=c("Date", "coral.id.x", "Date.coral.ID", "Origin", "Treatment", "Transplant.Site"))
 
-Chlacell2018Larvae.2018.anova2 <- aov(chla.cell~Origin*Treatment*Transplant.Site, data = L2018.chal.cell)
+L2018.chal.cell2$Origin <- factor(L2018.chal.cell2$Origin)
+L2018.chal.cell2$Treatment <- factor(L2018.chal.cell2$Treatment)
+L2018.chal.cell2$Transplant.Site <- factor(L2018.chal.cell2$Transplant.Site)
+
+Chlacell2018Larvae.2018.anova2 <- aov(chla.cell~Origin*Treatment*Transplant.Site, data = L2018.chal.cell2)
 qqnorm(resid(Chlacell2018Larvae.2018.anova2))
 qqline(resid(Chlacell2018Larvae.2018.anova2)) 
 
 
-boxplot(resid(Chlacell2018Larvae.2018.anova2)~L2018.chal.cell$Origin)
-boxplot(resid(Chlacell2018Larvae.2018.anova2)~L2018.chal.cell$Treatment) 
-boxplot(resid(Chlacell2018Larvae.2018.anova2)~L2018.chal.cell$Transplant.Site)
+boxplot(resid(Chlacell2018Larvae.2018.anova2)~L2018.chal.cell2$Origin)
+boxplot(resid(Chlacell2018Larvae.2018.anova2)~L2018.chal.cell2$Treatment) 
+boxplot(resid(Chlacell2018Larvae.2018.anova2)~L2018.chal.cell2$Transplant.Site)
 
 anova(Chlacell2018Larvae.2018.anova2)
 
 capture.output(anova(Chlacell2018Larvae.2018.anova2), file = "output/Statistics/L2018.Chla.cell.csv")
+
+
+### Mixed-model approach
+library(lme4)
+library(jtools)
+library(car)
+library(lsmeans)
+
+L2018.Chlacell.col.day <- summarySE(L2018.chal.cell, measurevar="chla.cell", groupvars=c("Date", "coral.id.x", "Origin", "Treatment", "Transplant.Site"))
+write.csv(L2018.Chlacell.col.day, file = "data/2018/Chlorophyll/L2018.Chlacell.col.day.csv")
+
+
+Chlacell2018Larvae.2018.lmer <- lmer(chla.cell~Origin*Treatment*Transplant.Site + (1|Date) + (1|coral.id.x), data = L2018.Chlacell.col.day, REML=FALSE)
+summary(Chlacell2018Larvae.2018.lmer)
+Anova(Chlacell2018Larvae.2018.lmer, type = "III")
+
+capture.output(Anova(Chlacell2018Larvae.2018.lmer, type = "III"), file = "output/Statistics/L.2018.Chla.cell.lmer.csv")
+
+#Posthoc
+Chlacell2018LarvaePH <- lsmeans(Chlacell2018Larvae.2018.lmer, pairwise~Origin*Treatment*Transplant.Site, adjust="tukey")
+capture.output(Chlacell2018LarvaePH, file = "output/Statistics/L.2018.Chla.cell.PH.csv")
+
+# 

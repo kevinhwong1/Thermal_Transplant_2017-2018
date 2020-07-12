@@ -5,8 +5,8 @@ data:  ChlA.ugcm2 by reef.zone
 t = -1.1139, df = 36.576, p-value = 0.2726
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- -1.3302116  0.3867113
+ -2.2777596  0.6621768
 sample estimates:
 mean in group Patch   mean in group Rim 
-           3.627708            4.099458 
+           6.211828            7.019620 
 

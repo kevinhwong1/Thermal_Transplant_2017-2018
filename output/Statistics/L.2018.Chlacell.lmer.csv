@@ -1,0 +1,13 @@
+Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: chla.cell
+                                  Chisq Df Pr(>Chisq)  
+Origin                           4.0119  1    0.04518 *
+Treatment                        3.0237  1    0.08206 .
+Transplant.Site                  3.4666  1    0.06262 .
+Origin:Treatment                 0.5506  1    0.45807  
+Origin:Transplant.Site           0.5139  1    0.47348  
+Treatment:Transplant.Site        0.6625  1    0.41568  
+Origin:Treatment:Transplant.Site 0.2803  1    0.59652  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

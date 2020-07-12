@@ -158,8 +158,14 @@ L2018.vol.mean.col <- summarySE(L2018.vol.info, measurevar="Volume", groupvars=c
 
 write.csv(L2018.vol.mean.col, file ="data/2018/Larval.Size/L.Size.2018.csv")
 
+
+# Mean sizes by Colony and Day
+L2018.vol.mean.ColDay <- summarySE(L2018.vol.info, measurevar="Volume", groupvars=c("coral.id", "Date.x", "Origin", "Treatment","Transplant.Site")) #summarize vol by treatment and reef
+write.csv(L2018.vol.mean.ColDay, file ="data/2018/Larval.Size/L.Size.2018.COLDAY.csv")
+
 #Mean size by histories 
-L2018.vol.mean.LL <- summarySE(L2018.vol.info, measurevar="Volume", groupvars=c("Origin", "Treatment","Transplant.Site")) #summarize vol by treatment and reef
+L2018.vol.mean.LL <- summarySE(L2018.vol.mean.ColDay, measurevar="Volume", groupvars=c("Origin", "Treatment","Transplant.Site")) #summarize vol by treatment and reef
+
 L2018.vol.mean.LL$reef.treatment <- paste(L2018.vol.mean.LL$Origin, L2018.vol.mean.LL$Treatment)
 
 #Plotting 
@@ -190,41 +196,62 @@ ggsave(file = "output/Graphs/L2018.Size.pdf", Size2018Larvae, width = 11, height
 
 ## Statistics
 
-L2018.vol.info$Origin <- factor(L2018.vol.info$Origin)
-L2018.vol.info$Treatment <- factor(L2018.vol.info$Treatment)
-L2018.vol.info$Transplant.Site <- factor(L2018.vol.info$Transplant.Site)
 
-SIZE2018Larvae.anova <- aov(Volume~Origin*Treatment*Transplant.Site, data = L2018.vol.info)
-qqnorm(resid(SIZE2018Larvae.anova))
-qqline(resid(SIZE2018Larvae.anova)) 
+### orthogonal random effect design 
 
-boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Origin)
-boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Treatment) 
-boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.info$Transplant.Site)
+library(lme4)
+library(jtools)
+library(car)
 
-anova(SIZE2018Larvae.anova)
+Vol2018Larvae.2018.lmer <- lmer(Volume~Origin*Treatment*Transplant.Site + (1|Date.x) +  (1|coral.id), data = L2018.vol.mean.ColDay, REML=FALSE)
+summary(Vol2018Larvae.2018.lmer)
+Anova(Vol2018Larvae.2018.lmer, type = "III")
 
-capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.csv")
+capture.output(Anova(Vol2018Larvae.2018.lmer, type = "III"), file = "output/Statistics/L.2018.vol.lmer.csv")
 
-# Post Hoc
-L.2018.vol.PH <- TukeyHSD(SIZE2018Larvae.anova, conf.level = 0.95)
-capture.output(L.2018.vol.PH, file = "output/Statistics/L2018.vol.PH.csv")
+#Posthoc
+Vol2018LarvaePH <- lsmeans(Vol2018Larvae.2018.lmer, pairwise~Origin*Treatment*Transplant.Site, adjust="tukey")
+capture.output(Vol2018LarvaePH, file = "output/Statistics/L.2018.vol.PH.csv")
 
-#PostHoc Tukey adjustment comparison of least-squares means
-L.2018.vol.lsm <- lsmeans(SIZE2018Larvae.anova, ~ Origin*Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.vol.pairs.LSM <- multcomp::cld(L.2018.vol.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.vol.pairs.LSM #view results
-capture.output(L.2018.vol.pairs.LSM, file = "output/Statistics/L.2018.vol.pairs.3way.csv")
 
-L.2018.vol.OxTre <- lsmeans(SIZE2018Larvae.anova, ~ Origin*Treatment, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.vol.pairs.OxTre <- multcomp::cld(L.2018.vol.OxTre, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.vol.pairs.OxTre #view results
-capture.output(L.2018.vol.pairs.OxTre, file = "output/Statistics/L.2018.vol.pairs.OxTre.csv")
 
-L.2018.vol.TreTrans <- lsmeans(SIZE2018Larvae.anova, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-L.2018.vol.pairs.TreTrans <- multcomp::cld(L.2018.vol.TreTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-L.2018.vol.pairs.TreTrans #view results
-capture.output(L.2018.vol.pairs.TreTrans, file = "output/Statistics/L.2018.vol.pairs.TreTrans.csv")
+
+# 
+# L2018.vol.mean.ColDay$Origin <- factor(L2018.vol.mean.ColDay$Origin)
+# L2018.vol.mean.ColDay$Treatment <- factor(L2018.vol.mean.ColDay$Treatment)
+# L2018.vol.mean.ColDay$Transplant.Site <- factor(L2018.vol.mean.ColDay$Transplant.Site)
+# 
+# SIZE2018Larvae.anova <- aov(Volume~Origin*Treatment*Transplant.Site, data = L2018.vol.mean.ColDay)
+# qqnorm(resid(SIZE2018Larvae.anova))
+# qqline(resid(SIZE2018Larvae.anova)) 
+# 
+# boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.mean.ColDay$Origin)
+# boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.mean.ColDay$Treatment) 
+# boxplot(resid(SIZE2018Larvae.anova)~L2018.vol.mean.ColDay$Transplant.Site)
+# 
+# anova(SIZE2018Larvae.anova)
+# 
+# capture.output(anova(SIZE2018Larvae.anova), file = "output/Statistics/L2018.Vol.csv")
+# 
+# # Post Hoc
+# L.2018.vol.PH <- TukeyHSD(SIZE2018Larvae.anova, conf.level = 0.95)
+# capture.output(L.2018.vol.PH, file = "output/Statistics/L2018.vol.PH.csv")
+# 
+# #PostHoc Tukey adjustment comparison of least-squares means
+# L.2018.vol.lsm <- lsmeans(SIZE2018Larvae.anova, ~ Origin*Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.vol.pairs.LSM <- multcomp::cld(L.2018.vol.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.vol.pairs.LSM #view results
+# capture.output(L.2018.vol.pairs.LSM, file = "output/Statistics/L.2018.vol.pairs.3way.csv")
+# 
+# L.2018.vol.OxTre <- lsmeans(SIZE2018Larvae.anova, ~ Origin*Treatment, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.vol.pairs.OxTre <- multcomp::cld(L.2018.vol.OxTre, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.vol.pairs.OxTre #view results
+# capture.output(L.2018.vol.pairs.OxTre, file = "output/Statistics/L.2018.vol.pairs.OxTre.csv")
+# 
+# L.2018.vol.TreTrans <- lsmeans(SIZE2018Larvae.anova, ~ Treatment*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
+# L.2018.vol.pairs.TreTrans <- multcomp::cld(L.2018.vol.TreTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
+# L.2018.vol.pairs.TreTrans #view results
+# capture.output(L.2018.vol.pairs.TreTrans, file = "output/Statistics/L.2018.vol.pairs.TreTrans.csv")
 
 # #Residual Analysis
 # L2018.vol.TPatch <- L2018.vol.mean.col %>%
