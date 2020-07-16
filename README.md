@@ -22,7 +22,7 @@ Kevin H. Wong*, Danielle M. Becker, Samantha J. de Putron, Gretchen Goodbody-Gri
 
 - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") **2017** *all raw data from 2017*
 
-  - [2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") **Chlorophyll**
-  all raw chlorophyll files from plate reader 
+  - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") **Chlorophyll**\
+  all raw chlorophyll files from plate reader
 
 - ![2018.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") **2018** * all raw data from 2018*
