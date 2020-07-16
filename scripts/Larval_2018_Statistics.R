@@ -34,7 +34,6 @@ lrt <- function (obj1, obj2) {
 
 L2018.zoox.mean.col.size <- read.csv("data/2018/Zoox/L2018_Zoox_calc.csv")
 
-
 ### orthogonal random effect design 
 
 #Three way model with date and coral ID as random factor

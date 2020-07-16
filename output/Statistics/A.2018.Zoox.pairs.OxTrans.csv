@@ -1,10 +1,11 @@
  Origin Transplant.Site lsmean    SE df lower.CL upper.CL .group
- Rim    Rim              0.708 0.121 32    0.462    0.954  a    
- Patch  Patch            0.849 0.121 32    0.603    1.095  a    
- Rim    Patch            1.066 0.121 32    0.820    1.312  a    
- Patch  Rim              1.079 0.121 32    0.833    1.325  a    
+ Rim    Rim              0.708 0.121 32    0.390     1.03  a    
+ Patch  Patch            0.849 0.121 32    0.531     1.17  a    
+ Rim    Patch            1.066 0.121 32    0.748     1.38  a    
+ Patch  Rim              1.079 0.121 32    0.760     1.40  a    
 
 Results are averaged over the levels of: Treatment 
 Confidence level used: 0.95 
+Conf-level adjustment: sidak method for 4 estimates 
 P value adjustment: tukey method for comparing a family of 4 estimates 
 significance level used: alpha = 0.05 

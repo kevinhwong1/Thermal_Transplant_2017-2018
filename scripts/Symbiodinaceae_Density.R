@@ -1,6 +1,6 @@
 #Title: Thermal Transplant 2017-2018 - Symbiodinaceae Densitiy (Adult and Larvae)
 #Author: KH Wong
-#Date Last Modified: 20191113
+#Date Last Modified: 20200716
 #See Readme file for details 
 
 library(dbplyr)
@@ -59,35 +59,7 @@ A2017.zoox.mean$reef.treatment <- paste(A2017.zoox.mean$reef.zone, A2017.zoox.me
 #Reordering factors
 A2017.zoox.mean$timepoint <- factor(A2017.zoox.mean$timepoint, levels = c("Pre-Treatment","Post-Treatment"))
 
-#Plotting 
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-zoox2017Adult <- ggplot(A2017.zoox.mean, aes(x=timepoint, y=Cells.cm2.x6, group=reef.treatment)) + 
-  geom_line(position=pd, color="black")+
-  geom_errorbar(aes(ymin=Cells.cm2.x6-se, ymax=Cells.cm2.x6 +se), width=.1, position=pd, color="black") + #Error bars
-  #  ylim(1,6)+
-  xlab("Timepoint") + ylab(expression("Number of cells " (x10^{6} ~ cm^{-2})))+ #Axis titles
-  geom_point(aes(shape=reef.zone, color=treatment), size=4, position=pd)+
-  scale_shape_manual(values=c(16,17),
-                     name = "Reef Zone")+
-  scale_color_manual(values=c("dodgerblue3", "tomato1"),
-                     name = "Treatment")+ #colour modification
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 16, color = "black"),
-        axis.title = element_text(size = 18, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = c(0.9,0.8))
-
-zoox2017Adult
-
-ggsave(file = "output/Graphs/A2017.Zoox.pdf", zoox2017Adult)
-
-
-# Plotting T1
-
-#Plotting 
-
+#Plotting T1 (Pre-treatment)
 A2017.zoox.mean2 <- summarySE(A2017.zoox.meta, measurevar="Cells.cm2.x6", groupvars=c("reef.zone", "timepoint"))
 
 #Reordering factors
@@ -95,15 +67,12 @@ A2017.zoox.mean2$timepoint <- factor(A2017.zoox.mean2$timepoint, levels = c("Pre
 pd <- position_dodge(0.3) # moves object .05 to the left and right
 
 Zoox2017Adult.T1 <- ggplot(A2017.zoox.mean2, aes(x=timepoint, y=Cells.cm2.x6, group=reef.zone)) + 
-#  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
   geom_errorbar(aes(ymin=Cells.cm2.x6-se, ymax=Cells.cm2.x6+se), width=.1, size = 1, position=pd, color="black") + #Error bars
   ylim(0,1.6)+
   xlab("Timepoint") + ylab(expression("Cell Density " (10^{6} ~ cm^{-2})))+ #Axis titles
   geom_point(aes(shape=reef.zone), fill = "black", size=14, position=pd, color = "black")+
   scale_shape_manual(values=c(21,24),
                      name = "Reef Zone")+
-#  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-#                    name = "Treatment")+ #colour modification
   annotate("rect", xmin=0, xmax=1.5, ymin = 0, ymax=1.5, alpha = 0.2) + 
   theme_bw() + theme(panel.grid.major = element_blank(), 
                      panel.grid.minor = element_blank(),
@@ -116,7 +85,6 @@ Zoox2017Adult.T1 <- ggplot(A2017.zoox.mean2, aes(x=timepoint, y=Cells.cm2.x6, gr
 ggsave(file = "output/Graphs/A2017.Zoox.T1.pdf", Zoox2017Adult.T1, width = 11, height = 11, units = c("in"))
 
 # T1 Statistics
-
 A2017.zoox.T1 <- A2017.zoox.meta %>%
   filter(timepoint == "Pre-Treatment")
 
@@ -175,23 +143,6 @@ anova(zoox.A2017.anova)
 
 capture.output(anova(zoox.A2017.anova), file = "output/Statistics/A2017.Zoox.csv")
 
-#Violin plot
-Violin.A2017.Zoox <- ggplot(A2017.zoox.T2, aes(x=reef.zone, y=Cells.cm2.x6, fill = treatment)) +
-  geom_violin(position = position_dodge(width = 0.9)) +
-  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
-  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
-  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
-  xlab("Reef Zone") + ylab(expression("Cell Denisty " (10^{3} ~ cm^{-2}))) + #Axis titles
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black")) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/A2017.Zoox.violin.pdf", Violin.A2017.Zoox, width = 11, height = 11, units = c("in"))
-
-
 
 
 
@@ -199,7 +150,7 @@ ggsave(file = "output/Graphs/A2017.Zoox.violin.pdf", Violin.A2017.Zoox, width = 
 
 #Import Data
 L2017.zoox <- read.csv("data/2017/Zoox/Larval_CellCounts.csv")
-
+A2017.meta <- read.csv("data/2017/Metadata/Colony.Metadata.csv") #Metadata
 #Cleaning up data frame
 L2017.zoox <- L2017.zoox[,colSums(is.na(L2017.zoox))<nrow(L2017.zoox)] #Removing columns with all NAs
 L2017.zoox.clean <-L2017.zoox[complete.cases(L2017.zoox), ]
@@ -227,44 +178,6 @@ L2017.zoox.patch$Cells.larvae.x3 <-  L2017.zoox.patch$Cells.larvae / 1000
 #Summarizing
 L2017.zoox.patch.mean <- summarySE(L2017.zoox.patch, measurevar="Cells.larvae.x3", groupvars=c("treatment", "reef.zone"))
 
-#Plotting reaction norm
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-legend.title <- "Treatment"
-#legend.title <- "Parental Treatment"
-zoox.larv.2017<- ggplot(L2017.zoox.patch.mean, aes(x=treatment, y=Cells.larvae.x3, group = reef.zone)) + 
-  geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
-  geom_errorbar(aes(ymin=Cells.larvae.x3-se, ymax=Cells.larvae.x3+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(5,8)+
-  xlab("Treatment") + ylab(expression("Symbiodiniaceae " (10^{3} ~ Larva^{-1})))+ #Axis titles
-  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/L2017.Zoox.Patch.pdf", zoox.larv.2017, width = 11, height = 11, units = c("in"))
-
-#Statistics
-L2017.zoox.Patch.anova <- lm(Cells.larvae.x3~treatment, data = L2017.zoox.patch)
-qqnorm(resid(L2017.zoox.Patch.anova))
-qqline(resid(L2017.zoox.Patch.anova))
-
-boxplot(resid(L2017.zoox.Patch.anova)~L2017.zoox.patch$treatment)
-
-t.test(Cells.larvae.x3~treatment, data = L2017.zoox.patch)
-
-capture.output(t.test(Cells.larvae.x3~treatment, data = L2017.zoox.patch), file = "output/Statistics/L2017.Zoox.Patch.csv")
-
-
 #### larval zoox per mm3 ####
 
 L2017.zoox.patch$Date.coral.ID <- paste(L2017.zoox.patch$date, L2017.zoox.patch$coral.id, sep = "-")
@@ -278,25 +191,7 @@ L2017.zoox.Patch.size$Cells.x3.mm3 <- L2017.zoox.Patch.size$Cells.larvae.x3/L201
 mean.L2017.zoox.size <- summarySE(L2017.zoox.Patch.size, measurevar="Cells.x3.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
 write.csv(mean.L2017.zoox.size, file = "data/2017/Zoox/L2017_zoox.vol.csv")
 
-#L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
-
-Violin.L2017.Zoox <- ggplot(L2017.zoox.Patch.size, aes(x=Treatment.1, y=Cells.x3.mm3, fill = Treatment.1)) +
-  geom_violin(position = position_dodge(width = 0.9)) +
-  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
-  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
-  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
-  xlab("Parental Treatment") + ylab(expression("Cell Density " (10^{3} ~ mm^{-3}))) + #Axis titles
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black")) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/L2017.Zoox.Patch.size.pdf", Violin.L2017.Zoox, width = 11, height = 11, units = c("in"))
-
-capture.output(t.test(Cells.x3.mm3~Treatment.1, data = L2017.zoox.Patch.size), file = "output/Statistics/L2017.Zoox.size.csv")
-
+#Plotting
 Box.L2017.Zoox <- ggplot(L2017.zoox.Patch.size, aes(x=Treatment.1, y=Cells.x3.mm3, fill = Treatment.1)) +
   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
   geom_jitter(position = position_jitter(width = 0.1), size =4) +
@@ -312,297 +207,9 @@ Box.L2017.Zoox <- ggplot(L2017.zoox.Patch.size, aes(x=Treatment.1, y=Cells.x3.mm
 
 ggsave(file = "output/Graphs/L2017.Zoox.Patch.size.box.pdf", Box.L2017.Zoox, width = 11, height = 11, units = c("in"))
 
+# Statistics
+capture.output(t.test(Cells.x3.mm3~Treatment.1, data = L2017.zoox.Patch.size), file = "output/Statistics/L2017.Zoox.size.csv")
 
-
-# Zoox.L2017.bar <- ggplot(L2017.zoox.patch.mean, aes(x=treatment, y=Cells.larvae.x3, fill=treatment)) + 
-#   geom_bar(position=position_dodge(), stat="identity", color = "black") +
-#   geom_errorbar(aes(ymin=Cells.larvae.x3-se, ymax=Cells.larvae.x3+se),
-#                 width=.2,                    # Width of the error bars
-#                 position=position_dodge(.9)) +
-#   xlab("Treatment") + ylab(expression("Number of cells " (x10^{3} ~ Larva^{-1})))+ #Axis titles
-#   ylim(0,9) +
-#   scale_fill_manual(values=c("dodgerblue3", "tomato1"),
-#                     name = "Treatment") + #colour modification
-#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-#                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
-#   theme(axis.text = element_text(size = 16, color = "black"),
-#         axis.title = element_text(size = 18, color = "black"),
-#         axis.title.x = element_blank()) +
-#   theme(legend.position = "none")
-# 
-# larv.2017.phys<- arrangeGrob(larval.size.2017, L2017.TP.Patch.plot, zoox.larv.2017, ncol = 1)
-# 
-# ggsave(file = "output/Graphs/larv.2017.phys.pdf", larv.2017.phys, width = 10, height = 13, units = c("in"))
-
-
-#### Larval 2018 zoox density
-
-#Import Data
-L2018.zoox <- read.csv("data/2018/Zoox/Larval_2018_Zoox.csv")
-
-#Cleaning up data frame
-L2018.zoox <- L2018.zoox[,colSums(is.na(L2018.zoox))<nrow(L2018.zoox)] #Removing columns with all NAs
-L2018.zoox.clean <-L2018.zoox[complete.cases(L2018.zoox), ]
-
-#Calculating cells/Larvae from cells/count
-L2018.zoox.clean$Average <- rowMeans(L2018.zoox.clean[ ,11:16]) #averaging counts
-L2018.zoox.clean$Cells.mL <- (L2018.zoox.clean$Average/L2018.zoox.clean$X.squares.count)/0.0001 #number of cells per mL - volume of haemocytometer
-L2018.zoox.clean$Cells.mL.Diluted <- L2018.zoox.clean$Cells.mL/L2018.zoox.clean$Dilution.Factor #factoring in dilution
-L2018.zoox.clean$Cells.larvae <- L2018.zoox.clean$Cells.mL.Diluted/L2018.zoox.clean$Sample.Size #diving by number of larvae per vial
-
-#Remove metadata columns
-#L2018.zoox.clean2 <- L2018.zoox.clean %>% select(Date, Colony, Cells.larvae)
-
-#Renaming columns
-colnames(L2018.zoox.clean)[colnames(L2018.zoox.clean)=='Colony']<-'coral.id' #changing column name 
-
-A2018.meta <- read.csv("data/2018/Metadata/Sample_Info_Transp.csv")
-
-#Attaching metadata
-L2018.zoox.clean3 <- merge(L2018.zoox.clean, A2018.meta, by = "coral.id")
-
-#making x103
-L2018.zoox.clean3$Cells.larvae.x3 <-  L2018.zoox.clean3$Cells.larvae / 1000
-
-#Summarizing
-L2018.zoox.colday <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("coral.id", "Date.x", "Origin", "Treatment.y", "Transplant.Site"))
-
-L2018.zoox.mean <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
-L2018.zoox.mean$reef.treatment <- paste(L2018.zoox.mean$Origin, L2018.zoox.mean$Treatment)
-
-#Plotting reaction norm
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-
-zoox.larv.2018<- ggplot(L2018.zoox.mean, aes(x=Transplant.Site, y=Cells.larvae.x3, group=reef.treatment)) + 
-  geom_line(position=pd, aes(linetype=Origin, color = Treatment.y), size = 2)+
-  geom_errorbar(aes(ymin=Cells.larvae.x3-se, ymax=Cells.larvae.x3+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(2,16)+
-  xlab("Transplant Site") + ylab(expression("Symbiodiniaceae " (10^{3} ~ Larva^{-1})))+ #Axis titles
-  geom_point(aes(fill=Treatment.y, shape=Origin), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-zoox.larv.2018
-ggsave(file = "output/Graphs/L2018.Zoox.pdf", zoox.larv.2018, width = 11, height = 11, units = c("in"))
-
-
-#Statistics
-Zoox2018Larvae.anova <- lm(Cells.larvae.x3~Origin*Treatment.y*Transplant.Site, data = L2018.zoox.col.mean)
-qqnorm(resid(Zoox2018Larvae.anova))
-qqline(resid(Zoox2018Larvae.anova)) 
-
-boxplot(resid(Zoox2018Larvae.anova)~L2018.zoox.col.mean$Origin)
-boxplot(resid(Zoox2018Larvae.anova)~L2018.zoox.col.mean$Treatment.y) 
-boxplot(resid(Zoox2018Larvae.anova)~L2018.zoox.col.mean$Transplant.Site)
-
-anova(Zoox2018Larvae.anova)
-
-capture.output(anova(Zoox2018Larvae.anova), file = "output/Statistics/L2018.Zoox.csv")
-
-
-
-#### cellsx3 per mm3 ####
-
-L2018.zoox.clean3$Date.coral.ID <- paste(L2018.zoox.clean3$Date.x, L2018.zoox.clean3$coral.id, sep = "-")
-#L2018.chla.colday <- summarySE(L2018.chla.data.vial2, measurevar="chlA.nglarv", groupvars=c("Date.coral.ID","Origin", "Treatment", "Transplant.Site"))
-
-L.Size.2018 <- read.csv("data/2018/Larval.Size/Mean_Larvalsize_ColDay.csv")
-
-L2018.zoox.meta.size <- merge(L.Size.2018, L2018.zoox.clean3, by = "Date.coral.ID")
-
-L2018.zoox.meta.size$Cells.x3.mm3 <- L2018.zoox.meta.size$Cells.larvae.x3/L2018.zoox.meta.size$Volume
-
-# Summarizing 
-L2018.zoox.mean.col.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
-write.csv(L2018.zoox.mean.col.size, file = "data/2018/Zoox/L2018_Zoox_calc.csv")
-L2018.zoox.mean.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
-
-#mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
-L2018.zoox.mean.size$reef.treatment <- paste(L2018.zoox.mean.size$Origin, L2018.zoox.mean.size$Treatment.y)
-
-#Plotting 
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-Zoox2018Larvae.size <- ggplot(L2018.zoox.mean.size, aes(x=Transplant.Site, y=Cells.x3.mm3, group=reef.treatment)) + 
-  geom_line(position=pd, aes(linetype=Origin, color = Treatment.y), size = 2)+
-  geom_errorbar(aes(ymin=Cells.x3.mm3-se, ymax=Cells.x3.mm3+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(10,55)+
-  xlab("Transplant Site") + ylab(expression("Cell Density " (10^{3} ~ mm^{-3})))+ #Axis titles
-  geom_point(aes(fill=Treatment.y, shape=Origin), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/L2018.Zoox.vol.pdf", Zoox2018Larvae.size, width = 11, height = 11, units = c("in"))
-
-
-## Statistics
-
-L2018.zoox.mean.col.size
-
-### orthogonal random effect design 
-
-library(lme4)
-library(jtools)
-library(car)
-
-#Three way model with date and coral ID as random factor
-Zoox2018Larvae.2018.lmer <- lmer(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site + (1|Date)  +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
-
-qqnorm(resid(Zoox2018Larvae.2018.lmer)) # Normality
-qqline(resid(Zoox2018Larvae.2018.lmer)) # Normal
-
-boxplot(resid(Zoox2018Larvae.2018.lmer)~L2018.zoox.mean.col.size$Origin) # Variance 
-boxplot(resid(Zoox2018Larvae.2018.lmer)~L2018.zoox.mean.col.size$Treatment.y)
-boxplot(resid(Zoox2018Larvae.2018.lmer)~L2018.zoox.mean.col.size$Transplant.Site)
-
-summary(Zoox2018Larvae.2018.lmer)
-Anova(Zoox2018Larvae.2018.lmer)
-
-capture.output(Anova(Zoox2018Larvae.2018.lmer, type = "III"), file = "output/Statistics/L.2018.zoox.lmer.csv")
-
-#extract model parameters (= means)
-fixef(Zoox2018Larvae.2018.lmer)
-summary(Zoox2018Larvae.2018.lmer)
-confint1<-confint(Zoox2018Larvae.2018.lmer)
-confint1
-lrt(Zoox2018Larvae.2018.lmer2, Zoox2018Larvae.2018.lmer)
-
-#Three way model with date as random factor
-Zoox2018Larvae.2018.lmer2 <- lmer(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site + (1|Date) , data = L2018.zoox.mean.col.size, REML=FALSE)
-qqnorm(resid(Zoox2018Larvae.2018.lmer2)) # Normality
-qqline(resid(Zoox2018Larvae.2018.lmer2)) # Normal
-
-boxplot(resid(Zoox2018Larvae.2018.lmer2)~L2018.zoox.mean.col.size$Origin) # Variance 
-boxplot(resid(Zoox2018Larvae.2018.lmer2)~L2018.zoox.mean.col.size$Treatment.y)
-boxplot(resid(Zoox2018Larvae.2018.lmer2)~L2018.zoox.mean.col.size$Transplant.Site)
-
-summary(Zoox2018Larvae.2018.lmer2)
-Anova(Zoox2018Larvae.2018.lmer2, type = "III")
-
-#Three way model with coral.id as random factor
-Zoox2018Larvae.2018.lmer3 <- lmer(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site + (1|coral.id.x) , data = L2018.zoox.mean.col.size, REML=FALSE)
-qqnorm(resid(Zoox2018Larvae.2018.lmer3)) # Normality
-qqline(resid(Zoox2018Larvae.2018.lmer3)) # Normal
-
-boxplot(resid(Zoox2018Larvae.2018.lmer3)~L2018.zoox.mean.col.size$Origin) # Variance 
-boxplot(resid(Zoox2018Larvae.2018.lmer3)~L2018.zoox.mean.col.size$Treatment.y)
-boxplot(resid(Zoox2018Larvae.2018.lmer3)~L2018.zoox.mean.col.size$Transplant.Site)
-
-summary(Zoox2018Larvae.2018.lmer3)
-Anova(Zoox2018Larvae.2018.lmer3, type = "III")
-
-lrt(Zoox2018Larvae.2018.lmer3, Zoox2018Larvae.2018.lmer)
-
-
-#Two way model
-Zoox2018Larvae.2018.OxT <- lmer(Cells.x3.mm3~Origin*Treatment.y + (1|Date) +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
-summary(Zoox2018Larvae.2018.OxT)
-Anova(Zoox2018Larvae.2018.OxT, type = "III")
-
-Zoox2018Larvae.2018.OxTS <- lmer(Cells.x3.mm3~Origin*Transplant.Site + (1|Date) +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
-summary(Zoox2018Larvae.2018.OxTS)
-Anova(Zoox2018Larvae.2018.OxTS, type = "III")
-
-Zoox2018Larvae.2018.TxTS <- lmer(Cells.x3.mm3~Treatment.y*Transplant.Site + (1|Date) +  (1|coral.id.x), data = L2018.zoox.mean.col.size, REML=FALSE)
-summary(Zoox2018Larvae.2018.TxTS)
-Anova(Zoox2018Larvae.2018.TxTS, type = "III")
-
-
-#Posthoc
-Zoox2018LarvaePH <- lsmeans(Zoox2018Larvae.2018.lmer, pairwise~Origin*Treatment.y*Transplant.Site, adjust="tukey")
-capture.output(Zoox2018LarvaePH, file = "output/Statistics/L.2018.zoox.PH.csv")
-
-
-# 
-# L2018.zoox.meta.size$Origin <- factor(L2018.zoox.meta.size$Origin)
-# L2018.zoox.meta.size$Treatment.y <- factor(L2018.zoox.meta.size$Treatment.y)
-# L2018.zoox.meta.size$Transplant.Site <- factor(L2018.zoox.meta.size$Transplant.Site)
-# 
-# Zoox2018Larvae.2018.anova2 <- aov(Cells.x3.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.zoox.meta.size)
-# qqnorm(resid(Zoox2018Larvae.2018.anova2))
-# qqline(resid(Zoox2018Larvae.2018.anova2)) 
-# 
-# 
-# boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Origin)
-# boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Treatment.y) 
-# boxplot(resid(Zoox2018Larvae.2018.anova2)~L2018.zoox.meta.size$Transplant.Site)
-# 
-# anova(Zoox2018Larvae.2018.anova2)
-# 
-# capture.output(anova(Zoox2018Larvae.2018.anova2), file = "output/Statistics/L2018.Zoox.vol.csv")
-# 
-# # Post-Hoc 
-# 
-# L.2018.Zoox.PH <- TukeyHSD(Zoox2018Larvae.2018.anova2, conf.level = 0.95)
-# capture.output(L.2018.Zoox.PH, file = "output/Statistics/L2018.Zoox.PH.csv")
-# 
-# #PostHoc Tukey adjustment comparison of least-squares means
-# L.2018.Zoox.TreatTrans <- lsmeans(Zoox2018Larvae.2018.anova2, ~ Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-# L.2018.Zoox.pairs.TreatTrans <- multcomp::cld(L.2018.Zoox.TreatTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-# L.2018.Zoox.pairs.TreatTrans #view results
-# capture.output(L.2018.Zoox.pairs.TreatTrans, file = "output/Statistics/L.2018.Zoox.pairs.TreatTrans.csv")
-
-# 
-# ## Making residuals
-# 
-# L.Zoox.2018.TPatch <- L2018.zoox.clean3 %>%
-#   filter(Transplant.Site == "Patch")
-# 
-# L.Zoox.2018.TRim <- L2018.zoox.clean3 %>%
-#   filter(Transplant.Site == "Rim")
-# 
-# # Summarizing data
-# L.Zoox.2018.TPatch.mean <- summarySE(L.Zoox.2018.TPatch, measurevar="Cells.larvae.x3", groupvars=c("Origin", "Treatment.y"))
-# L.Zoox.2018.TRim.mean <- summarySE(L.Zoox.2018.TRim, measurevar="Cells.larvae.x3", groupvars=c("Origin", "Treatment.y"))
-# 
-# L.Zoox.comp <- merge(L.Zoox.2018.TPatch.mean, L.Zoox.2018.TRim.mean, by = c("Origin", "Treatment.y"))
-# 
-# # residual calculation
-# L.Zoox.comp$resid.L.Zoox <- resid(lm(L.Zoox.comp$Cells.larvae.x3.y - L.Zoox.comp$Cells.larvae.x3.x ~0))
-# L.Zoox.comp$resid.se <- resid(lm(L.Zoox.comp$se.y - L.Zoox.comp$se.x ~0))
-# 
-# colnames(L.Zoox.comp) [2] <- "Treatment"
-# 
-# L.Zoox.comp2 <- L.Zoox.comp %>%
-#   select("Origin", "Treatment", "resid.L.Zoox")
-# 
-# write.csv(L.Zoox.comp2, file ="output/Residual_Analysis/Resid.L.Zoox.csv")
-# 
-# # Statsitics
-# 
-# ##Pnet
-# L.Zoox.Resid.anova <- lm(resid.L.Zoox~Origin*Treatment, data = L.Zoox.comp2)
-# qqnorm(resid(L.Zoox.Resid.anova))
-# qqline(resid(L.Zoox.Resid.anova))
-# 
-# boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Origin.x)
-# boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Treatment.x)
-# 
-# anova(L.Zoox.Resid.anova)
-# 
-# capture.output(anova(Pnet.2018.anova), file = "output/Statistics/A2018.Pnet.csv")
 
 
 ### 2018 Adult Symbiodinaceae Densities ###
@@ -625,6 +232,8 @@ A2018.adult.Zoox$Cell.ml.DF <- A2018.adult.Zoox$Cells.mL * A2018.adult.Zoox$Dilu
 #Removing metadata columns
 A2018.adult.Zoox2 <- A2018.adult.Zoox %>%
   select("coral.id", "Cell.ml.DF")
+
+names(A2018.Frag.sa)[2] <- "coral.id"
 
 #Merging dataframes
 A2018.zoox.colony <- merge(A2018.adult.Zoox2, A2018.meta, by = "coral.id")
@@ -701,6 +310,86 @@ A.2018.Zoox.OxTrans <- lsmeans(Zoox2018Adult.anova, ~ Origin*Transplant.Site, ad
 A.2018.Zoox.pairs.OxTrans <- multcomp::cld(A.2018.Zoox.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
 A.2018.Zoox.pairs.OxTrans #view results
 capture.output(A.2018.Zoox.pairs.OxTrans, file = "output/Statistics/A.2018.Zoox.pairs.OxTrans.csv")
+
+
+##### Larval 2018 zoox density #####
+
+#Import Data
+L2018.zoox <- read.csv("data/2018/Zoox/Larval_2018_Zoox.csv")
+
+#Cleaning up data frame
+L2018.zoox <- L2018.zoox[,colSums(is.na(L2018.zoox))<nrow(L2018.zoox)] #Removing columns with all NAs
+L2018.zoox.clean <-L2018.zoox[complete.cases(L2018.zoox), ]
+
+#Calculating cells/Larvae from cells/count
+L2018.zoox.clean$Average <- rowMeans(L2018.zoox.clean[ ,11:16]) #averaging counts
+L2018.zoox.clean$Cells.mL <- (L2018.zoox.clean$Average/L2018.zoox.clean$X.squares.count)/0.0001 #number of cells per mL - volume of haemocytometer
+L2018.zoox.clean$Cells.mL.Diluted <- L2018.zoox.clean$Cells.mL/L2018.zoox.clean$Dilution.Factor #factoring in dilution
+L2018.zoox.clean$Cells.larvae <- L2018.zoox.clean$Cells.mL.Diluted/L2018.zoox.clean$Sample.Size #diving by number of larvae per vial
+
+#Remove metadata columns
+#L2018.zoox.clean2 <- L2018.zoox.clean %>% select(Date, Colony, Cells.larvae)
+
+#Renaming columns
+colnames(L2018.zoox.clean)[colnames(L2018.zoox.clean)=='Colony']<-'coral.id' #changing column name 
+
+A2018.meta <- read.csv("data/2018/Metadata/Sample_Info_Transp.csv")
+
+#Attaching metadata
+L2018.zoox.clean3 <- merge(L2018.zoox.clean, A2018.meta, by = "coral.id")
+
+#making x103
+L2018.zoox.clean3$Cells.larvae.x3 <-  L2018.zoox.clean3$Cells.larvae / 1000
+
+#Summarizing
+L2018.zoox.colday <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("coral.id", "Date.x", "Origin", "Treatment.y", "Transplant.Site"))
+
+L2018.zoox.mean <- summarySE(L2018.zoox.clean3, measurevar="Cells.larvae.x3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
+L2018.zoox.mean$reef.treatment <- paste(L2018.zoox.mean$Origin, L2018.zoox.mean$Treatment)
+
+#### cellsx3 per mm3 ####
+
+L2018.zoox.clean3$Date.coral.ID <- paste(L2018.zoox.clean3$Date.x, L2018.zoox.clean3$coral.id, sep = "-")
+
+L.Size.2018 <- read.csv("data/2018/Larval.Size/Mean_Larvalsize_ColDay.csv")
+
+L2018.zoox.meta.size <- merge(L.Size.2018, L2018.zoox.clean3, by = "Date.coral.ID")
+
+L2018.zoox.meta.size$Cells.x3.mm3 <- L2018.zoox.meta.size$Cells.larvae.x3/L2018.zoox.meta.size$Volume
+
+# Summarizing 
+L2018.zoox.mean.col.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
+write.csv(L2018.zoox.mean.col.size, file = "data/2018/Zoox/L2018_Zoox_calc.csv")
+L2018.zoox.mean.size <- summarySE(L2018.zoox.meta.size, measurevar="Cells.x3.mm3", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
+
+#mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
+L2018.zoox.mean.size$reef.treatment <- paste(L2018.zoox.mean.size$Origin, L2018.zoox.mean.size$Treatment.y)
+
+#Plotting 
+pd <- position_dodge(0.1) # moves object .05 to the left and right
+#legend.title <- "Treatment"
+Zoox2018Larvae.size <- ggplot(L2018.zoox.mean.size, aes(x=Transplant.Site, y=Cells.x3.mm3, group=reef.treatment)) + 
+  geom_line(position=pd, aes(linetype=Origin, color = Treatment.y), size = 2)+
+  geom_errorbar(aes(ymin=Cells.x3.mm3-se, ymax=Cells.x3.mm3+se), width=.1, position=pd, color="black") + #Error bars
+  ylim(10,55)+
+  xlab("Transplant Site") + ylab(expression("Cell Density " (10^{3} ~ mm^{-3})))+ #Axis titles
+  geom_point(aes(fill=Treatment.y, shape=Origin), size=14, position=pd, color = "black")+
+  scale_shape_manual(values=c(21,24),
+                     name = "Reef Zone")+
+  scale_fill_manual(values=c("#FFFFFF", "#999999"),
+                    name = "Treatment")+ #colour modification
+  scale_color_manual(values=c("black", "#999999"),
+                     name = "Treatment")+
+  theme_bw() + theme(panel.grid.major = element_blank(), 
+                     panel.grid.minor = element_blank(),
+                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black"),
+        axis.title.x = element_blank()) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2018.Zoox.vol.pdf", Zoox2018Larvae.size, width = 11, height = 11, units = c("in"))
+
 
 # ## Making residuals
 # A.Zoox.2018.TPatch <- A2018.zoox.meta %>%

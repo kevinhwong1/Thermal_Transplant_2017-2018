@@ -53,7 +53,7 @@ Patch:Hot:Rim-Patch:Ambient:Patch      0.065168854 -0.7166846 0.8470223 0.999993
 Rim:Hot:Rim-Patch:Ambient:Patch       -0.235944427 -1.0177979 0.5459090 0.9744722
 Patch:Hot:Patch-Rim:Ambient:Patch     -0.194345923 -0.9761994 0.5875075 0.9915936
 Rim:Hot:Patch-Rim:Ambient:Patch        0.248331906 -0.5335215 1.0301854 0.9663090
-Patch:Ambient:Rim-Rim:Ambient:Patch    0.199868121 -0.5819853 0.9817216 0.9900797
+Patch:Ambient:Rim-Rim:Ambient:Patch    0.199868122 -0.5819853 0.9817216 0.9900797
 Rim:Ambient:Rim-Rim:Ambient:Patch     -0.240885192 -1.0227386 0.5409683 0.9714112
 Patch:Hot:Rim-Rim:Ambient:Patch        0.074324737 -0.7075287 0.8561782 0.9999839
 Rim:Hot:Rim-Rim:Ambient:Patch         -0.226788544 -1.0086420 0.5550649 0.9795018

@@ -9,8 +9,6 @@ library(dplyr)
 library(tidyverse)
 
 
-### 2017 colony surface area ###
-
 ### 2018 colony surface area ###
 coral.sa.2018 <-read.csv("data/2018/Surface.Area/coral.trans.sa.csv", header=T, sep = ",")
 

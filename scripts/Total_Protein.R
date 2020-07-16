@@ -1,6 +1,6 @@
 #Title: Thermal Transplant 2017-2018 - Total Protein (Adult and Larvae)
 #Author: KH Wong
-#Date Last Modified: 20190320
+#Date Last Modified: 20200716
 #See Readme file for details 
 
 library(dbplyr)
@@ -242,103 +242,6 @@ mean.A2017.TP$reef.treatment <- paste(mean.A2017.TP$reef.zone, mean.A2017.TP$tre
 #Reordering factors
 mean.A2017.TP$timepoint <- factor(mean.A2017.TP$timepoint, levels = c("Pre-Treatment","Post-Treatment"))
 
-# Plotting
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-TP2017Adult <- ggplot(mean.A2017.TP, aes(x=timepoint, y=Total.Protein.mgcm2, group=reef.treatment)) + 
-  geom_line(position=pd, color="black")+
-  geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(1.3,2.6)+
-  xlab("Timepoint") + ylab(expression("Total Protein " (mg~cm^{-2})))+ #Axis titles
-  geom_point(aes(shape=reef.zone, color=treatment), size=4, position=pd)+
-  scale_shape_manual(values=c(16,17),
-                     name = "Reef Zone")+
-  scale_color_manual(values=c("dodgerblue3", "tomato1"),
-                     name = "Treatment")+ #colour modification
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 16, color = "black"),
-        axis.title = element_text(size = 18, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = c(0.9,0.8))
-
-ggsave(file = "output/Graphs/A2017.TP.pdf", TP2017Adult)
-
-# Statsitics 
-A2017.TP.anova <- lm(Total.Protein.mgcm2~reef.zone*treatment*timepoint, data = A2017.TP.final)
-qqnorm(resid(A2017.TP.anova))
-qqline(resid(A2017.TP.anova))
-
-boxplot(resid(A2017.TP.anova)~A2017.TP.final$reef.zone)
-boxplot(resid(A2017.TP.anova)~A2017.TP.final$treatment)
-boxplot(resid(A2017.TP.anova)~A2017.TP.final$timepoint)
-anova(A2017.TP.anova)
-
-capture.output(anova(A2017.TP.anova), file = "output/Statistics/A2017.TP.csv")
-
-### Only T2 Analysis
-
-A2017.TP.T2 <- A2017.TP.final %>%
-  filter(timepoint == "Post-Treatment")
-
-mean.A2017.TP.Col.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("coral.id","treatment", "reef.zone"))
-
-# Summarizing 
-mean.A2017.TP.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("treatment", "reef.zone"))
-
-# Plotting
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-TP2017Adult.T2 <- ggplot(mean.A2017.TP.T2, aes(x=treatment, y=Total.Protein.mgcm2, group=reef.zone)) + 
-  geom_line(position=pd, color="black", aes(linetype=reef.zone), size = 2)+
-  geom_errorbar(aes(ymin=Total.Protein.mgcm2-se, ymax=Total.Protein.mgcm2+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(1.4,2.1)+
-  xlab("Timepoint") + ylab(expression("Total Protein " (mg~cm^{-2})))+ #Axis titles
-  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/A2017.TP.T2.pdf", TP2017Adult.T2, width = 11, height = 11, units = c("in"))
-
-##Statistics
-
-A2017.TP.anova.T2 <- lm(Total.Protein.mgcm2~reef.zone*treatment, data = mean.A2017.TP.Col.T2)
-qqnorm(resid(A2017.TP.anova.T2))
-qqline(resid(A2017.TP.anova.T2))
-
-boxplot(resid(A2017.TP.anova.T2)~mean.A2017.TP.Col.T2$reef.zone)
-boxplot(resid(A2017.TP.anova.T2)~mean.A2017.TP.Col.T2$treatment)
-
-anova(A2017.TP.anova.T2)
-
-capture.output(anova(A2017.TP.anova.T2), file = "output/Statistics/A2017.TP.T2.csv")
-
-#Violin plot
-Violin.A2017.TP <- ggplot(mean.A2017.TP.Col.T2, aes(x=reef.zone, y=Total.Protein.mgcm2, fill = treatment)) +
-  geom_violin(position = position_dodge(width = 0.9)) +
-  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
-  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
-  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
-  xlab("Reef Zone") + ylab(expression("Total Protein " (mg ~ cm^{-2}))) + #Axis titles
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black")) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/A2017.TP.violin.pdf", Violin.A2017.TP, width = 11, height = 11, units = c("in"))
-
-
 # T1 base plot 
 mean.A2017.col.TP <- summarySE(A2017.TP.final, measurevar="Total.Protein.mgcm2", groupvars=c("coral.id", "treatment", "reef.zone", "timepoint"))
 mean.A2017.TP.T1 <- summarySE(mean.A2017.col.TP, measurevar="Total.Protein.mgcm2", groupvars=c("timepoint", "reef.zone"))
@@ -385,11 +288,11 @@ t.test(Total.Protein.mgcm2~reef.zone, data = A2017.TP.T1)
 capture.output(t.test(Total.Protein.mgcm2~reef.zone, data = A2017.TP.T1), file = "output/Statistics/A2017.TP.T1.csv")
 
 
-
 # Plotting T2 
 A2017.TP.T2 <- mean.A2017.col.TP %>%
   filter(timepoint == "Post-Treatment")
 
+mean.A2017.TP.Col.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("coral.id","treatment", "reef.zone"))
 
 # Gross photosynthesis 
 mean.A2017.TP.T2 <- summarySE(A2017.TP.T2, measurevar="Total.Protein.mgcm2", groupvars=c("treatment", "reef.zone"))
@@ -420,13 +323,25 @@ TP2017Adult.T2 <- ggplot(mean.A2017.TP.T2, aes(x=treatment, y=Total.Protein.mgcm
 ggsave(file = "output/Graphs/A2017.TP.T2.pdf", TP2017Adult.T2, width = 11, height = 11, units = c("in"))
 
 
+##Statistics
+
+A2017.TP.anova.T2 <- lm(Total.Protein.mgcm2~reef.zone*treatment, data = mean.A2017.TP.Col.T2)
+qqnorm(resid(A2017.TP.anova.T2))
+qqline(resid(A2017.TP.anova.T2))
+
+boxplot(resid(A2017.TP.anova.T2)~mean.A2017.TP.Col.T2$reef.zone)
+boxplot(resid(A2017.TP.anova.T2)~mean.A2017.TP.Col.T2$treatment)
+
+anova(A2017.TP.anova.T2)
+
+capture.output(anova(A2017.TP.anova.T2), file = "output/Statistics/A2017.TP.T2.csv")
 
 
 ### 2017 Larval Total Protein ###
 
 L2017.TP <- read.csv("data/2017/Protein/Total_Protein_Larvae.csv")
 L2017.Vial <- read.csv("data/2017/Metadata/Vial.metadata.csv")
-
+A2017.meta <- read.csv("data/2017/Metadata/Colony.Metadata.csv") #Metadata
 ## Making a new data frame for each run because each run has different standards 
 # Subsetting Runs
 L2017.TP.Run1 <- L2017.TP %>% 
@@ -554,25 +469,6 @@ L2017.TP.Patch.meta$Conc.calcS.mg.mm3 <- L2017.TP.Patch.meta$Conc.calcS.size/100
 L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
 L2017.TP.Final <- summarySE(L2017.TP.Patch.meta.1, measurevar="Conc.calcS.mg.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
 
-
-
-Violin.L2017.TP <- ggplot(L2017.TP.Patch.meta.1, aes(x=Treatment.1, y=Conc.calcS.mg.mm3, fill = Treatment.1)) +
-  geom_violin(position = position_dodge(width = 0.9)) +
-  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
-  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
-  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
-  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
-  xlab("Parental Treatment") + ylab(expression("Total Protein " (mg ~ mm^{-3}))) + #Axis titles
-  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black")) +
-  theme(legend.position = "none")
-
-ggsave(file = "output/Graphs/L2017.TP.Patch.size.pdf", Violin.L2017.TP, width = 11, height = 11, units = c("in"))
-
-capture.output(t.test(Conc.calcS.mg.mm3~Treatment.1, data = L2017.TP.Patch.meta.1), file = "output/Statistics/L2017.TP.size.csv")
-
 #Boxplot with jitter
 Box.L2017.TP <- ggplot(L2017.TP.Final, aes(x=treatment, y=Conc.calcS.mg.mm3, fill = treatment)) +
   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
@@ -591,8 +487,6 @@ Box.L2017.TP <- ggplot(L2017.TP.Final, aes(x=treatment, y=Conc.calcS.mg.mm3, fil
 ggsave(file = "output/Graphs/L2017.TP.Patch.size.box.pdf", Box.L2017.TP, width = 11, height = 11, units = c("in"))
 
 # Statistics
-
-# Statistics
 L2017.TP.Patch.anova <- lm(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final)
 qqnorm(resid(L2017.TP.Patch.anova))
 qqline(resid(L2017.TP.Patch.anova))
@@ -602,85 +496,6 @@ boxplot(resid(L2017.TP.Patch.anova)~L2017.TP.Final$treatment)
 t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final)
 
 capture.output(t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final), file = "output/Statistics/L2017.TP.Patch.csv")
-
-
-
-
-#Plotting reaction norm
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-legend.title <- "Treatment"
-L2017.TP.Patch.plot2<- ggplot(L2017.TP.Patch.meta, aes(x=treatment, y=Conc.calcS, group = reef.zone)) + 
-  geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
-  geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(30,45)+
-  xlab("Treatment") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
-  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-L2017.TP.Patch.plot
-ggsave(file = "output/Graphs/L2017.TP.Patch.pdf", L2017.TP.Patch.plot, width = 11, height = 11, units = c("in"))
-
-
-##### ug Protein per larva #####
-#Getting means
-
-L2017.TP.Patch.Col.mean <- summarySE(L2017.TP.Patch, measurevar="Conc.calcS", groupvars=c("coral.id","treatment", "reef.zone"))
-L2017.TP.Patch.mean <- summarySE(L2017.TP.Patch, measurevar="Conc.calcS", groupvars=c("treatment", "reef.zone"))
-
-#Plotting reaction norm
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-legend.title <- "Treatment"
-L2017.TP.Patch.plot<- ggplot(L2017.TP.Patch.mean, aes(x=treatment, y=Conc.calcS, group = reef.zone)) + 
-  geom_line(position=pd, aes(linetype=reef.zone, color = treatment), size = 2)+
-  geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se), width=.1, position=pd, color="black") + #Error bars
-  ylim(30,45)+
-  xlab("Treatment") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
-  geom_point(aes(fill=treatment, shape=reef.zone), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-L2017.TP.Patch.plot
-ggsave(file = "output/Graphs/L2017.TP.Patch.pdf", L2017.TP.Patch.plot, width = 11, height = 11, units = c("in"))
-# 
-# TP.L2017.bar <- ggplot(L2017.TP.Patch.mean, aes(x=treatment, y=Conc.calcS, fill=treatment)) + 
-#   geom_bar(position=position_dodge(), stat="identity", color = "black") +
-#   geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se),
-#                 width=.2,                    # Width of the error bars
-#                 position=position_dodge(.9)) +
-#   xlab("Treatment") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
-#   ylim(0,50) +
-#   scale_fill_manual(values=c("dodgerblue3", "tomato1"),
-#                     name = "Treatment") + #colour modification
-#   theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
-#                      panel.grid.minor = element_blank(), axis.line = element_blank()) +
-#   theme(axis.text = element_text(size = 16, color = "black"),
-#         axis.title = element_text(size = 18, color = "black"),
-#         axis.title.x = element_blank()) +
-#   theme(legend.position = "none")
-
 
 
 ### Total protein Adult 2018 ###
@@ -796,6 +611,8 @@ A2018.TP.all <- rbind(A2018.TP.Sample1,
 A2018.TP.all <- A2018.TP.all %>%
   select("Vial", "ConcentrationS")
 
+names(A2018.frag.sa)[2] <- "coral.id"
+
 A2018.TP.coralid <- merge(A2018.TP.all, A2018.vial.meta, by = "Vial")
 A2018.TP.vol <- merge(A2018.TP.coralid, A2018.frag.vol, by = "coral.id")
 A2018.TP.sa <- merge(A2018.TP.vol, A2018.frag.sa, by = "coral.id")
@@ -859,42 +676,7 @@ anova(TP2018Adult.2018.anova)
 
 capture.output(anova(TP2018Adult.2018.anova), file = "output/Statistics/A2018.TP.csv")
 
-## Making residuals
-mean.TP.Col.A2018 <- read.csv("data/2018/Protein/A.Protein.2018.csv")
 
-A.TP.2018.TPatch <- mean.TP.Col.A2018 %>%
-  filter(Transplant.Site == "Patch")
-
-A.TP.2018.TRim <- mean.TP.Col.A2018 %>%
-  filter(Transplant.Site == "Rim")
-
-A.TP.2018.TPatch$coral.id <- A.TP.2018.TPatch$coral.id %>% str_replace("-A","")
-A.TP.2018.TRim$coral.id <- A.TP.2018.TRim$coral.id %>% str_replace("-B","")
-
-A.TP.2018.comp <- merge(A.TP.2018.TPatch, A.TP.2018.TRim, by = "coral.id")
-
-# residual calculation
-A.TP.2018.comp$resid.A.TP <- resid(lm(A.TP.2018.comp$Total.Protein.mgcm2.y - A.TP.2018.comp$Total.Protein.mgcm2.x ~0))
-
-# Summarizing residuals
-A.TP.resid.2018.mean <- summarySE(A.TP.2018.comp, measurevar="resid.A.TP", groupvars=c("Treatment.x", "Origin.x"))
-
-colnames(A.TP.resid.2018.mean) [1] <- "Treatment"
-colnames(A.TP.resid.2018.mean) [2] <- "Origin"
-
-write.csv(A.TP.resid.2018.mean, file ="output/Residual_Analysis/Resid.A.TP.csv")
-
-# Statsitics
-A.TP.resid.anova <- lm(resid.A.TP~Origin.x*Treatment.x, data = A.TP.2018.comp)
-qqnorm(resid(A.TP.resid.anova))
-qqline(resid(A.TP.resid.anova))
-
-boxplot(resid(A.TP.resid.anova)~A.TP.2018.comp$Origin.x)
-boxplot(resid(A.TP.resid.anova)~A.TP.2018.comp$Treatment.x)
-
-anova(A.TP.resid.anova)
-
-capture.output(anova(A.TP.resid.anova), file = "output/Statistics/A2018.TP.Resid.csv")
 
 ### Larval Total Protein 2018 ### 
 
@@ -984,50 +766,9 @@ mean.TP.col.L2018 <- summarySE(L2018.TP.meta, measurevar="Conc.calcS", groupvars
 mean.TP.L2018 <- summarySE(mean.TP.col.L2018, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y", "Transplant.Site"))
 mean.TP.L2018$reef.treatment <- paste(mean.TP.L2018$Origin, mean.TP.L2018$Treatment)
 
-#Plotting 
-pd <- position_dodge(0.1) # moves object .05 to the left and right
-#legend.title <- "Treatment"
-TP2018Larvae <- ggplot(mean.TP.L2018, aes(x=Transplant.Site, y=Conc.calcS, group=reef.treatment)) + 
-  geom_line(position=pd, aes(linetype=Origin, color = Treatment.y), size = 2)+
-  geom_errorbar(aes(ymin=Conc.calcS-se, ymax=Conc.calcS+se), width=.1, position=pd, color="black") + #Error bars
-  #  ylim(1,4)+
-  xlab("Transplant Site") + ylab(expression(" Total Protein " (mu*g ~ Larva^{-1})))+ #Axis titles
-  geom_point(aes(fill=Treatment.y, shape=Origin), size=14, position=pd, color = "black")+
-  scale_shape_manual(values=c(21,24),
-                     name = "Reef Zone")+
-  scale_fill_manual(values=c("#FFFFFF", "#999999"),
-                    name = "Treatment")+ #colour modification
-  scale_color_manual(values=c("black", "#999999"),
-                     name = "Treatment")+
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
-
-TP2018Larvae
-ggsave(file = "output/Graphs/L2018.TP.pdf", TP2018Larvae, width = 11, height = 11, units = c("in"))
-
-
-## Statistics
-TP2018Larvae.2018.anova <- lm(Conc.calcS~Origin*Treatment.y*Transplant.Site, data = mean.TP.col.L2018)
-qqnorm(resid(TP2018Larvae.2018.anova))
-qqline(resid(TP2018Larvae.2018.anova)) 
-
-boxplot(resid(TP2018Larvae.2018.anova)~mean.TP.col.L2018$Origin)
-boxplot(resid(TP2018Larvae.2018.anova)~mean.TP.col.L2018$Treatment.y) 
-boxplot(resid(TP2018Larvae.2018.anova)~mean.TP.col.L2018$Transplant.Site)
-
-anova(TP2018Larvae.2018.anova)
-
-capture.output(anova(TP2018Larvae.2018.anova), file = "output/Statistics/L2018.TP.csv")
-
 #### ug protein per mm3 ####
 
 L2018.TP.meta$Date.coral.ID <- paste(L2018.TP.meta$Date.x, L2018.TP.meta$coral.id, sep = "-")
-#L2018.TP.colday <- summarySE(L2018.TP.meta, measurevar="Conc.calcS", groupvars=c("Date.coral.ID","Origin", "Treatment.y", "Transplant.Site"))
 
 L.Size.2018 <- read.csv("data/2018/Larval.Size/Mean_Larvalsize_ColDay.csv")
 
@@ -1035,8 +776,6 @@ L2018.TP.meta.size <- merge(L.Size.2018, L2018.TP.meta, by = "Date.coral.ID")
 
 L2018.TP.meta.size$Conc.calcS.ug.mm3 <- L2018.TP.meta.size$Conc.calcS/L2018.TP.meta.size$Volume
 L2018.TP.meta.size$Conc.calcS.mg.mm3 <- L2018.TP.meta.size$Conc.calcS.ug.mm3/100
-
-#L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
 
 # Summarizing 
 L2018.TP.mean.size.col.day <- summarySE(L2018.TP.meta.size, measurevar="Conc.calcS.mg.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
@@ -1069,108 +808,3 @@ TP2018Larvae.size <- ggplot(L2018.TP.mean.size, aes(x=Transplant.Site, y=Conc.ca
   theme(legend.position = "none")
 
 ggsave(file = "output/Graphs/L2018.TP.vol.pdf", TP2018Larvae.size, width = 11, height = 11, units = c("in"))
-
-
-## Statistics
-
-L2018.TP.mean.size.col.day <- summarySE(L2018.TP.meta.size, measurevar="Conc.calcS.mg.mm3", groupvars=c("Date", "coral.id.x", "Origin", "Treatment.y", "Transplant.Site"))
-write.csv(L2018.TP.mean.size.col.day, file = "data/2018/Protein/L2018.TP.Vol.Means.csv")
-
-L2018.TP.mean.size.col.day$Origin <- factor(L2018.TP.mean.size.col.day$Origin)
-L2018.TP.mean.size.col.day$Treatment.y <- factor(L2018.TP.mean.size.col.day$Treatment.y)
-L2018.TP.mean.size.col.day$Transplant.Site <- factor(L2018.TP.mean.size.col.day$Transplant.Site)
-
-TP2018Larvae.2018.anova2 <- aov(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site, data = L2018.TP.mean.size.col.day)
-qqnorm(resid(TP2018Larvae.2018.anova2))
-qqline(resid(TP2018Larvae.2018.anova2)) 
-
-boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.mean.size.col.day$Origin)
-boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.mean.size.col.day$Treatment.y) 
-boxplot(resid(TP2018Larvae.2018.anova2)~L2018.TP.mean.size.col.day$Transplant.Site)
-
-anova(TP2018Larvae.2018.anova2)
-
-capture.output(anova(TP2018Larvae.2018.anova2), file = "output/Statistics/L2018.TP.vol.csv")
-
-### orthogonal random effect design 
-
-library(lme4)
-library(jtools)
-library(car)
-
-TP2018Larvae.2018.anova3 <- lmer(Conc.calcS.mg.mm3~Origin*Treatment.y*Transplant.Site + (1|Date), data = L2018.TP.mean.size.col.day, REML=FALSE)
-summary(TP2018Larvae.2018.anova3)
-Anova(TP2018Larvae.2018.anova3, type = "III")
-
-capture.output(Anova(TP2018Larvae.2018.anova3, type = "III"), file = "output/Statistics/L.2018.TP.lmer.csv")
-
-#Posthoc
-TP2018LarvaePH <- lsmeans(TP2018Larvae.2018.anova3, pairwise~Origin*Treatment.y*Transplant.Site, adjust="tukey")
-capture.output(TP2018LarvaePH, file = "output/Statistics/L.2018.TP.PH.csv")
-
-
-# 
-# # Post Hoc
-# L.2018.TP.PH <- TukeyHSD(TP2018Larvae.2018.anova2, conf.level = 0.95)
-# capture.output(L.2018.TP.PH, file = "output/Statistics/L2018.TP.PH.csv")
-# 
-# #PostHoc Tukey adjustment comparison of least-squares means
-# L.2018.TP.lsm <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-# L.2018.TP.pairs.LSM <- multcomp::cld(L.2018.TP.lsm, alpha=.05, Letters=letters) #list pairwise tests and letter display
-# L.2018.TP.pairs.LSM #view results
-# capture.output(L.2018.TP.pairs.LSM, file = "output/Statistics/L.2018.TP.pairs.3way.csv")
-# 
-# #PostHoc Tukey adjustment comparison of least-squares means
-# L.2018.TP.OxTrans <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Transplant.Site, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-# L.2018.TP.pairs.OxTrans <- multcomp::cld(L.2018.TP.OxTrans, alpha=.05, Letters=letters) #list pairwise tests and letter display
-# L.2018.TP.pairs.OxTrans #view results
-# capture.output(L.2018.TP.pairs.OxTrans, file = "output/Statistics/L.2018.TP.pairs.OxTrans.csv")
-# 
-# #PostHoc Tukey adjustment comparison of least-squares means
-# L.2018.TP.OxTreat <- lsmeans(TP2018Larvae.2018.anova2, ~ Origin*Treatment.y, adjust="tukey") #compute least-squares means for Treatment*Day from ANOVA model
-# L.2018.TP.pairs.OxTreat <- multcomp::cld(L.2018.TP.OxTreat, alpha=.05, Letters=letters) #list pairwise tests and letter display
-# L.2018.TP.pairs.OxTreat #view results
-# capture.output(L.2018.TP.pairs.OxTreat, file = "output/Statistics/L.2018.TP.pairs.OxTreat.csv")
-
-
-# 
-# 
-# 
-# #Residual analysis
-# L.TP.2018.TPatch <- mean.TP.col.L2018 %>%
-#   filter(Transplant.Site == "Patch")
-# 
-# L.TP.TRim <- mean.TP.col.L2018 %>%
-#   filter(Transplant.Site == "Rim")
-# 
-# # Summarizing data
-# L.TP.2018.TPatch.mean <- summarySE(L.TP.2018.TPatch, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y"))
-# L.TP.2018.TRim.mean <- summarySE(L.TP.TRim, measurevar="Conc.calcS", groupvars=c("Origin", "Treatment.y"))
-# 
-# L.TP.comp <- merge(L.TP.2018.TPatch.mean, L.TP.2018.TRim.mean, by = c("Origin", "Treatment.y"))
-# 
-# # residual calculation
-# L.TP.comp$resid.L.TP <- resid(lm(L.TP.comp$Conc.calcS.y - L.TP.comp$Conc.calcS.x ~0))
-# L.TP.comp$resid.TP.se <- resid(lm(L.TP.comp$se.y - L.TP.comp$se.x ~0))
-# 
-# colnames(L.TP.comp) [2] <- "Treatment"
-# 
-# L.TP.comp2 <- L.TP.comp %>%
-#   select("Origin", "Treatment", "resid.L.TP")
-# 
-# write.csv(L.TP.comp2, file ="output/Residual_Analysis/Resid.L.TP.csv")
-# 
-# # Statsitics
-# 
-# ##Pnet
-# L.Zoox.Resid.anova <- lm(resid.L.Zoox~Origin*Treatment, data = L.Zoox.comp2)
-# qqnorm(resid(L.Zoox.Resid.anova))
-# qqline(resid(L.Zoox.Resid.anova))
-# 
-# boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Origin.x)
-# boxplot(resid(Pnet.2018.anova)~resp.2018.comp$Treatment.x)
-# 
-# anova(L.Zoox.Resid.anova)
-# 
-# capture.output(anova(Pnet.2018.anova), file = "output/Statistics/A2018.Pnet.csv")
-# 

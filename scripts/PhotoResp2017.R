@@ -1,7 +1,7 @@
 #Title: Photosynthesis and Respiration Calculations for Thermal Acclim. Proj 2017
 #Author: HM Putnam and NJ Silbiger
 #Edited by: Kevin Wong
-#Date Last Modified: 20180529
+#Date Last Modified: 20200716
 #See Readme file for details 
 
 ##Install packages
@@ -121,6 +121,8 @@ for(i in 1:length(file.names)) { # for every file in list start at the first and
 
 write.csv(Photo.R, 'output/Photo_Resp_Output/T1_Photo.R.csv')
 
+Photo.R <- read.csv('output/Photo_Resp_Output/T1_Photo.R.csv')
+
 #Split up the photostynthesis and respiration data into two dataframes
 PHO <- Photo.R[Photo.R$V5=='Photo', ]
 RES <- Photo.R[Photo.R$V5=='Resp', ]
@@ -169,7 +171,7 @@ write.csv(Resp, file="output/Photo_Resp_Output/Respiration.rates.T1.csv")
 Photo <- read.csv("output/Photo_Resp_Output/Photosynthesis.rates.T1.csv")
 Resp <- read.csv("output/Photo_Resp_Output/Respiration.rates.T1.csv")
 
-resp.data <- merge(Photo[,c(2,11,12,13,20)],Resp[,c(2,20)], by="Fragment.ID")
+resp.data <- merge(Photo[,c(2,12,13,14,21)],Resp[,c(2,21)], by="Fragment.ID")
 
 #rename the columns
 names(resp.data)[names(resp.data) == "umol.cm2.hr.x"]<- "Pnet_umol.cm2.hr" 
@@ -179,102 +181,7 @@ names(resp.data)[names(resp.data) == "umol.cm2.hr.y"] <- "Rdark_umol.cm2.hr"
 resp.data$Pgross_umol.cm2.hr <- resp.data$Pnet_umol.cm2.hr-resp.data$Rdark_umol.cm2.hr
 
 write.csv(resp.data, file="output/Photo_Resp_Output/photo_resp.T1.csv")
-# 
-# #Calculate means
-# AllMeans <- ddply(resp.data, c('Origin','Treatment'), summarize, #take out treatment?
-#                   #pnet
-#                   Pnet.mean= mean(Pnet_umol.cm2.hr, na.rm=T), #mean pnet
-#                   N = sum(!is.na(Pnet_umol.cm2.hr)), # sample size
-#                   Pnet.se = sd(Pnet_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
-#                   #Rdark
-#                   Rdark.mean= mean(Rdark_umol.cm2.hr, na.rm=T), #mean rdark
-#                   Rdark.se = sd(Rdark_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
-#                   #Pgross
-#                   Pgross.mean  = mean(Pgross_umol.cm2.hr, na.rm=TRUE),
-#                   Pgross.se = sd (Pgross_umol.cm2.hr, na.rm=TRUE)/sqrt(N))
-# AllMeans
-# #write Results
-# write.csv(resp.data, file="../Data/AllRates.csv") # raw data
-# write.csv(AllMeans, file="../Output/AllMeans.csv") # Mean data
-# 
-# #Plot the pnet mean
-# Fig.Pn <-  ggplot(AllMeans, aes(x=Treatment, y=Pnet.mean,  group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Pnet.mean+Pnet.se, ymin=Pnet.mean-Pnet.se), colour="black", width=.1, position = position_dodge(width = 0.2)) + #add standard error bars about the mean
-#   geom_point(aes(shape=Origin), position = position_dodge(width = 0.2), size=4) + #plot points
-#   scale_shape_manual(values=c(1,15,16,17,18)) + #sets point shape manually
-#   geom_line(aes(), position = position_dodge(width = 0.2), size = 0.5) + #add lines
-#   xlab("Treatment") + #label x axis
-#   ylab("Net Photosynthesis umol cm-2 h-1") + #label y axis
-#   ylim(-1, 1.5)+
-#   theme_bw() + #Set the background color
-#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #Set the text angle
-#         axis.line = element_line(color = 'black'), #Set the axes color
-#         panel.border = element_blank(), #Set the border
-#         panel.grid.major = element_blank(), #Set the major gridlines
-#         panel.grid.minor = element_blank(), #Set the minor gridlines
-#         plot.background=element_blank(),  #Set the plot background
-#         legend.key = element_blank(),  #remove legend background
-#         legend.position='none') + #set legend location
-#   ggtitle("Net Photosythesis") + #add a main title
-#   theme(plot.title = element_text(face = 'bold', 
-#                                   size = 12, 
-#                                   hjust = 0)) #set title attributes
-# Fig.Pn #view plot
-# 
-# #plot pgross mean
-# Fig.Pg <-  ggplot(AllMeans, aes(x=Treatment, y=Pgross.mean,  group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Pgross.mean+Pgross.se, ymin=Pgross.mean-Pgross.se), colour="black", width=.1, position = position_dodge(width = 0.2)) + #add standard error bars about the mean
-#   geom_point(aes(shape=Origin), position = position_dodge(width = 0.2), size=4) + #plot points
-#   scale_shape_manual(values=c(1,15,16,17,18)) + #sets point shape manually
-#   geom_line(aes(), position = position_dodge(width = 0.2), size = 0.5) + #add lines
-#   xlab("Treatment") + #label x axis
-#   ylab("Gross Photosynthesis umol cm-2 h-1") + #label y axis
-#   ylim(-1, 1.5)+
-#   theme_bw() + #Set the background color
-#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #Set the text angle
-#         axis.line = element_line(color = 'black'), #Set the axes color
-#         panel.border = element_blank(), #Set the border
-#         panel.grid.major = element_blank(), #Set the major gridlines
-#         panel.grid.minor = element_blank(), #Set the minor gridlines
-#         plot.background=element_blank(),  #Set the plot background
-#         legend.key = element_blank(),  #remove legend background
-#         legend.position='none') + #set legend location
-#   ggtitle("Gross Photosythesis") + #add a main title
-#   theme(plot.title = element_text(face = 'bold', 
-#                                   size = 12, 
-#                                   hjust = 0)) #set title attributes
-# Fig.Pg #view plot
-# 
-# #plot rdark mean
-# Fig.Rd <-  ggplot(AllMeans, aes(x=Treatment, y=Rdark.mean,  group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Rdark.mean+Rdark.se, ymin=Rdark.mean-Rdark.se), colour="black", width=.1, position = position_dodge(width = 0.2)) + #add standard error bars about the mean
-#   geom_point(aes(shape=Origin), position = position_dodge(width = 0.2), size=4) + #plot points
-#   scale_shape_manual(values=c(1,15,16,17,18)) + #sets point shape manually
-#   geom_line(aes(), position = position_dodge(width = 0.2), size = 0.5) + #add lines
-#   xlab("Treatment") + #label x axis
-#   ylab("Dark Respiration umol cm-2 h-1") + #label y axis
-#   ylim(-1, 1.5)+
-#   theme_bw() + #Set the background color
-#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #Set the text angle
-#         axis.line = element_line(color = 'black'), #Set the axes color
-#         panel.border = element_blank(), #Set the border
-#         panel.grid.major = element_blank(), #Set the major gridlines
-#         panel.grid.minor = element_blank(), #Set the minor gridlines
-#         plot.background=element_blank(),  #Set the plot background
-#         legend.key = element_blank(),  #remove legend background
-#         legend.position=c(.8, .7)) + #set legend location
-#   ggtitle("Dark Respiration") + #add a main title
-#   theme(plot.title = element_text(face = 'bold', 
-#                                   size = 12, 
-#                                   hjust = 0)) #set title attributes
-# Fig.Rd #view plot
-# 
-# dev.off()
-# 
-# Resp.Figs <- arrangeGrob( Fig.Pn, Fig.Pg,Fig.Rd, ncol=3)
-# ggsave(file="~/MyProjects/Thermal_Acclimation_2017/Output/Colony_Photo_Resp_Output/T1_ColonyRespirometry.pdf", Resp.Figs, width = 11, height = 6, units = c("in"))
-# 
-# Resp.Figs #view plot
+
 
 #T2
 #PHOTOSYNTHESIS
@@ -343,8 +250,9 @@ for(i in 1:length(file.names)) { # for every file in list start at the first and
   }
 }
 
-write.csv(Photo.R, 'Photo.R.csv')
-Photo.R
+write.csv(Photo.R, 'output/Photo_Resp_Output/T2_Photo.R.csv')
+
+Photo.R <- read.csv('output/Photo_Resp_Output/T2_Photo.R.csv')
 
 #Split up the photostynthesis and respiration data into two dataframes
 PHO <- Photo.R[Photo.R$V5=='Photo', ]
@@ -404,178 +312,8 @@ names(resp.data)[names(resp.data) == "umol.cm2.hr.y"] <- "Rdark_umol.cm2.hr"
 #Pnet plus resp (if positive) is pGross
 resp.data$Pgross_umol.cm2.hr <- resp.data$Pnet_umol.cm2.hr-resp.data$Rdark_umol.cm2.hr
 write.csv(resp.data, file="output/Photo_Resp_Output/photo_resp.T2.csv")
-# 
-# #Removing Blanks
-# resp.data2<- subset(resp.data, Origin == "Rim" | Origin == "Patch")
-# resp.data2
-# 
-# #Calculate means
-# AllMeans2 <- ddply(resp.data2, c('Origin','Treatment','Timepoint'), summarize, #take out treatment?
-#                    #pnet
-#                    Pnet.mean= mean(Pnet_umol.cm2.hr, na.rm=T), #mean pnet
-#                    N = sum(!is.na(Pnet_umol.cm2.hr)), # sample size
-#                    Pnet.se = sd(Pnet_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
-#                    #Rdark
-#                    Rdark.mean= mean(Rdark_umol.cm2.hr, na.rm=T), #mean rdark
-#                    Rdark.se = sd(Rdark_umol.cm2.hr, na.rm=T)/sqrt(N), #SE
-#                    #Pgross
-#                    Pgross.mean  = mean(Pgross_umol.cm2.hr, na.rm=T),
-#                    Pgross.se = sd(Pgross_umol.cm2.hr, na.rm=T)/sqrt(N))
-# 
-# #write Results
-# write.csv(resp.data, file="data/AllRates2.csv") # raw data
-# write.csv(AllMeans2, file="output/AllMeans2.csv") # Mean data
-# 
-# AllMeans2
-# 
-# pd <- position_dodge(0.1) # moves object .05 to the left and right
-# legend.title <- "Reef Zone"
-# 
-# #PLot the means
-# Fig.Pn <-  ggplot(AllMeans2, aes(x=Treatment, y=Pnet.mean,  color=Treatment, group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Pnet.mean+Pnet.se, ymin=Pnet.mean-Pnet.se), colour="black", width=.1, position = pd) + #add standard error bars about the mean
-#   geom_line(position=pd, color="black")+
-#   xlab("Treatment") + #label x axis
-#   ylab(expression("Net Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#   ylim(-0.25, 0.75)+
-#   geom_point(aes(shape=Origin, color=Treatment), size=4, position=pd)+
-#   scale_shape_manual(values=c(16,17),
-#                      name = "Reef Zone")+
-#   scale_color_manual(values=c("#999999", "#000000"),
-#                      name = "Treatment")+ #colour modification
-#   theme_bw() + theme(panel.border = element_rect(linetype = "solid", color = "black"), panel.grid.major = element_blank(), #Makes background theme white
-#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-#   theme(plot.title = element_text(face = 'bold', 
-#                                   size = 12, 
-#                                   hjust = 0),
-#         legend.position = "none") #set title attributes
-# Fig.Pn #view plot
-# 
-# Fig.Pg <-  ggplot(AllMeans2, aes(x=Treatment, y=Pgross.mean,  color=Treatment, group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Pgross.mean+Pgross.se, ymin=Pgross.mean-Pgross.se), colour="black", width=.1, position = pd) + #add standard error bars about the mean
-#   geom_line(position=pd, color="black")+
-#   xlab("Treatment") + #label x axis
-#   ylab(expression("Gross Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#   ylim(0, 1)+
-#   geom_point(aes(shape=Origin, color=Treatment), size=4, position=pd)+
-#   scale_shape_manual(values=c(16,17),
-#                      name = "Reef Zone")+
-#   scale_color_manual(values=c("#999999", "#000000"),
-#                      name = "Treatment")+ #colour modification
-#   theme_bw() + theme(panel.border = element_rect(linetype = "solid", color = "black"), panel.grid.major = element_blank(), #Makes background theme white
-#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-#   theme(plot.title = element_text(face = 'bold', 
-#                                   size = 12, 
-#                                   hjust = 0),
-#         legend.position = "none") #set title attributes
-# Fig.Pg #view plot
-# 
-# AllMeans2$Rdark.mean.abs <- abs(AllMeans2$Rdark.mean)
-# 
-# Fig.Rd <-  ggplot(AllMeans2, aes(x=Treatment, y=Rdark.mean.abs,  color=Treatment, group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Rdark.mean.abs+Rdark.se, ymin=Rdark.mean.abs-Rdark.se), colour="black", width=.1, position = pd) + #add standard error bars about the mean
-#   geom_line(position=pd, color="black")+
-#   xlab("Treatment") + #label x axis
-#   ylab(expression("Dark Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#   ylim(0.25, 0.7)+
-#   geom_point(aes(shape=Origin, color=Treatment), size=4, position=pd)+
-#   scale_shape_manual(values=c(16,17),
-#                      name = "Reef Zone")+
-#   scale_color_manual(values=c("#999999", "#000000"),
-#                      name = "Treatment")+ #colour modification
-#   theme_bw() + theme(panel.border = element_rect(linetype = "solid", color = "black"), panel.grid.major = element_blank(), #Makes background theme white
-#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-#   theme(plot.title = element_text(face = 'bold', 
-#                                   size = 12, 
-#                                   hjust = 0),
-#         legend.position = c(0.844,0.829),
-#         legend.box.background = element_rect(colour = "black")) #set title attributes
-# Fig.Rd #view plot
-# 
-# #dev.off()
-# 
-# Resp.Figs <- arrangeGrob ( Fig.Pn, Fig.Pg, Fig.Rd,ncol=3)
-# ggsave(file="output/Graphs/T2_ColonyRespirometry.pdf", Resp.Figs, width = 11, height = 6, units = c("in"))
-# 
-# 
-# ###Edited
-# 
-# #PLot the means
-# Fig.Pn <-  ggplot(AllMeans2, aes(x=Treatment, y=Pnet.mean,  color=Treatment, group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Pnet.mean+Pnet.se, ymin=Pnet.mean-Pnet.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
-#   geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
-#   xlab("Treatment") + #label x axis
-#   ylab(expression("Net Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#   ylim(-0.25, 0.75)+
-#   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
-#   scale_shape_manual(values=c(21,24),
-#                      name = "Reef Zone")+
-#   scale_fill_manual(values=c("#FFFFFF", "#999999"),
-#                      name = "Treatment")+ #colour modification
-#   theme_bw() + theme(panel.grid.major = element_blank(), 
-#                      panel.grid.minor = element_blank(),
-#                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-#   theme(axis.text = element_text(size = 30, color = "black"),
-#         axis.title = element_text(size = 36, color = "black"),
-#         axis.title.x = element_blank()) +
-#   theme(legend.position = "none")
-# Fig.Pn #view plot
-# 
-# ggsave(file="output/Graphs/T2_NetPhoto.pdf", Fig.Pn, width = 8, height = 11, units = c("in"))
-# 
-# Fig.Pg <-  ggplot(AllMeans2, aes(x=Treatment, y=Pgross.mean,  color=Treatment, group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Pgross.mean+Pgross.se, ymin=Pgross.mean-Pgross.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
-#   geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
-#   xlab("Treatment") + #label x axis
-#   ylab(expression("Gross Photosynthetic Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#   ylim(0, 1)+
-#   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
-#   scale_shape_manual(values=c(21,24),
-#                      name = "Reef Zone")+
-#   scale_fill_manual(values=c("#FFFFFF", "#999999"),
-#                     name = "Treatment")+ #colour modification
-#   theme_bw() + theme(panel.grid.major = element_blank(), 
-#                      panel.grid.minor = element_blank(),
-#                      panel.background = element_rect(colour = "black", size=1), legend.position = "none") +
-#   theme(axis.text = element_text(size = 30, color = "black"),
-#         axis.title = element_text(size = 36, color = "black"),
-#         axis.title.x = element_blank()) +
-#   theme(legend.position = "none")
-# Fig.Pg #view plot
-# ggsave(file="output/Graphs/T2_GrossPhoto.pdf", Fig.Pg, width = 8, height = 11, units = c("in"))
-# 
-# AllMeans2$Rdark.mean.abs <- abs(AllMeans2$Rdark.mean)
-# 
-# pd <- position_dodge(0.1)
-# Fig.Rd <-  ggplot(AllMeans2, aes(x=Treatment, y=Rdark.mean.abs,  color=Treatment, group=Origin)) + #set up plot information
-#   geom_errorbar(aes(x=Treatment, ymax=Rdark.mean.abs+Rdark.se, ymin=Rdark.mean.abs-Rdark.se), colour="black", size = 1, width=.1, position = pd) + #add standard error bars about the mean
-#   geom_line(position=pd, color="black", aes(linetype=Origin), size = 2)+
-#   xlab("Treatment") + #label x axis
-#   ylab(expression("Respiration Rate " (mu~mol ~ cm^{-2} ~ h^{-1}))) + #label y axis
-#   ylim(0.25, 0.6)+
-#   geom_point(aes(fill=Treatment, shape=Origin), size=14, position=pd, color = "black")+
-#   scale_shape_manual(values=c(21,24),
-#                      name = "Reef Zone")+
-#   scale_fill_manual(values=c("#FFFFFF", "#999999"),
-#                     name = "Treatment")+ #colour modification
-#   theme_bw() + theme(panel.border = element_rect(linetype = "solid", color = "black"), panel.grid.major = element_blank(), #Makes background theme white
-#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-#   theme_bw() + theme(panel.grid.major = element_blank(), 
-#                      panel.grid.minor = element_blank(),
-#                      panel.background = element_rect(colour = "black", size=1)) +
-#   theme(axis.text = element_text(size = 30, color = "black"),
-#         axis.title = element_text(size = 36, color = "black"),
-#         axis.title.x = element_blank()) +
-#   theme(legend.position = "none")
-# Fig.Rd #view plot
-# ggsave(file="output/Graphs/T2_Respiration.pdf", Fig.Rd, width = 8, height = 11, units = c("in"))
-# 
-# #dev.off()
-# 
-# Resp.Figs <- arrangeGrob ( Fig.Pn, Fig.Pg, Fig.Rd,ncol=3)
-# ggsave(file="output/Graphs/T2_ColonyRespirometry.pdf", Resp.Figs, width = 11, height = 6, units = c("in"))
 
-
+#### PLOTTING ####
 # Plotting T1 base graph
 resp.2017.T1 <- read.csv("output/Photo_Resp_Output/photo_resp.T1.csv")
 resp.2017.T2 <- read.csv("output/Photo_Resp_Output/photo_resp.T2.csv")
@@ -584,6 +322,7 @@ resp.2017.T1$timepoint <- "Pre-Treatment"
 resp.2017.T2$timepoint <- "Post-Treatment"
 
 Resp.2017.all <- rbind(resp.2017.T1, resp.2017.T2)
+Resp.2017.all$abs.resp <- -(Resp.2017.all$Rdark_umol.cm2.hr)
 
 #Gross Photosynthesis T1
 mean.A2017.gross.photo.T1 <- summarySE(Resp.2017.all, measurevar="Pgross_umol.cm2.hr", groupvars=c("timepoint", "Origin"))
@@ -633,7 +372,7 @@ capture.output(wilcox.test(Pgross_umol.cm2.hr~Origin, data = A2017.respall.T1), 
 
 
 # Respiration T1 
-Resp.2017.all$abs.resp <- -(Resp.2017.all$Rdark_umol.cm2.hr)
+
 mean.A2017.resp.T1 <- summarySE(Resp.2017.all, measurevar="abs.resp", groupvars=c("timepoint", "Origin"))
 mean.A2017.resp.T1$timepoint <- factor(mean.A2017.resp.T1$timepoint, levels = c("Pre-Treatment","Post-Treatment"))
 
@@ -663,6 +402,10 @@ Resp2017Adult.T1 <- ggplot(mean.A2017.resp.T1, aes(x=timepoint, y=abs.resp, grou
 ggsave(file = "output/Graphs/A2017.Resp.T1.pdf", Resp2017Adult.T1, width = 11, height = 11, units = c("in"))
 
 # T1 Resp Statsistics 
+
+A2017.respall.T1 <- Resp.2017.all %>%
+  filter(timepoint == "Pre-Treatment")
+
 A2017.Resp.T1.anova <- lm(abs.resp~Origin, data = A2017.respall.T1)
 qqnorm(resid(A2017.Resp.T1.anova))
 qqline(resid(A2017.Resp.T1.anova))
@@ -738,79 +481,41 @@ Resp2017Adult.T2 <- ggplot(mean.A2017.Resp.T2, aes(x=Treatment, y=abs.resp, grou
 ggsave(file = "output/Graphs/A2017.Resp.T2.pdf", Resp2017Adult.T2, width = 11, height = 11, units = c("in"))
 
 
-
-
-
 ## Statsitics (time 2)
 ## Statistics
 
 #Pnet
-Pnet2017anova <- lm(Pnet_umol.cm2.hr~Origin*Treatment, data = resp.data2)
+Pnet2017anova <- lm(Pnet_umol.cm2.hr~Origin*Treatment, data = A2017.resp.all.T2)
 qqnorm(resid(Pnet2017anova))
 qqline(resid(Pnet2017anova)) 
 
-boxplot(resid(Pnet2017anova)~resp.data2$Origin)
-boxplot(resid(Pnet2017anova)~resp.data2$Treatment) 
+boxplot(resid(Pnet2017anova)~A2017.resp.all.T2$Origin)
+boxplot(resid(Pnet2017anova)~A2017.resp.all.T2$Treatment) 
 
 anova(Pnet2017anova)
 
 capture.output(anova(Pnet2017anova), file = "output/Statistics/A2017.Pnet.csv")
 
 #Pgross
-Pgross2017anova <- lm(Pgross_umol.cm2.hr~Origin*Treatment, data = resp.data2)
+Pgross2017anova <- lm(Pgross_umol.cm2.hr~Origin*Treatment, data = A2017.resp.all.T2)
 qqnorm(resid(Pgross2017anova))
 qqline(resid(Pgross2017anova)) 
 
-boxplot(resid(Pgross2017anova)~resp.data2$Origin)
-boxplot(resid(Pgross2017anova)~resp.data2$Treatment) 
+boxplot(resid(Pgross2017anova)~A2017.resp.all.T2$Origin)
+boxplot(resid(Pgross2017anova)~A2017.resp.all.T2$Treatment) 
 
 anova(Pgross2017anova)
 
 capture.output(anova(Pgross2017anova), file = "output/Statistics/A2017.Pgross.csv")
 
 #Rdark
-Rdark2017anova <- lm(Rdark_umol.cm2.hr~Origin*Treatment, data = resp.data2)
+Rdark2017anova <- lm(Rdark_umol.cm2.hr~Origin*Treatment, data = A2017.resp.all.T2)
 qqnorm(resid(Rdark2017anova))
 qqline(resid(Rdark2017anova)) 
 
-boxplot(resid(Rdark2017anova)~resp.data2$Origin)
-boxplot(resid(Rdark2017anova)~resp.data2$Treatment) 
+boxplot(resid(Rdark2017anova)~A2017.resp.all.T2$Origin)
+boxplot(resid(Rdark2017anova)~A2017.resp.all.T2$Treatment) 
 
 anova(Rdark2017anova)
 
 capture.output(anova(Rdark2017anova), file = "output/Statistics/A2017.Rdark.csv")
-
-
-# # Pnet
-# hist(resp.data2$Pnet_umol.cm2.hr)
-# library(car)
-# shapiro.test(resp.data2$Pnet_umol.cm2.hr) 
-# bartlett.test(Pnet_umol.cm2.hr~Treatment, data=resp.data2)
-# bartlett.test(Pnet_umol.cm2.hr~Origin, data=resp.data2)
-# 
-# Pnet.aov <- aov(Pnet_umol.cm2.hr ~ Treatment*Origin, data = resp.data2)
-# summary(Pnet.aov)
-# TukeyHSD(Pnet.aov)
-# 
-# #Pgross
-# hist(resp.data2$Pgross_umol.cm2.hr)
-# library(car)
-# shapiro.test(resp.data2$Pgross_umol.cm2.hr) 
-# bartlett.test(Pgross_umol.cm2.hr~Treatment, data=resp.data2)
-# bartlett.test(Pgross_umol.cm2.hr~Origin, data=resp.data2)
-# 
-# Pgross.aov <- aov(Pgross_umol.cm2.hr ~ Treatment*Origin, data = resp.data2)
-# summary(Pgross.aov)
-# TukeyHSD(Pgross.aov)
-# 
-# #Rdark
-# 
-# hist(resp.data2$Rdark_umol.cm2.hr)
-# library(car)
-# shapiro.test(resp.data2$Rdark_umol.cm2.hr) 
-# bartlett.test(Rdark_umol.cm2.hr~Treatment, data=resp.data2)
-# bartlett.test(Rdark_umol.cm2.hr~Origin, data=resp.data2)
-# 
-# Rdark.aov <- aov(Rdark_umol.cm2.hr ~ Treatment*Origin, data = resp.data2)
-# summary(Rdark.aov)
-# TukeyHSD(Rdark.aov)
