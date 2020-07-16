@@ -16,16 +16,16 @@ library(Rmisc)
 ### Adult 2017 Total Protein ###
 
 # Import Data
-A2017.TP.Run1 <- read.csv("data/2017/Protein/TProtein_Adult_20190122_Run1.csv")
-A2017.TP.Run2 <- read.csv("data/2017/Protein/TProtein_Adult_20190122_Run2.csv")
-A2017.TP.Run3 <- read.csv("data/2017/Protein/TProtein_Adult_20190123_Run3.csv")
-A2017.TP.Run4 <- read.csv("data/2017/Protein/TProtein_Adult_20190123_Run4.csv")
-A2017.TP.Run5 <- read.csv("data/2017/Protein/TProtein_Adult_20190123_Run5.csv")
-A2017.TP.Run6 <- read.csv("data/2017/Protein/TProtein_Adult_20190124_Run6.csv")
-A2017.TP.Run7 <- read.csv("data/2017/Protein/TProtein_Adult_20190124_Run7.csv")
-A2017.TP.Run8 <- read.csv("data/2017/Protein/TProtein_Adult_20190125_Run8.csv")
-A2017.TP.Run9 <- read.csv("data/2017/Protein/TProtein_Adult_20190125_Run9.csv")
-A2017.TP.Run10 <- read.csv("data/2017/Protein/TProtein_Adult_20190125_Run10.csv")
+A2017.TP.Run1 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190122_Run1.csv")
+A2017.TP.Run2 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190122_Run2.csv")
+A2017.TP.Run3 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190123_Run3.csv")
+A2017.TP.Run4 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190123_Run4.csv")
+A2017.TP.Run5 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190123_Run5.csv")
+A2017.TP.Run6 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190124_Run6.csv")
+A2017.TP.Run7 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190124_Run7.csv")
+A2017.TP.Run8 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190125_Run8.csv")
+A2017.TP.Run9 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190125_Run9.csv")
+A2017.TP.Run10 <- read.csv("data/2017/Protein/Raw_files/TProtein_Adult_20190125_Run10.csv")
 
 A2017.vial.meta <- read.csv("data/2017/Metadata/BIOS2017_Adult_Vial.csv") #Vial metadata
 A2017.frag <- read.csv("data/2017/Surface.Area/Adult.Frag.2017.Calculated.csv") #Fragment metadata
@@ -339,7 +339,7 @@ capture.output(anova(A2017.TP.anova.T2), file = "output/Statistics/A2017.TP.T2.c
 
 ### 2017 Larval Total Protein ###
 
-L2017.TP <- read.csv("data/2017/Protein/Total_Protein_Larvae.csv")
+L2017.TP <- read.csv("data/2017/Protein/Raw_files/Total_Protein_Larvae.csv")
 L2017.Vial <- read.csv("data/2017/Metadata/Vial.metadata.csv")
 A2017.meta <- read.csv("data/2017/Metadata/Colony.Metadata.csv") #Metadata
 ## Making a new data frame for each run because each run has different standards 
