@@ -15,11 +15,11 @@ library(gdata)
 ##### Adult 2017 Chl A #####
 
 #Load data 
-A2017.chla.run1 <- read.csv("data/2017/Chlorophyll/Chl_20190117_Run1.csv")
-A2017.chla.run2 <- read.csv("data/2017/Chlorophyll/Chl_20190117_Run2.csv")
-A2017.chla.run3 <- read.csv("data/2017/Chlorophyll/Chl_20190117_Run3.csv")
-A2017.chla.run4 <- read.csv("data/2017/Chlorophyll/Chl_20190117_Run4.csv")
-A2017.chla.run5 <- read.csv("data/2017/Chlorophyll/Chl_20190117_Run5.csv")
+A2017.chla.run1 <- read.csv("data/2017/Chlorophyll/Raw_Files/Chl_20190117_Run1.csv")
+A2017.chla.run2 <- read.csv("data/2017/Chlorophyll/Raw_Files/Chl_20190117_Run2.csv")
+A2017.chla.run3 <- read.csv("data/2017/Chlorophyll/Raw_Files/Chl_20190117_Run3.csv")
+A2017.chla.run4 <- read.csv("data/2017/Chlorophyll/Raw_Files/Chl_20190117_Run4.csv")
+A2017.chla.run5 <- read.csv("data/2017/Chlorophyll/Raw_Files/Chl_20190117_Run5.csv")
 
 A2017.vial.meta <- read.csv("data/2017/Metadata/BIOS2017_Adult_Vial.csv") #Vial metadata
 A2017.frag <- read.csv("data/2017/Surface.Area/Adult.Frag.2017.Calculated.csv") #Fragment metadata
@@ -280,17 +280,17 @@ capture.output(anova(A2017.Chla.cell.anova.T2), file = "output/Statistics/A2017.
 ##### Larval 2017 Chl a #####
 
 #Load data 
-L2017.chla.run1 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run1.csv")
-L2017.chla.run2 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run2.csv")
-L2017.chla.run3 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run3.csv")
-L2017.chla.run4 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run4.csv")
-L2017.chla.run5 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run5.csv")
-L2017.chla.run6 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run6.csv")
-L2017.chla.run7 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run7.csv")
-L2017.chla.run8 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run8.csv")
-L2017.chla.run9 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run9.csv")
-L2017.chla.run10 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run10.csv")
-L2017.chla.run11 <- read.csv("data/2017/Chlorophyll/Chl_Larvae_20190307_Run11.csv")
+L2017.chla.run1 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run1.csv")
+L2017.chla.run2 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run2.csv")
+L2017.chla.run3 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run3.csv")
+L2017.chla.run4 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run4.csv")
+L2017.chla.run5 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run5.csv")
+L2017.chla.run6 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run6.csv")
+L2017.chla.run7 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run7.csv")
+L2017.chla.run8 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run8.csv")
+L2017.chla.run9 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run9.csv")
+L2017.chla.run10 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run10.csv")
+L2017.chla.run11 <- read.csv("data/2017/Chlorophyll/Raw_files/Chl_Larvae_20190307_Run11.csv")
 
 L2017.vial.meta <- read.csv("data/2017/Metadata/Vial.Metadata.csv") #Vial metadata
 A2017.meta <- read.csv("data/2017/Metadata/Colony.Metadata.csv") #Metadata
@@ -438,27 +438,27 @@ capture.output(t.test(Chla.cell~treatment.x, data = L2017.chla.cell), file = "ou
 
 # Loading Data
 
-A2018.chla.run1.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run1.csv")
-A2018.chla.run2.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run2.csv")
-A2018.chla.run3.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run3.csv")
-A2018.chla.run4.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run4.csv")
-A2018.chla.run5.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run5.csv")
-A2018.chla.run6.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run6.csv")
-A2018.chla.run7.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run7.csv")
-A2018.chla.run8.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run8.csv")
-A2018.chla.run9.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run9.csv")
-A2018.chla.run10.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run10.csv")
-A2018.chla.run11.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run11.csv")
-A2018.chla.run12.1 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190501_Run12.csv")
+A2018.chla.run1.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run1.csv")
+A2018.chla.run2.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run2.csv")
+A2018.chla.run3.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run3.csv")
+A2018.chla.run4.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run4.csv")
+A2018.chla.run5.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run5.csv")
+A2018.chla.run6.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run6.csv")
+A2018.chla.run7.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run7.csv")
+A2018.chla.run8.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run8.csv")
+A2018.chla.run9.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run9.csv")
+A2018.chla.run10.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run10.csv")
+A2018.chla.run11.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run11.csv")
+A2018.chla.run12.1 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190501_Run12.csv")
 
-A2018.chla.run1.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run1.csv")
-A2018.chla.run2.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run2.csv")
-A2018.chla.run3.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run3.csv")
-A2018.chla.run4.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run4.csv")
-A2018.chla.run5.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run5.csv")
-A2018.chla.run6.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run6.csv")
-A2018.chla.run7.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run7.csv")
-A2018.chla.run8.2 <- read.csv("data/2018/Chlorophyll/Chl_Adults_20190502_Run8.csv")
+A2018.chla.run1.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run1.csv")
+A2018.chla.run2.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run2.csv")
+A2018.chla.run3.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run3.csv")
+A2018.chla.run4.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run4.csv")
+A2018.chla.run5.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run5.csv")
+A2018.chla.run6.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run6.csv")
+A2018.chla.run7.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run7.csv")
+A2018.chla.run8.2 <- read.csv("data/2018/Chlorophyll/Raw_files/Chl_Adults_20190502_Run8.csv")
 
 
 A2018.vial.meta <- read.csv("data/2018/Metadata/BIOS2018_Adult_Vial.csv") #Vial metadata

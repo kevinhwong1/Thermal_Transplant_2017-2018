@@ -501,11 +501,11 @@ capture.output(t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final), file 
 ### Total protein Adult 2018 ###
 
 # Import Data
-A2018.TP.Run1 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190426_Run1.csv")
-A2018.TP.Run2 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190426_Run2.csv")
-A2018.TP.Run3 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190514_Run3.csv")
-A2018.TP.Run4 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190514_Run4.csv")
-A2018.TP.Run5 <- read.csv("data/2018/Protein/TProtein_Adult2018_20190514_Run5.csv")
+A2018.TP.Run1 <- read.csv("data/2018/Protein/Raw_files/TProtein_Adult2018_20190426_Run1.csv")
+A2018.TP.Run2 <- read.csv("data/2018/Protein/Raw_files/TProtein_Adult2018_20190426_Run2.csv")
+A2018.TP.Run3 <- read.csv("data/2018/Protein/Raw_files/TProtein_Adult2018_20190514_Run3.csv")
+A2018.TP.Run4 <- read.csv("data/2018/Protein/Raw_files/TProtein_Adult2018_20190514_Run4.csv")
+A2018.TP.Run5 <- read.csv("data/2018/Protein/Raw_files/TProtein_Adult2018_20190514_Run5.csv")
 
 A2018.vial.meta <- read.csv("data/2018/Metadata/BIOS2018_Adult_Vial.csv") #Vial metadata
 A2018.frag.vol <- read.csv("data/2018/Metadata/BIOS2018_Frag_Vol.csv") #Fragment metadata
@@ -681,9 +681,9 @@ capture.output(anova(TP2018Adult.2018.anova), file = "output/Statistics/A2018.TP
 ### Larval Total Protein 2018 ### 
 
 # Import Data
-L2018.TP.Run1 <- read.csv("data/2018/Protein/TProtein_Larvae2018_20190515_Run1.csv")
-L2018.TP.Run2 <- read.csv("data/2018/Protein/TProtein_Larvae2018_20190515_Run2.csv")
-L2018.TP.Run3 <- read.csv("data/2018/Protein/TProtein_Larvae2018_20190515_Run3.csv")
+L2018.TP.Run1 <- read.csv("data/2018/Protein/Raw_files/TProtein_Larvae2018_20190515_Run1.csv")
+L2018.TP.Run2 <- read.csv("data/2018/Protein/Raw_files/TProtein_Larvae2018_20190515_Run2.csv")
+L2018.TP.Run3 <- read.csv("data/2018/Protein/Raw_files/TProtein_Larvae2018_20190515_Run3.csv")
 
 L2018.vial.meta <- read.csv("data/2018/Metadata/Larval_2018_vial_metadata.csv") #Vial metadata
 L2018.TP.well <- read.csv("data/2018/Protein/Larval_Protein_2018_Well.csv")
