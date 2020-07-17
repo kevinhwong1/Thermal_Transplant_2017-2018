@@ -38,17 +38,17 @@ Metadata for matching larval samples to corresponding well
 
   - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**Colony_Respirometry**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Colony_Respirometry)
 
+    - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**T1_clay**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Colony_Respirometry/T1_clay)\
+  All raw respirometry data from PreSens output for T1 (initial) measurements
+
+    - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**T2**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Colony_Respirometry/T2)\
+  All raw respirometry data from PreSens output for T2 (post-treatment) measurements
+
     - ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Colony_Sample_Info_T1.csv**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/data/2017/Colony_Respirometry/Colony_Sample_Info_T1.csv)\
   T1 (initial) sample information data for respirometry
 
     - ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Colony_Sample_Info_T2.csv**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/data/2017/Colony_Respirometry/Colony_Sample_Info_T1.csv)\
     T2 (post-treatment) sample information data for respirometry
-
-    - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**T1_clay**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Colony_Respirometry/T1_clay)\
-    All raw respirometry data from PreSens output for T1 (initial) measurements
-
-    - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**T2**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Colony_Respirometry/T2)\
-    All raw respirometry data from PreSens output for T2 (post-treatment) measurements
 
   - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**Larval.Size**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Larval.Size)
 
@@ -99,11 +99,11 @@ Standard curve (tinfoil weight vs surface area) for adult fragments
 
   - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**Tank.Measurements**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Tank.Measurements)
 
+    - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**Logger**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Tank.Measurements/Logger)\
+  All raw temperature logger files for the acclimation and treatment period
+
     - ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Daily_Tank_Measures_Outside.csv**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/data/2017/Tank.Measurements/Daily_Tank_Measures_Outside.csv)\
 Daily (handheld) tank measurements during the acclimation and treatment period
-
-    - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**Logger**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Tank.Measurements/Logger)\
-    All raw temperature logger files for the acclimation and treatment period
 
   - ![2017.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**Zoox**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/data/2017/Zoox)
 
@@ -243,7 +243,7 @@ Larval symbiont cell densities calculated in R
     - ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Larval_2018_Zoox.csv**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/data/2018/Zoox/Larval_2018_Zoox.csv)\
 Raw larval 2018 symbiont cell counts
 
-![data.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**data**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/images) *all markdown images*
+![data.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**images**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/images) *all markdown images*
 
 ![data.folder](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/folder.png "Data Folder Logo") [**output**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/tree/master/output) *all output files, graphs, and manuscript figures/tables*
 
@@ -282,10 +282,8 @@ Adult 2018 respirometry calculations, graphs, and statistics
 - ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Surface_Area_Calculations.R**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/scripts/Surface_Area_Calculations.R)\
 Surface area calculations, graphs, and statistics
 
-- ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Symbiodinaceae_Density.R
-**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/scripts/Symbiodinaceae_Density.R)\
+- ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Symbiodinaceae_Density.R**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/scripts/Symbiodinaceae_Density.R)\
 Symbiont cell density calculations, graphs, and statistics
 
-- ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Total_Protein.R
-**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/scripts/Total_Protein.R)\
+- ![2017.file](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/images/file.png "Data File Logo") [**Total_Protein.R**](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/scripts/Total_Protein.R)\
 Total protein calculations, graphs, and statistics
