@@ -1,0 +1,12 @@
+
+	Welch Two Sample t-test
+
+data:  Salinity by Treatment
+t = 0.29831, df = 639.89, p-value = 0.7656
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.04351298  0.05910170
+sample estimates:
+mean in group Ambient     mean in group Hot 
+             37.44992              37.44212 
+

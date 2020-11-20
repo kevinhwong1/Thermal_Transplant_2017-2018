@@ -1,6 +1,6 @@
 #Title: Thermal Transplant 2017-2018 - BEACON field temps
 #Author: KH Wong
-#Date Last Modified: 202023
+#Date Last Modified: 20200623
 #See Readme file for details 
 
 library(dbplyr)
@@ -19,70 +19,7 @@ library(ggradar)
 library(ggiraphExtra)
 library(tidyverse)
 library(scales)
-
-##### 2012-2016 field temps #####
-# #Import data
-# Crescent.2010 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Nov2010_Feb2012.csv") 
-# Crescent.2012 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Feb2012_Feb2013.csv") 
-# Crescent.2013 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Apr2013_Mar2014.csv")
-# Crescent.2014 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Jul2014_Jul2015.csv")
-# Crescent.2015 <- read.csv("data/2018/Field_Temp/Crescent_64W_32N_Jul2015_Apr2016.csv")
-# 
-# Hog.2010 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Dec2010_Jan2012.csv")
-# Hog.2012 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Feb2012_Mar2013.csv")
-# Hog.2013 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Apr2013_Jun2014.csv")
-# Hog.2014.a <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Jul2014_Oct2014.csv")
-# Hog.2014.b <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Oct2014_Jan2015.csv")
-# Hog.2015 <- read.csv("data/2018/Field_Temp/Hog_Reef_64W_32N_Jul2015_Aug2016.csv")
-# 
-# # Selecting Columns 
-# Crescent.2010.1 <- Crescent.2010 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Crescent.2012.1 <- Crescent.2012 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Crescent.2013.1 <- Crescent.2013 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Crescent.2014.1 <- Crescent.2014 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Crescent.2015.1 <- Crescent.2015 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# 
-# Hog.2010.1 <- Hog.2010 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Hog.2012.1 <- Hog.2012 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Hog.2013.1 <- Hog.2013 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Hog.2014.a1 <- Hog.2014.a %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Hog.2014.b1 <- Hog.2014.b %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# Hog.2015.1 <- Hog.2015 %>% select(Mooring.Name, Date, Time, SST_C, Salinity, pCO2_SW_uatm)
-# 
-# #Binding Data by reef site 
-# Crescent.2010.2015 <- rbind(Crescent.2010.1, Crescent.2012.1, Crescent.2013.1, Crescent.2014.1, Crescent.2015.1)
-# Hog.2010.2015 <- rbind(Hog.2010.1, Hog.2012.1, Hog.2013.1, Hog.2014.a1, Hog.2014.b1, Hog.2015.1)
-# 
-# #Adding reef zone
-# Crescent.2010.2015$Reef <- "Patch"
-# Hog.2010.2015$Reef <- "Rim"
-# 
-# #Binding all datasets together
-# bda.2010.2015 <- rbind(Crescent.2010.2015, Hog.2010.2015)
-# 
-# #Changing date format 
-# bda.2010.2015$Date <- as.Date(bda.2010.2015$Date, "%m/%d/%Y")
-# 
-# #Removing NAs
-# bda.2010.2015 <- na.omit(bda.2010.2015)
-# 
-# #Removing rows with -999 values 
-# bda.2010.2015.clean <- bda.2010.2015 %>% 
-#   filter(SST_C != -999) 
-# 
-# #Raw temp plot
-# raw.2010.2015 <- ggplot(bda.2010.2015.clean, aes(x=Date, y = SST_C, group = Reef, color = Reef)) +
-#   geom_line() +
-#   scale_color_manual(values=c("tomato3", "dodgerblue3")) +
-#   scale_x_date(date_breaks = "1 year", date_labels= "%Y") +
-#   theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-#                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
-#                      axis.text.x=element_text())
-# 
-# 
-# 
-# 
-
+library(tidyr)
 
 ##### 2017-2018 field temps #####
 #Import data 
@@ -140,7 +77,7 @@ temp.d.30 <- summaryBy(SST_C.max ~ Site, data = Daily.range,
 
 ##### 2011-2013 Temp and light #####
 
-#Import data
+#Import data (Hog and Cresecent)
 BDA.2011.2013 <- read.csv("data/2018/Field_Temp/BDA_2011-2013_TempLight.csv") 
 
 #Changing date format 
@@ -150,64 +87,106 @@ BDA.2011.2013$Date <- as.Date(BDA.2011.2013$Date, "%m/%d/%Y")
 BDA.2011.2013.clean <- BDA.2011.2013 %>% 
   filter(Temp != -9999) %>%
   filter(Light != -9999) %>%
-  filter(Temp < 32)  %>%
+  filter(Temp < 31)  %>%
   filter(Date < "2012-09-05") %>%
   filter(Date > " 2010-10-18")
 
-# Mean Temp by date
-mean.temps.2011.2013 <- summarySE(BDA.2011.2013.clean, measurevar="Temp", groupvars=c("Date","Site"))
-mean.temps.2011.2013.select <- mean.temps.2011.2013 %>%
+#Import data (Whalebone)
+
+BDA.WB <- read.csv("data/2018/Field_Temp/Whalebone_2010-2012_Temp.csv") 
+
+#Separating date and time column 
+BDA.WB.2 <- BDA.WB %>%
+  separate(Date_Time, c('Date', 'Time'), " ")
+
+#Changing date format: Temp loggers switch format between 2011 and 2012, therefore we have to convert the dates separately then recombine
+BDA.WB.2.a <- BDA.WB.2[1:35040,]
+BDA.WB.2.b <- BDA.WB.2[35041:52608,]
+BDA.WB.2.c <- BDA.WB.2[52609:87648,]
+BDA.WB.2.d <- BDA.WB.2[87648:105216,]
+
+BDA.WB.2.a$Date <- as.Date(BDA.WB.2.a$Date, "%m-%d-%y")
+BDA.WB.2.c$Date <- as.Date(BDA.WB.2.c$Date, "%m-%d-%y")
+
+BDA.WB.2.b$Date <- as.Date(BDA.WB.2.b$Date, "%Y-%m-%d")
+BDA.WB.2.d$Date <- as.Date(BDA.WB.2.d$Date, "%Y-%m-%d")
+
+BDA.WB.3 <- rbind(BDA.WB.2.a, BDA.WB.2.b, BDA.WB.2.c, BDA.WB.2.d)
+
+# Removing NAs
+BDA.WB.4 <- BDA.WB.3 %>%
+  filter(Temp != "NA") %>%
   filter(Date < "2012-09-05") %>%
   filter(Date > " 2010-10-18")
 
-Mean.temp.20112013.plot <- ggplot(mean.temps.2011.2013.select, aes(x=Date, y = Temp, group = Site, color = Site)) + 
-                            geom_point() + 
-                            geom_line() +
-#                            geom_ribbon(aes(ymin=(Temp - ci), ymax=(Temp + ci)), linetype=2, alpha=0.1) +
-                            ylab("Temperature °C")+
-                            scale_x_date(date_breaks = "3 month", date_labels= "%b %Y") +
-                            scale_y_continuous(limits = c(17, 32), breaks = seq(17, 32, by = 2)) +
-                            scale_shape_manual(values=c(21,24),
-                                               name = "Site")+
-                            scale_color_manual(values=c("tomato3", "dodgerblue3")) +
-  theme_bw() + theme(panel.grid.major = element_blank(), 
-                     panel.grid.minor = element_blank(),
-                     panel.background = element_rect(colour = "black", size=1)) +
-  theme(axis.text = element_text(size = 30, color = "black"),
-        axis.title = element_text(size = 36, color = "black"),
-        axis.title.x = element_blank()) +
-  theme(legend.position = "none")
+#combining datasets
+BDA.env.2010.2012.raw <- rbind(BDA.2011.2013.clean[,c(1,4,5,6,7)], BDA.WB.4)
 
-ggsave(file = "output/Graphs/2010.2012.temp.pdf", Mean.temp.20112013.plot, width = 20, height = 11, units = c("in"))
+#Averaging loggers
+BDA.env.2010.2012 <- summarySE(BDA.env.2010.2012.raw, measurevar="Temp", groupvars=c("Site","Date","Time")) 
+
+write.csv(BDA.env.2010.2012, file = 'data/2018/Field_Temp/All.Temp.data.csv')
+# 
+# # Mean Temp by date
+# mean.temps.2011.2013 <- summarySE(BDA.2011.2013.clean, measurevar="Temp", groupvars=c("Date","Site"))
+# mean.temps.2011.2013.select <- mean.temps.2011.2013 %>%
+#   filter(Date < "2012-09-05") %>%
+#   filter(Date > " 2010-10-18")
+# 
+# Mean.temp.20112013.plot <- ggplot(mean.temps.2011.2013.select, aes(x=Date, y = Temp, group = Site, color = Site)) + 
+#                             geom_point() + 
+#                             geom_line() +
+# #                            geom_ribbon(aes(ymin=(Temp - ci), ymax=(Temp + ci)), linetype=2, alpha=0.1) +
+#                             ylab("Temperature °C")+
+#                             scale_x_date(date_breaks = "3 month", date_labels= "%b %Y") +
+#                             scale_y_continuous(limits = c(17, 32), breaks = seq(17, 32, by = 2)) +
+#                             scale_shape_manual(values=c(21,24),
+#                                                name = "Site")+
+#                             scale_color_manual(values=c("tomato3", "dodgerblue3")) +
+#   theme_bw() + theme(panel.grid.major = element_blank(), 
+#                      panel.grid.minor = element_blank(),
+#                      panel.background = element_rect(colour = "black", size=1)) +
+#   theme(axis.text = element_text(size = 30, color = "black"),
+#         axis.title = element_text(size = 36, color = "black"),
+#         axis.title.x = element_blank()) +
+#   theme(legend.position = "none")
+# 
+# ggsave(file = "output/Graphs/2010.2012.temp.pdf", Mean.temp.20112013.plot, width = 20, height = 11, units = c("in"))
 
 # Summary statistics 
 library(doBy)
-temp.summary<- summaryBy(Temp ~ Site, data = BDA.2011.2013.clean,
+temp.summary<- summaryBy(Temp ~ Site, data = BDA.env.2010.2012,
           FUN = function(x) { c(max = max(x), min = min(x)) } )
 temp.summary$Temp.seasonal <- temp.summary$Temp.max - temp.summary$Temp.min
 
 # Daily Range
-Daily.range <- summaryBy(Temp ~ Date + Site, data=BDA.2011.2013.clean, FUN=c(max,min,mean,sd))
+Daily.range <- summaryBy(Temp ~ Date + Site, data=BDA.env.2010.2012, FUN=c(max,min,mean,sd))
 
 Daily.range$temp.daily.range <- Daily.range$Temp.max - Daily.range$Temp.min
 
-temp.d.range <- summaryBy(temp.daily.range ~ Site, data = Daily.range,
+Daily.range.clean <- Daily.range %>%
+  filter(temp.daily.range < 4)
+
+temp.d.range <- summaryBy(temp.daily.range ~ Site, data = Daily.range.clean,
                           FUN = function(x) { c(mean = mean(x)) } )
 
-
-
-temp.d.30 <- summaryBy(Temp.max ~ Site, data = Daily.range,
+temp.d.30 <- summaryBy(Temp.max ~ Site, data = Daily.range.clean,
                           FUN = function(x) { c(d.above.30 = count(x>30)) } )
-Temp.days.30 <- c(70, 4)
-
-light.summary<- summaryBy(Light ~ Site, data = BDA.2011.2013.clean,
-                         FUN = function(x) { c(m = mean(x), var = sd(x), max = max(x)) } )
+Temp.days.30 <- c(48, 4, 6)
 
 temp.summary2 <- merge(temp.summary, temp.d.range, by = "Site")
 temp.summary3 <- data.frame(temp.summary2, Temp.days.30)
 
-temp.light.summary <- merge(temp.summary3, light.summary, by = "Site")
-temp.light.summary2 <- temp.light.summary[c(2:9)]
+temp.summary.4 <- temp.summary3 %>%
+  filter(Site != "Whalebone")
+
+temp.summary.5 <- temp.summary.4[2:6]
+
+# light.summary<- summaryBy(Light ~ Site, data = BDA.2011.2013.clean,
+#                           FUN = function(x) { c(m = mean(x), var = sd(x), max = max(x)) } )
+# 
+# temp.light.summary <- merge(temp.summary3, light.summary, by = "Site")
+# temp.light.summary2 <- temp.light.summary[c(2:9)]
 
 
 #### RADAR PLOT ####
@@ -216,10 +195,10 @@ fn <- function(x) x * 100/max(x, na.rm = TRUE)
 fn(c(0,1,0))
 
 ## to all columns of your data frame
-rad.data <- data.frame(lapply(temp.light.summary2, fn))
+rad.data <- data.frame(lapply(temp.summary.5, fn))
 rownames(rad.data) <- c("Patch", "Rim")
-colnames(rad.data) <- c("Maximum Temperature", "Minimum Temperature", "Mean Seasonal Temperature Range", "Mean Daily Temperature Range", "Days above 30°C", "Mean Seasonal Light Level", "Light Variability", "Maximum Light Level")
-rad.data <- rad.data[,c(1,2,5,4,3,6,7,8)]
+colnames(rad.data) <- c("Max", "Min", "Seasonal", "Daily", "30°C")
+rad.data <- rad.data[,c(1,2,3,4,5)]
 
 # To use the fmsb package, I have to add 2 lines to the dataframe: the max and min of each variable to show on the plot!
 rad.data <- rbind(rep(100,5) , rep(0,5) , rad.data)
@@ -242,6 +221,8 @@ radarchart(rad.data, axistype=1 ,
             #custom labels
             vlcex=0.9
 )
+
+dev.off()
 
 # Add a legend
 legend(x=0.9, y=0.9, legend = rownames(rad.data[-c(1,2),]), bty = "n", pch=20 , col=colors_border , text.col = "black", cex=1.2, pt.cex=3)
@@ -465,4 +446,37 @@ treat.env.sal <- summarySE(tank.env.treat.all, measurevar="Salinity", groupvars=
 treat.env.pH <- summarySE(tank.env.treat.all, measurevar="pH", groupvars="Treatment")
 treat.env.PAR <- summarySE(tank.env.treat.all, measurevar="Light.PAR.corr", groupvars="Treatment")
 
+
+#Stats for Salinity
+sal.lm <- lm(Salinity~Treatment, data = tank.env.treat.all)
+qqnorm(resid(sal.lm))
+qqline(resid(sal.lm))
+
+boxplot(resid(sal.lm)~tank.env.treat.all$Treatment)
+
+t.test(Salinity~Treatment, data = tank.env.treat.all)
+
+capture.output(t.test(Salinity~Treatment, data = tank.env.treat.all), file = "output/Statistics/salinity.csv")
+
+#Stats for pH
+pH.lm <- lm(pH~Treatment, data = tank.env.treat.all)
+qqnorm(resid(pH.lm))
+qqline(resid(pH.lm))
+
+boxplot(resid(pH.lm)~tank.env.treat.all$Treatment)
+
+t.test(pH~Treatment, data = tank.env.treat.all)
+
+capture.output(t.test(Salinity~Treatment, data = tank.env.treat.all), file = "output/Statistics/salinity.csv")
+
+#Stats for light
+light.lm <- lm(Light.PAR.corr~Treatment, data = tank.env.treat.all)
+qqnorm(resid(light.lm))
+qqline(resid(light.lm))
+
+boxplot(resid(light.lm)~tank.env.treat.all$Treatment)
+
+t.test(Light.PAR.corr~Treatment, data = tank.env.treat.all)
+
+capture.output(t.test(Salinity~Treatment, data = tank.env.treat.all), file = "output/Statistics/salinity.csv")
 
