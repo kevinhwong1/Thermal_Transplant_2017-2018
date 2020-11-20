@@ -1,11 +1,11 @@
 # The integration of press and pulse disturbances drive differential carryover patterning in adult corals and their offspring
 
 
-![Fig.2](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/output/Manuscript_Figures/Figure_2.eps)
+![Fig.2](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/output/Manuscript_Figures/Cover_Photo.png)
 
 
 ### Authors:
-Kevin H. Wong*, Danielle M. Becker, Samantha J. de Putron, Gretchen Goodbody-Gringley, Hollie M. Putnam
+Kevin H. Wong*,Gretchen Goodbody-Gringley,  Samantha J. de Putron, Danielle M. Becker, Alex Chequer, and Hollie M. Putnam
 
 ### Journal:
 
