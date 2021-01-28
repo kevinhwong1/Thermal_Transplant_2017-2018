@@ -339,7 +339,7 @@ capture.output(anova(A2017.TP.anova.T2), file = "output/Statistics/A2017.TP.T2.c
 
 ### 2017 Larval Total Protein ###
 
-L2017.TP <- read.csv("data/2017/Protein/Raw_files/Total_Protein_Larvae.csv")
+L2017.TP <- read.csv("data/2017/Protein/Total_Protein_Larvae.csv")
 L2017.Vial <- read.csv("data/2017/Metadata/Vial.metadata.csv")
 A2017.meta <- read.csv("data/2017/Metadata/Colony.Metadata.csv") #Metadata
 ## Making a new data frame for each run because each run has different standards 
@@ -454,6 +454,35 @@ L2017.TP.meta <- merge(L2017.TP.vial, L2017.Vial, by= "Vial")
 L2017.TP.meta2 <- merge(L2017.TP.meta, A2017.meta, by= "coral.id")
 
 L2017.TP.Patch <- subset(L2017.TP.meta2, reef.zone=="Patch")
+
+### ug protein per larva
+
+L2017.TP.larva <- summarySE(L2017.TP.Patch, measurevar="Conc.calcS", groupvars=c("treatment", "Sample.date", "coral.id"))
+
+#Boxplot with jitter
+Box.L2017.TP.larva <- ggplot(L2017.TP.larva, aes(x=treatment, y=Conc.calcS, fill = treatment)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 1)) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Total Protein " (mg ~ larva^{-1}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.TP.Patch.larva.box.pdf", Box.L2017.TP.larva, width = 11, height = 11, units = c("in"))
+
+# Statistics
+
+t.test(Conc.calcS~treatment, data = L2017.TP.larva)
+
+capture.output(t.test(Conc.calcS~treatment, data = L2017.TP.larva), file = "output/Statistics/L2017.TP.Patch.larva.csv")
+
+
 
 #### ug protein per mm3 ####
 

@@ -176,7 +176,28 @@ L2017.zoox.patch <- subset(L2017.zoox.meta, reef.zone=="Patch")
 L2017.zoox.patch$Cells.larvae.x3 <-  L2017.zoox.patch$Cells.larvae / 1000
 
 #Summarizing
-L2017.zoox.patch.mean <- summarySE(L2017.zoox.patch, measurevar="Cells.larvae.x3", groupvars=c("treatment", "reef.zone"))
+L2017.zoox.patch.mean <- summarySE(L2017.zoox.patch, measurevar="Cells.larvae.x3", groupvars=c("treatment", "coral.id", "date"))
+
+#Plotting
+Box.L2017.Zoox.larva <- ggplot(L2017.zoox.patch.mean, aes(x=treatment, y=Cells.larvae.x3, fill = treatment)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size =4) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Cell Density " (10^{3} ~ larva^{-1}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.Zoox.Patch.larva.box.pdf", Box.L2017.Zoox.larva, width = 11, height = 11, units = c("in"))
+
+# Statistics
+capture.output(t.test(Cells.larvae.x3~treatment, data = L2017.zoox.patch.mean), file = "output/Statistics/L2017.Zoox.larva.csv")
+
+
 
 #### larval zoox per mm3 ####
 
@@ -191,8 +212,9 @@ L2017.zoox.Patch.size$Cells.x3.mm3 <- L2017.zoox.Patch.size$Cells.larvae.x3/L201
 mean.L2017.zoox.size <- summarySE(L2017.zoox.Patch.size, measurevar="Cells.x3.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
 write.csv(mean.L2017.zoox.size, file = "data/2017/Zoox/L2017_zoox.vol.csv")
 
+
 #Plotting
-Box.L2017.Zoox <- ggplot(L2017.zoox.Patch.size, aes(x=Treatment.1, y=Cells.x3.mm3, fill = Treatment.1)) +
+Box.L2017.Zoox <- ggplot(mean.L2017.zoox.size, aes(x=treatment, y=Cells.x3.mm3, fill = treatment)) +
   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
   geom_jitter(position = position_jitter(width = 0.1), size =4) +
   #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
@@ -208,8 +230,7 @@ Box.L2017.Zoox <- ggplot(L2017.zoox.Patch.size, aes(x=Treatment.1, y=Cells.x3.mm
 ggsave(file = "output/Graphs/L2017.Zoox.Patch.size.box.pdf", Box.L2017.Zoox, width = 11, height = 11, units = c("in"))
 
 # Statistics
-capture.output(t.test(Cells.x3.mm3~Treatment.1, data = L2017.zoox.Patch.size), file = "output/Statistics/L2017.Zoox.size.csv")
-
+capture.output(t.test(Cells.x3.mm3~treatment, data = mean.L2017.zoox.size), file = "output/Statistics/L2017.Zoox.size.csv")
 
 
 ### 2018 Adult Symbiodinaceae Densities ###

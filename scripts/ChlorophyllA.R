@@ -358,6 +358,38 @@ mean.chla.L2017$Timepoint <- factor(mean.chla.L2017$Timepoint, levels = c("Pre-T
 mean.chla.L2017.patch <- mean.chla.L2017 %>% 
   filter(reef.zone == "Patch")
 
+##Chla/larva
+
+chla.L2017.patch <- L2017.chla.final %>% 
+  filter(reef.zone == "Patch")
+
+L2017.mean.chla.larva <- summarySE(chla.L2017.patch, measurevar="chlA.nglarv", groupvars=c("treatment", "Larval.Release.Date", "coral.id"))
+
+Box.L2017.Chla.larva <- ggplot(L2017.mean.chla.larva, aes(x=treatment, y=chlA.nglarv, fill = treatment)) +
+  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+  #  stat_summary(fun.y=median, geom="line", position = position_dodge(width = 0.9), aes(group=Parental.Treatment))  + 
+  #  stat_summary(fun.y=median, geom="point", position = position_dodge(width = 0.9)) +
+  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Treatment") + ylab(expression("Chlorophyll a " (ng ~ larva^{-1}))) + #Axis titles
+#  ylim(40,250) +
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+ggsave(file = "output/Graphs/L2017.Chla.Patch.larva.box.pdf", Box.L2017.Chla.larva, width = 11, height = 11, units = c("in"))
+
+#Statistics
+
+t.test(chlA.nglarv~treatment, data = L2017.mean.chla.larva)
+
+capture.output(t.test(chlA.nglarv~treatment, data = L2017.mean.chla.larva), file = "output/Statistics/L2017.Chla.larva.Patch.csv")
+
+
+
+
 ## Chla standardized by larval volume ##
 
 L2017.chla.final$Date.coral.ID <- paste(L2017.chla.final$Larval.Release.Date, L2017.chla.final$coral.id, sep = "-")
