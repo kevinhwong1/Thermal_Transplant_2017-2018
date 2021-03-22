@@ -1,0 +1,7 @@
+Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: Cells.x3.mm3
+           Chisq Df Pr(>Chisq)  
+treatment 4.3183  1    0.03771 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

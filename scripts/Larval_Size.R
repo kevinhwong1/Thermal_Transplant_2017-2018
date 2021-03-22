@@ -14,6 +14,7 @@ library(ggplot2)
 library(lattice)
 library(Rmisc)
 library(lsmeans)
+library(lme4)
 
 ### 2017 Larval Size ###
 
@@ -49,16 +50,100 @@ Box.L2017.Size <- ggplot(L2017.vol.patch.mean, aes(x=Treatment.1, y=Volume_1, fi
 
 ggsave(file = "output/Graphs/L2017.Patch.size.box.pdf", Box.L2017.Size, width = 11, height = 11, units = c("in"))
 
-# Statistics
-L2017.Vol.anova <- lm(Volume_1~Treatment.1, data = L2017.vol.T1)
+Box.L2017.Size.day <- ggplot(L2017.vol.patch.mean, aes(x=Date.Release, y=Volume_1, fill = Date.Release)) +
+#  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+#  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Date of release") + ylab(expression("Larval Volume " (mm^{3}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+Box.L2017.Size.col <- ggplot(L2017.vol.patch.mean, aes(x=coral.id, y=Volume_1, fill = coral.id)) +
+  #  geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
+  geom_jitter(position = position_jitter(width = 0.1), size = 4) +
+  #  scale_fill_manual(values=c("#FFFFFF", "#999999")) +
+  xlab("Parental Colony") + ylab(expression("Larval Volume " (mm^{3}))) + #Axis titles
+  theme_bw() + theme(panel.border = element_rect(color="black", fill=NA, size=0.75), panel.grid.major = element_blank(), #Makes background theme white
+                     panel.grid.minor = element_blank(), axis.line = element_blank()) +
+  theme(axis.text = element_text(size = 30, color = "black"),
+        axis.title = element_text(size = 36, color = "black")) +
+  theme(legend.position = "none")
+
+
+# Statistics (t-test)
+L2017.Vol.anova <- lm(Volume_1~Treatment.1, data = L2017.vol.patch.mean)
 qqnorm(resid(L2017.Vol.anova))
 qqline(resid(L2017.Vol.anova))
 
-boxplot(resid(L2017.Vol.anova)~L2017.vol.T1$Treatment.1)
+boxplot(resid(L2017.Vol.anova)~L2017.vol.patch.mean$Treatment.1)
+
+wilcox.test(Volume_1~Treatment.1, data = L2017.vol.patch.mean)
+
+capture.output(t.test(Volume_1~Treatment.1, data = L2017.vol.patch.mean), file = "output/Statistics/L2017.Vol.csv")
 
 t.test(Volume_1~Treatment.1, data = L2017.vol.T1)
+summary(aov(Volume_1~Date.Release, data = L2017.vol.T1))
+summary(aov(Volume_1~coral.id, data = L2017.vol.T1))
 
-capture.output(t.test(Volume_1~Treatment.1, data = L2017.vol.T1), file = "output/Statistics/L2017.Vol.csv")
+# Statistics (mixed effect modelling)
+
+### orthogonal random effect design 
+
+#One way model with date and coral ID as random factor
+Vol2017Larvae.lmer <- lmer(Volume_1~1+Treatment.1 + (1|Date.Release) +  (1|coral.id), data = L2017.vol.T1, REML=FALSE)
+qqnorm(resid(Vol2017Larvae.lmer)) # Normality
+qqline(resid(Vol2017Larvae.lmer)) # Normal
+
+boxplot(resid(Vol2017Larvae.lmer)~L2017.vol.T1$Treatment.1) # Variance 
+
+summary(Vol2017Larvae.lmer)
+
+#One way model with date as random factor
+Vol2017Larvae.lmer2 <- lmer(Volume_1~ 1 + Treatment.1 + (1|Date.Release), data = L2017.vol.T1, REML=FALSE)
+qqnorm(resid(Vol2017Larvae.lmer2)) # Normality
+qqline(resid(Vol2017Larvae.lmer2)) # Normal
+
+boxplot(resid(Vol2017Larvae.lmer2)~L2017.vol.T1$Treatment.1) # Variance 
+
+summary(Vol2017Larvae.lmer2)
+
+#one way model with coral.id as random factor
+Vol2017Larvae.lmer3 <- lmer(Volume_1~1+Treatment.1 + (1|coral.id), data = L2017.vol.T1, REML=FALSE)
+qqnorm(resid(Vol2017Larvae.lmer3)) # Normality
+qqline(resid(Vol2017Larvae.lmer3)) # Normal
+
+boxplot(resid(Vol2017Larvae.lmer3)~L2017.vol.T1$Treatment.1) # Variance 
+
+summary(Vol2017Larvae.lmer3)
+
+## Model Comparisons
+lrt(Vol2017Larvae.lmer2, Vol2017Larvae.lmer) # Full Model is best
+lrt(Vol2017Larvae.lmer3, Vol2017Larvae.lmer) # Full Model is best
+
+#MODEL SELECTION = I
+capture.output(Anova(Vol2017Larvae.lmer), file = "output/Statistics/L.2017.vol.lmer.csv")
+
+lm1 <- lmer(Volume_1 ~ Treatment.1 + (1 | Date.Release) + (1 | coral.id), data = L2017.vol.T1)
+lm2 <- lmer(Volume_1 ~ 1 + Treatment.1 + (1 | Date.Release), data = L2017.vol.T1)
+lm3 <- lmer(Volume_1 ~ 1 + Treatment.1 + (1 | coral.id), data = L2017.vol.T1)
+summary(lm1)
+summary(lm2)
+summary(lm3)
+anova(lm1, lm2, lm3)
+
+Anova(lm1, type="II")
+Anova(lm2, type="II")
+Anova(lm3, type="II")
+
+
+
+### Generalized linear mixed model approach
+
+f1 <- glmer(Volume_1~Treatment.1 + (1|Date.Release) + (1|coral.id), data = L2017.vol.T1)
+summary(f1)
 
 ### 2018 Larval Size ###
 

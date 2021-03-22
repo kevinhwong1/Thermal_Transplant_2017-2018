@@ -1,0 +1,5 @@
+Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: Volume_1
+             Chisq Df Pr(>Chisq)
+Treatment.1 0.4239  1      0.515

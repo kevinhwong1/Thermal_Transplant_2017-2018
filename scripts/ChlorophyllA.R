@@ -400,7 +400,7 @@ L2017.chla.final.size <- merge(L.Size.2017.Patch, L2017.chla.final, by = "Date.c
 
 L2017.chla.final.size$chla.ng.mm3 <- L2017.chla.final.size$chlA.nglarv/L2017.chla.final.size$Volume_1
 
-mean.chla.final.size <- summarySE(L2017.chla.final.size, measurevar="chla.ng.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
+mean.chla.final.size <- summarySE(L2017.chla.final.size, measurevar="chla.ng.mm3", groupvars=c("treatment", "reef.zone", "Date.Release", "coral.id.x"))
 
 Box.L2017.Chla <- ggplot(mean.chla.final.size, aes(x=treatment, y=chla.ng.mm3, fill = treatment)) +
   geom_boxplot(width=.3, outlier.colour=NA, position = position_dodge(width = 0.9)) +
@@ -429,11 +429,51 @@ t.test(chla.ng.mm3~treatment, data = mean.chla.final.size)
 
 capture.output(t.test(chla.ng.mm3~treatment, data = mean.chla.final.size), file = "output/Statistics/L2017.Chla.vol.Patch.csv")
 
+# Statistics (mixed effect modelling)
+
+### orthogonal random effect design 
+
+#One way model with date and coral ID as random factor
+Chla.mm.2017Larvae.lmer <- lmer(chla.ng.mm3~1+treatment + (1|Date.Release) +  (1|coral.id.x), data = mean.chla.final.size, REML=FALSE)
+qqnorm(resid(Chla.mm.2017Larvae.lmer)) # Normality
+qqline(resid(Chla.mm.2017Larvae.lmer)) # Normal
+
+boxplot(resid(Chla.mm.2017Larvae.lmer)~mean.chla.final.size$treatment) # Variance 
+
+summary(Chla.mm.2017Larvae.lmer)
+
+#One way model with date as random factor
+Chla.mm.2017Larvae.lmer2 <- lmer(chla.ng.mm3~1+treatment + (1|Date.Release), data = mean.chla.final.size, REML=FALSE)
+qqnorm(resid(Chla.mm.2017Larvae.lmer2)) # Normality
+qqline(resid(Chla.mm.2017Larvae.lmer2)) # Normal
+
+boxplot(resid(Chla.mm.2017Larvae.lmer2)~mean.chla.final.size$treatment) # Variance 
+
+summary(Chla.mm.2017Larvae.lmer2)
+
+#one way model with coral.id as random factor
+Chla.mm.2017Larvae.lmer3 <- lmer(chla.ng.mm3~1+treatment + (1|coral.id.x), data = mean.chla.final.size, REML=FALSE)
+qqnorm(resid(Chla.mm.2017Larvae.lmer3)) # Normality
+qqline(resid(Chla.mm.2017Larvae.lmer3)) # Normal
+
+boxplot(resid(Chla.mm.2017Larvae.lmer3)~mean.chla.final.size$treatment) # Variance 
+
+summary(Chla.mm.2017Larvae.lmer3)
+
+## Model Comparisons
+lrt(Chla.mm.2017Larvae.lmer2, Chla.mm.2017Larvae.lmer) # Model II is best
+lrt(Chla.mm.2017Larvae.lmer3, Chla.mm.2017Larvae.lmer) # Model III is best
+
+#MODEL SELECTION = II
+capture.output(Anova(Chla.mm.2017Larvae.lmer2), file = "output/Statistics/L.2017.chla.mm.lmer.csv")
+
+
+
 ## chla/cell ##
 
 L2017.zoox.vol <- read.csv("data/2017/Zoox/L2017_zoox.vol.csv")
 
-L2017.chla.cell <- merge(mean.chla.final.size, L2017.zoox.vol, by = "Date.coral.ID")
+L2017.chla.cell <- merge(mean.chla.final.size, L2017.zoox.vol, by = c("Date.Release", "coral.id.x"))
 
 L2017.chla.cell$Chla.cell <- L2017.chla.cell$chla.ng.mm3 / L2017.chla.cell$Cells.x3.mm3
 
@@ -463,6 +503,46 @@ boxplot(resid(L2017.Chla.cell.Patch.anova)~L2017.chla.cell$treatment.x)
 t.test(Chla.cell~treatment.x, data = L2017.chla.cell)
 
 capture.output(t.test(Chla.cell~treatment.x, data = L2017.chla.cell), file = "output/Statistics/L2017.Chla.cell.Patch.csv")
+
+
+
+# Statistics (mixed effect modelling)
+
+### orthogonal random effect design 
+
+#One way model with date and coral ID as random factor
+Chla.cell.2017Larvae.lmer <- lmer(Chla.cell~1+treatment.x + (1|Date.Release) +  (1|coral.id.x), data = L2017.chla.cell, REML=FALSE)
+qqnorm(resid(Chla.cell.2017Larvae.lmer)) # Normality
+qqline(resid(Chla.cell.2017Larvae.lmer)) # Normal
+
+boxplot(resid(Chla.cell.2017Larvae.lmer)~mean.chla.final.size$treatment) # Variance 
+
+summary(Chla.cell.2017Larvae.lmer)
+
+#One way model with date as random factor
+Chla.cell.2017Larvae.lmer2 <- lmer(Chla.cell~1+treatment.x + (1|Date.Release) , data = L2017.chla.cell, REML=FALSE)
+qqnorm(resid(Chla.cell.2017Larvae.lmer2)) # Normality
+qqline(resid(Chla.cell.2017Larvae.lmer2)) # Normal
+
+boxplot(resid(Chla.cell.2017Larvae.lmer2)~mean.chla.final.size$treatment) # Variance 
+
+summary(Chla.cell.2017Larvae.lmer2)
+
+#one way model with coral.id as random factor
+Chla.cell.2017Larvae.lmer3 <- lmer(Chla.cell~1+treatment.x + (1|coral.id.x), data = L2017.chla.cell, REML=FALSE)
+qqnorm(resid(Chla.cell.2017Larvae.lmer3)) # Normality
+qqline(resid(Chla.cell.2017Larvae.lmer3)) # Normal
+
+boxplot(resid(Chla.cell.2017Larvae.lmer3)~mean.chla.final.size$treatment) # Variance 
+
+summary(Chla.cell.2017Larvae.lmer3)
+
+## Model Comparisons
+lrt(Chla.cell.2017Larvae.lmer2, Chla.cell.2017Larvae.lmer) # Model II is best
+lrt(Chla.cell.2017Larvae.lmer3, Chla.cell.2017Larvae.lmer) # Model III is best
+
+#MODEL SELECTION = II
+capture.output(Anova(Chla.cell.2017Larvae.lmer2), file = "output/Statistics/L.2017.chla.cell.lmer.csv")
 
 
 

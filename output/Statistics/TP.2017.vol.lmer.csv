@@ -1,0 +1,5 @@
+Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: Conc.calcS.mg.mm3
+           Chisq Df Pr(>Chisq)
+treatment 1.1339  1     0.2869

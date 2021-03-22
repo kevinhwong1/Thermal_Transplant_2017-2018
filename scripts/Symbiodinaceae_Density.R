@@ -209,7 +209,7 @@ L2017.zoox.Patch.size <- merge(L.Size.2017.Patch, L2017.zoox.patch, by = "Date.c
 
 L2017.zoox.Patch.size$Cells.x3.mm3 <- L2017.zoox.Patch.size$Cells.larvae.x3/L2017.zoox.Patch.size$Volume_1
 
-mean.L2017.zoox.size <- summarySE(L2017.zoox.Patch.size, measurevar="Cells.x3.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
+mean.L2017.zoox.size <- summarySE(L2017.zoox.Patch.size, measurevar="Cells.x3.mm3", groupvars=c("treatment", "reef.zone", "Date.Release", "coral.id.x"))
 write.csv(mean.L2017.zoox.size, file = "data/2017/Zoox/L2017_zoox.vol.csv")
 
 
@@ -231,6 +231,45 @@ ggsave(file = "output/Graphs/L2017.Zoox.Patch.size.box.pdf", Box.L2017.Zoox, wid
 
 # Statistics
 capture.output(t.test(Cells.x3.mm3~treatment, data = mean.L2017.zoox.size), file = "output/Statistics/L2017.Zoox.size.csv")
+
+
+# Statistics (mixed effect modelling)
+
+### orthogonal random effect design 
+
+#One way model with date and coral ID as random factor
+Zoox2017Larvae.lmer <- lmer(Cells.x3.mm3~1+treatment + (1|Date.Release) +  (1|coral.id.x), data = mean.L2017.zoox.size, REML=FALSE)
+qqnorm(resid(Zoox2017Larvae.lmer)) # Normality
+qqline(resid(Zoox2017Larvae.lmer)) # Normal
+
+boxplot(resid(Zoox2017Larvae.lmer)~mean.L2017.zoox.size$treatment) # Variance 
+
+summary(Zoox2017Larvae.lmer)
+
+#One way model with date as random factor
+Zoox2017Larvae.lmer2 <- lmer(Cells.x3.mm3~1+treatment + (1|Date.Release), data = mean.L2017.zoox.size, REML=FALSE)
+qqnorm(resid(Zoox2017Larvae.lmer2)) # Normality
+qqline(resid(Zoox2017Larvae.lmer2)) # Normal
+
+boxplot(resid(Zoox2017Larvae.lmer2)~mean.L2017.zoox.size$treatment) # Variance 
+
+summary(Zoox2017Larvae.lmer2)
+
+#one way model with coral.id as random factor
+Zoox2017Larvae.lmer3 <- lmer(Cells.x3.mm3~1+treatment + (1|coral.id.x), data = mean.L2017.zoox.size, REML=FALSE)
+qqnorm(resid(Zoox2017Larvae.lmer3)) # Normality
+qqline(resid(Zoox2017Larvae.lmer3)) # Normal
+
+boxplot(resid(Zoox2017Larvae.lmer3)~mean.L2017.zoox.size$treatment) # Variance 
+
+summary(Zoox2017Larvae.lmer3)
+
+## Model Comparisons
+lrt(Zoox2017Larvae.lmer2, Zoox2017Larvae.lmer) # Model II is best
+lrt(Zoox2017Larvae.lmer3, Zoox2017Larvae.lmer) # Model III is best
+
+#MODEL SELECTION = II
+capture.output(Anova(Zoox2017Larvae.lmer2), file = "output/Statistics/L.2017.zoox.lmer.csv")
 
 
 ### 2018 Adult Symbiodinaceae Densities ###

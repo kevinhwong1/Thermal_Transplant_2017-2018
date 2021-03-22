@@ -496,7 +496,7 @@ L2017.TP.Patch.meta$Conc.calcS.size <- L2017.TP.Patch.meta$Conc.calcS/L2017.TP.P
 L2017.TP.Patch.meta$Conc.calcS.mg.mm3 <- L2017.TP.Patch.meta$Conc.calcS.size/100
 
 L2017.TP.Patch.meta.1 <- L2017.TP.Patch.meta[-c(43), ] #outlier removal
-L2017.TP.Final <- summarySE(L2017.TP.Patch.meta.1, measurevar="Conc.calcS.mg.mm3", groupvars=c("treatment", "reef.zone", "Date.coral.ID"))
+L2017.TP.Final <- summarySE(L2017.TP.Patch.meta.1, measurevar="Conc.calcS.mg.mm3", groupvars=c("treatment", "reef.zone", "Date.Release", "coral.id.x"))
 
 #Boxplot with jitter
 Box.L2017.TP <- ggplot(L2017.TP.Final, aes(x=treatment, y=Conc.calcS.mg.mm3, fill = treatment)) +
@@ -525,6 +525,46 @@ boxplot(resid(L2017.TP.Patch.anova)~L2017.TP.Final$treatment)
 t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final)
 
 capture.output(t.test(Conc.calcS.mg.mm3~treatment, data = L2017.TP.Final), file = "output/Statistics/L2017.TP.Patch.csv")
+
+
+# Statistics (mixed effect modelling)
+
+### orthogonal random effect design 
+
+#One way model with date and coral ID as random factor
+TP2017Larvae.lmer <- lmer(Conc.calcS.mg.mm3~1+treatment + (1|Date.Release) +  (1|coral.id.x), data = L2017.TP.Final, REML=FALSE)
+qqnorm(resid(TP2017Larvae.lmer)) # Normality
+qqline(resid(TP2017Larvae.lmer)) # Normal
+
+boxplot(resid(TP2017Larvae.lmer)~L2017.TP.Final$treatment) # Variance 
+
+summary(TP2017Larvae.lmer)
+
+#One way model with date as random factor
+TP2017Larvae.lmer2 <- lmer(Conc.calcS.mg.mm3~1+treatment + (1|Date.Release) , data = L2017.TP.Final, REML=FALSE)
+qqnorm(resid(TP2017Larvae.lmer2)) # Normality
+qqline(resid(TP2017Larvae.lmer2)) # Normal
+
+boxplot(resid(TP2017Larvae.lmer2)~L2017.TP.Final$treatment) # Variance 
+
+summary(TP2017Larvae.lmer2)
+
+#one way model with coral.id as random factor
+TP2017Larvae.lmer3 <- lmer(Conc.calcS.mg.mm3~1+treatment +  (1|coral.id.x), data = L2017.TP.Final, REML=FALSE)
+qqnorm(resid(TP2017Larvae.lmer3)) # Normality
+qqline(resid(TP2017Larvae.lmer3)) # Normal
+
+boxplot(resid(TP2017Larvae.lmer3)~L2017.TP.Final$treatment) # Variance 
+
+summary(TP2017Larvae.lmer3)
+
+## Model Comparisons
+lrt(TP2017Larvae.lmer2, TP2017Larvae.lmer) # Model II is best
+lrt(TP2017Larvae.lmer3, TP2017Larvae.lmer) # Model III is best
+
+#MODEL SELECTION = I
+capture.output(Anova(TP2017Larvae.lmer3), file = "output/Statistics/TP.2017.vol.lmer.csv")
+
 
 
 ### Total protein Adult 2018 ###

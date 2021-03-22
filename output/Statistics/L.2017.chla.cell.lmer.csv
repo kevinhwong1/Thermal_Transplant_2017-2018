@@ -1,0 +1,5 @@
+Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: Chla.cell
+             Chisq Df Pr(>Chisq)
+treatment.x 0.6519  1     0.4194
