@@ -3,7 +3,7 @@
 ![Fig.2](https://github.com/kevinhwong1/Thermal_Transplant_2017-2018/blob/master/output/Manuscript_Figures/Cover_Photo.jpg)
 
 ## Authors
-Kevin H. Wong*,Gretchen Goodbody-Gringley,  Samantha J. de Putron, Danielle M. Becker, Alex Chequer, and Hollie M. Putnam
+Kevin H. Wong, Gretchen Goodbody-Gringley, Samantha J. de Putron, Danielle M. Becker, Alex Chequer, and Hollie M. Putnam
 
 ## Journal
 
